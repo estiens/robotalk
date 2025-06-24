@@ -1,14 +1,13 @@
-<div class="py-8 min-h-screen">
-  <div class="mx-auto px-4 max-w-5xl">
+<div class="max-w-5xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2 font-bold text-transparent text-4xl" data-test="page-title">
-        New AI Conversation
+    <div class="mb-12 text-center">
+      <h1 class="bg-clip-text bg-gradient-to-r from-primary to-secondary mb-3 font-bold text-transparent text-5xl" data-test="page-title">
+        Create a New Conversation
       </h1>
-      <p class="text-base-content/70">Set up a dialogue between AI models using OpenRouter</p>
+      <p class="text-lg text-base-content/70">Configure a dialogue between multiple AI participants.</p>
     </div>
 
-    <%= form_with model: @conversation, local: true, class: "space-y-6" do |form| %>
+    <%= form_with model: @conversation, local: true, class: "space-y-8" do |form| %>
       <!-- Error Messages -->
       <% if @conversation.errors.any? %>
         <div class="alert alert-error">
@@ -28,7 +27,7 @@
 
       <!-- Dialogue Instructions (moved up) -->
       <!-- Dialogue Instructions Section -->
-      <div class="bg-base-100 shadow-xl border border-base-300 card"
+      <div class="bg-base-100 shadow-xl card"
            data-controller="dialogue-form"
            data-dialogue-form-types-value="<%= ConversationTemplates::DIALOGUE_TYPES.to_json %>">
         <div class="card-body">
@@ -105,7 +104,7 @@
       <%= form.hidden_field :dialogue_instructions, "data-dialogue-form-target": "dialogueInstructionsField" %>
 
       <!-- Participants Section -->
-      <div class="bg-base-100 shadow-xl border border-base-300 card" 
+      <div class="bg-base-100 shadow-xl card" 
            data-controller="participant-form"
            data-participant-form-participant-index-value="<%= @conversation.participants.size %>"
            data-participant-form-model-options-value="<%= @available_models.to_json %>"
@@ -150,6 +149,5 @@
         <%= form.submit "Generate in Background", name: "generate_in_background", class: "btn btn-secondary", data: { "turbo-submits-with": "Enqueuing..." } %>
       </div>
     <% end %>
-  </div>
 </div>
 
