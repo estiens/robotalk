@@ -4,7 +4,9 @@ class Message < ApplicationRecord
   belongs_to :conversation_participant, optional: true # For identifying the speaker
   has_many :tool_calls, dependent: :destroy
 
-  validates :conversation_participant_id, presence: true, if: -> { role == "assistant" }
+  # Removed validation: validates :conversation_participant_id, presence: true, if: -> { role == "assistant" }
+  # This is because acts_as_chat creates an empty assistant message first,
+  # and the participant is assigned in the persist_message_completion (on_end_message) callback.
 
   before_create :set_round_number
   after_create :advance_conversation_round_if_needed # Restore this callback

@@ -216,38 +216,37 @@ class Conversation < ApplicationRecord
       Rails.logger.info "Content: #{message.content&.truncate(200)}"
 
       # Set the conversation_participant based on current_turn_participant_id
-      if message.role == "assistant" && current_turn_participant_id.present?
-        participant = participants.find_by(id: current_turn_participant_id)
-        if participant
-          if message.conversation_participant != participant
-            message.conversation_participant = participant
-            # Explicitly save if we've just set the participant and the message is persistable
-            message.save if message.persisted? && message.changed? 
-            Rails.logger.info "Assigned conversation_participant: #{participant.name} (ID: #{participant.id}) to message ID: #{message.id || 'new'}"
-          elsif message.conversation_participant == participant
-            Rails.logger.info "Conversation_participant already correctly set for message ID: #{message.id || 'new'}"
+      # This is critical for assistant messages.
+      if message.role == "assistant"
+        if current_turn_participant_id.present?
+          participant = participants.find_by(id: current_turn_participant_id)
+          if participant
+            message.conversation_participant = participant # Assign the association
+            Rails.logger.info "[Conversation##persist_message_completion] Participant #{participant.name} (ID: #{participant.id}) WILL BE SET for message ID: #{message.id || 'new'}."
+          else
+            # This is a critical issue if a participant ID was expected but not found.
+            Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find participant with ID: #{current_turn_participant_id} for assistant message. Message will lack a participant."
           end
         else
-          Rails.logger.warn "[Conversation##persist_message_completion] Could not find participant with ID: #{current_turn_participant_id} to assign to message."
+          # This is also critical if an assistant message is being processed without a current_turn_participant_id.
+          Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: current_turn_participant_id is BLANK for assistant message. Message will lack a participant."
         end
-      elsif message.role == "assistant"
-        Rails.logger.warn "[Conversation##persist_message_completion] current_turn_participant_id is blank for assistant message. Participant not set."
       end
     else
-      Rails.logger.warn "Status: Failure (message object is nil)"
+      Rails.logger.warn "[Conversation##persist_message_completion] Status: Failure (message object is nil)"
     end
     Rails.logger.info "-------------------------"
 
-    # Now call super, which might update tokens, content, etc.
-    # The message object should already have the participant associated if found.
+    # Now call super. acts_as_chat's super method should handle saving the message,
+    # including the conversation_participant_id if the association is set on the message object.
     result = super(message) 
 
     # Verify and log after persistence by super
     if message&.persisted? && message.role == "assistant"
       if message.conversation_participant.nil?
-        Rails.logger.warn "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) still has no conversation_participant after super. This is unexpected."
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL FAILURE: Message ID #{message.id} (assistant) was saved WITHOUT a conversation_participant. Check previous logs for why."
       else
-        Rails.logger.info "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) successfully persisted with participant: #{message.conversation_participant.name}"
+        Rails.logger.info "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) successfully persisted with participant: #{message.conversation_participant.name} (ID: #{message.conversation_participant_id})."
       end
     end
     
