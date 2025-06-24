@@ -68,9 +68,9 @@
           </div>
           
           <div class="mt-6">
-            <div class="flex gap-4 items-start">
+            <div class="items-start gap-4 grid grid-cols-4">
               <!-- Topic -->
-              <div class="flex-1 form-control">
+              <div class="col-span-3 form-control">
                 <%= form.label :conversation_topic, class: "label" do %>
                   <span class="font-semibold text-base-content label-text">Topic</span>
                 <% end %>
@@ -84,7 +84,7 @@
               </div>
 
               <!-- Max Rounds -->
-              <div class="w-24 form-control">
+              <div class="col-span-1 form-control">
                 <%= form.label :max_rounds, class: "label" do %>
                   <span class="font-semibold text-base-content label-text">Rounds</span>
                 <% end %>
@@ -133,7 +133,7 @@
             </button>
           </div>
           
-          <div data-participant-form-target="container" class="grid gap-6 md:grid-cols-2">
+          <div data-participant-form-target="container" class="gap-6 grid md:grid-cols-2">
             <%= form.fields_for :participants do |participant_form| %>
               <%= render 'participant_form', participant_form: participant_form, available_models: @available_models %>
             <% end %>
