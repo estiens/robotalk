@@ -1,15 +1,12 @@
-<%# We only want to display assistant messages in the main timeline %>
-<% assistant_messages_to_display = conversation.messages.where(role: "assistant").order(:created_at) %>
+<%# We only want to display finalized assistant messages in the main timeline %>
+<% finalized_assistant_messages = conversation.assistant_messages.order(:created_at) %>
 
-<% if assistant_messages_to_display.any? || conversation.generating? %> <%# Show card even if generating first message %>
+<% if finalized_assistant_messages.any? || conversation.generating? %> <%# Show card even if generating first message %>
   <div class="bg-base-100 shadow-xl card">
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <%# System messages can be shown in a separate, optional debug/info area if needed, but not in the main flow %>
-      <%# For now, we will not render system_messages directly in the timeline to avoid confusion %>
-      
-      <!-- System Messages (Collapsible, only if not empty and not generating initial message) -->
-      <% system_messages = conversation.messages.where(role: 'system').order(:created_at) %>
-      <% if system_messages.any? && !(conversation.generating? && assistant_messages_to_display.empty?) %>
+      <%# System messages (base Message class) can be shown in a separate, optional debug/info area if needed %>
+      <% system_messages = conversation.messages.where(role: Message::ROLE_SYSTEM).order(:created_at) %>
+      <% if system_messages.any? && !(conversation.generating? && finalized_assistant_messages.empty?) %>
         <div class="mb-6 collapse collapse-arrow bg-base-200 border border-base-300">
           <input type="checkbox" /> 
           <div class="collapse-title font-medium text-sm">
@@ -36,9 +33,10 @@
       <% end %>
 
       <!-- Assistant Messages Timeline -->
-      <% if assistant_messages_to_display.any? %>
+      <% if finalized_assistant_messages.any? %>
         <div class="space-y-4">
-          <% assistant_messages_to_display.each_with_index do |message, index| %>
+          <% finalized_assistant_messages.each_with_index do |message, index| %>
+            <%# Ensure we pass an AssistantMessage instance to the partial %>
             <%= render "conversations/message", message: message, conversation: conversation, index: index %>
           <% end %>
         </div>
