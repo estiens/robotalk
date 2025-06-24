@@ -1,13 +1,18 @@
 class Conversation < ApplicationRecord
   include TurboStreamable
   
-  acts_as_chat
+  acts_as_chat # From ruby_llm gem
   belongs_to :user
-  has_many :messages, dependent: :destroy # This will fetch all messages, including base Message and AssistantMessage
-  has_many :assistant_messages, -> { where(type: 'AssistantMessage') }, class_name: "AssistantMessage" # For easy querying
+
+  # Fetches all messages regardless of STI type. Used by acts_as_chat for history.
+  has_many :messages, dependent: :destroy
+  
+  # Specifically fetches finalized assistant messages for display and application logic.
+  has_many :assistant_messages, -> { order(created_at: :asc) }, class_name: "AssistantMessage"
+  
   has_many :participants, class_name: "ConversationParticipant", dependent: :destroy
 
-  attr_accessor :current_turn_participant_id # Temporary store for the current speaker's participant ID
+  attr_accessor :current_turn_participant_id # Transient store for the current speaker's participant ID
 
   enum :status, {
     interactive: "interactive",
@@ -273,81 +278,84 @@ class Conversation < ApplicationRecord
     # This finds/creates an ActiveRecord `::Message` (the shell created by on_new_message)
     # and updates it with content, tokens, etc., from the RubyLLM::Message.
     # It should return the finalized ActiveRecord `::Message` instance.
-    active_record_message_shell = super(message) # This is likely a base Message instance
+    ar_message_shell = super(message) # This is a base Message instance, potentially updated.
 
-    if active_record_message_shell.is_a?(::Message) && active_record_message_shell.persisted? && active_record_message_shell.role == Message::ROLE_ASSISTANT
+    if ar_message_shell.is_a?(::Message) && ar_message_shell.persisted? && ar_message_shell.role == Message::ROLE_ASSISTANT
       # This is an assistant message shell that has been persisted by acts_as_chat.
-      # We now transform it into an AssistantMessage and ensure its associations.
+      # We now "promote" it to an AssistantMessage and ensure its final associations.
       
       unless self.current_turn_participant_id.present?
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: self.current_turn_participant_id is BLANK for Message shell ID #{active_record_message_shell.id}. Cannot create AssistantMessage."
-        return active_record_message_shell 
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: self.current_turn_participant_id is BLANK for Message shell ID #{ar_message_shell.id}. Cannot finalize as AssistantMessage."
+        return ar_message_shell 
       end
 
       participant_for_this_turn = participants.find_by(id: self.current_turn_participant_id)
 
       unless participant_for_this_turn
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find ConversationParticipant with ID: #{self.current_turn_participant_id} to create AssistantMessage from shell ID #{active_record_message_shell.id}."
-        return active_record_message_shell
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find ConversationParticipant with ID: #{self.current_turn_participant_id} to finalize AssistantMessage from shell ID #{ar_message_shell.id}."
+        return ar_message_shell
       end
 
-      # Update the type and participant_id directly on the existing record.
-      # This effectively "promotes" the Message shell to an AssistantMessage.
-      active_record_message_shell.update_columns(
+      # Update the type and other final attributes directly on the existing record.
+      # The `round_number` should have been set by `set_initial_round_number_for_shell` on the Message.
+      # The `model_id` on the message is set by acts_as_chat using `self.model_id` from the Conversation.
+      update_attrs = {
         type: "AssistantMessage",
         conversation_participant_id: participant_for_this_turn.id,
-        # Ensure content and other attributes from ruby_llm_message are on the shell
-        # acts_as_chat's super should have handled this, but we can be explicit if needed:
         content: message.content, # from RubyLLM::Message
         input_tokens: message.input_tokens,
-        output_tokens: message.output_tokens,
-        model_id: message.model_id # from RubyLLM::Message, should match participant_for_this_turn.model_id
-      )
+        output_tokens: message.output_tokens
+        # model_id is already set by acts_as_chat on the shell
+        # round_number is already set by before_create on the shell
+      }
       
-      # Reload as an AssistantMessage instance
-      finalized_assistant_message = AssistantMessage.find(active_record_message_shell.id)
-
-      Rails.logger.info "[Conversation##persist_message_completion] Successfully typed and associated AssistantMessage ID #{finalized_assistant_message.id} with participant: #{finalized_assistant_message.conversation_participant.name} (ID: #{finalized_assistant_message.conversation_participant_id})."
+      ar_message_shell.update_columns(update_attrs) # Bypasses callbacks on Message, directly updates DB.
       
-      # The AssistantMessage's after_create callback will handle round advancement.
-      # No need to call it explicitly here if it's an after_create on AssistantMessage.
-      # If it was an after_save, it would have been triggered by update_columns.
-      # If `advance_round_for_assistant_message` is a method on Conversation:
-      # self.advance_round_for_assistant_message(finalized_assistant_message)
+      # Reload as an AssistantMessage instance to trigger its callbacks (like after_create_commit)
+      # and to ensure we have the correctly typed object.
+      finalized_assistant_message = AssistantMessage.find(ar_message_shell.id)
 
-
-      return finalized_assistant_message # Return the fully typed AssistantMessage
+      Rails.logger.info "[Conversation##persist_message_completion] Successfully promoted Message shell ID #{ar_message_shell.id} to AssistantMessage ID #{finalized_assistant_message.id} and associated with participant: #{finalized_assistant_message.conversation_participant.name}."
+      
+      # The AssistantMessage's after_create_commit callback (`trigger_conversation_processing`)
+      # will call `conversation.process_new_assistant_message(self)`.
+      
+      return finalized_assistant_message
       
     elsif message.role == Message::ROLE_ASSISTANT 
-      Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: `super(message)` did not return a persisted ActiveRecord::Message for an assistant role. Result: #{active_record_message_shell.inspect}. RubyLLM::Message content: #{message.content&.truncate(50)}"
+      Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: `super(message)` did not return a persisted ActiveRecord::Message for an assistant role. Result: #{ar_message_shell.inspect}. RubyLLM::Message content: #{message.content&.truncate(50)}"
     end
     
-    active_record_message_shell # Return whatever super gave us if not an assistant message
+    ar_message_shell # Return whatever super gave us if not an assistant message
   end
 
-  def advance_round_for_assistant_message(assistant_message)
+  # This method is called by AssistantMessage's after_create_commit callback
+  def process_new_assistant_message(assistant_message)
+    Rails.logger.info "[Conversation##process_new_assistant_message] Processing finalized AssistantMessage ID: #{assistant_message.id}, Round: #{assistant_message.round_number}."
     return unless assistant_message.persisted? && assistant_message.is_a?(AssistantMessage) && assistant_message.round_number.present?
 
     num_participants = self.participants.count
     return if num_participants.zero?
 
     # Count how many AssistantMessages (speakers) there are for this message's round_number
+    # Use self.assistant_messages to query only finalized AssistantMessage instances.
     assistant_messages_in_this_round = self.assistant_messages
                                            .where(round_number: assistant_message.round_number)
                                            .count
 
     if assistant_messages_in_this_round >= num_participants
+      # This round is complete based on finalized AssistantMessages.
       if self.current_round <= assistant_message.round_number
         new_conversation_round = assistant_message.round_number + 1
-        self.update!(current_round: new_conversation_round) # Use self.update!
-        Rails.logger.info "[Conversation##advance_round_for_assistant_message] Advanced conversation #{self.id} to round #{new_conversation_round} because round #{assistant_message.round_number} is complete (#{assistant_messages_in_this_round}/#{num_participants} speakers)."
+        self.update!(current_round: new_conversation_round)
+        Rails.logger.info "[Conversation##process_new_assistant_message] Advanced conversation #{self.id} to round #{new_conversation_round} because round #{assistant_message.round_number} is complete (#{assistant_messages_in_this_round}/#{num_participants} speakers)."
       else
-        Rails.logger.info "[Conversation##advance_round_for_assistant_message] Conversation #{self.id} (current_round: #{self.current_round}) is already past this message's round (#{assistant_message.round_number}). No advancement needed."
+        Rails.logger.info "[Conversation##process_new_assistant_message] Conversation #{self.id} (current_round: #{self.current_round}) is already past this message's round (#{assistant_message.round_number}). No advancement needed."
       end
     else
-      Rails.logger.info "[Conversation##advance_round_for_assistant_message] Round #{assistant_message.round_number} for conversation #{self.id} is not yet complete. Speakers in round: #{assistant_messages_in_this_round}/#{num_participants}."
+      Rails.logger.info "[Conversation##process_new_assistant_message] Round #{assistant_message.round_number} for conversation #{self.id} is not yet complete. Speakers in round: #{assistant_messages_in_this_round}/#{num_participants}."
     end
-    self.broadcast_controls
+    self.broadcast_controls # Update UI for next speaker, round number, etc.
   end
 
   # current_round is a database column, not calculated here.

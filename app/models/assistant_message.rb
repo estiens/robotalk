@@ -24,3 +24,23 @@ class AssistantMessage < Message
     conversation.advance_round_for_assistant_message(self)
   end
 end
+class AssistantMessage < Message
+  # This subclass represents finalized assistant messages.
+  # It inherits attributes and associations from the base Message class.
+
+  # Default scope to ensure queries for AssistantMessage only return messages with role 'assistant'.
+  # This also helps ensure that when an AssistantMessage is instantiated, its role is correctly set.
+  default_scope { where(role: Message::ROLE_ASSISTANT) }
+
+  # Callbacks specific to AssistantMessage completion.
+  # This runs after an AssistantMessage instance is successfully created and saved.
+  after_create_commit :trigger_conversation_processing
+
+  private
+
+  def trigger_conversation_processing
+    # Notify the conversation that a new assistant message has been finalized.
+    # The conversation can then handle round advancement and control updates.
+    conversation.process_new_assistant_message(self)
+  end
+end
