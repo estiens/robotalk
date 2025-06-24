@@ -239,15 +239,18 @@ class Conversation < ApplicationRecord
 
     # Now call super. acts_as_chat's super method should handle saving the message,
     # including the conversation_participant_id if the association is set on the message object.
-    result = super(message) 
+    result = super(message) # This should return the persisted ActiveRecord Message instance
 
-    # Verify and log after persistence by super
-    if message&.persisted? && message.role == "assistant"
-      if message.conversation_participant.nil?
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL FAILURE: Message ID #{message.id} (assistant) was saved WITHOUT a conversation_participant. Check previous logs for why."
+    # Verify and log after persistence by super, using the 'result' object
+    # which should be the ActiveRecord Message instance.
+    if result.is_a?(::Message) && result.persisted? && result.role == "assistant"
+      if result.conversation_participant.nil?
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL FAILURE: ActiveRecord Message ID #{result.id} (assistant) was saved WITHOUT a conversation_participant. Check previous logs for why."
       else
-        Rails.logger.info "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) successfully persisted with participant: #{message.conversation_participant.name} (ID: #{message.conversation_participant_id})."
+        Rails.logger.info "[Conversation##persist_message_completion] ActiveRecord Message ID #{result.id} (assistant) successfully persisted with participant: #{result.conversation_participant.name} (ID: #{result.conversation_participant_id})."
       end
+    elsif message.role == "assistant" # Fallback to logging based on the input RubyLLM::Message if result is not as expected
+        Rails.logger.warn "[Conversation##persist_message_completion] Verification step: result of super was not a persisted ActiveRecord::Message. Result: #{result.inspect}. Original RubyLLM::Message ID (if any): #{message.id}"
     end
     
     result
