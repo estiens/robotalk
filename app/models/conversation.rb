@@ -94,57 +94,59 @@ class Conversation < ApplicationRecord
 
     Rails.logger.info "About to call ask() method (streaming is always on)"
     
-    # Variable to hold the ActiveRecord assistant message for this turn
-    # acts_as_chat creates this message shell via on_new_message callback when ask/complete is called.
-    # We expect persist_message_completion to be called after the stream to finalize it.
-    active_record_assistant_message_for_this_turn = nil
+    # This variable will hold the ActiveRecord assistant message created by acts_as_chat
+    # for the current turn. It's created as an empty shell by an on_new_message callback
+    # when ask() is called.
+    ar_message_shell_for_this_turn = nil
 
     begin
       result = ask(prompt) do |chunk|
-        # On the first chunk, identify the assistant message created for this turn.
-        if active_record_assistant_message_for_this_turn.nil?
-          # Fetch the latest assistant message, which should be the one acts_as_chat just created.
-          active_record_assistant_message_for_this_turn = messages.where(role: "assistant").order(:created_at).last
-          if active_record_assistant_message_for_this_turn.nil?
-            Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: active_record_assistant_message_for_this_turn is nil after first chunk. This should not happen."
-            next # Skip this chunk if we can't find the message
+        if ar_message_shell_for_this_turn.nil?
+          # This is the first chunk (or just before it).
+          # acts_as_chat should have created the empty assistant message shell.
+          ar_message_shell_for_this_turn = messages.where(role: "assistant").order(:created_at).last
+          
+          if ar_message_shell_for_this_turn.nil?
+            Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: Could not find the assistant message shell created by acts_as_chat. Aborting stream for this turn."
+            # Consider breaking the ask block or raising an error if this happens.
+            next 
           end
 
-          # Assign participant in-memory for the initial broadcast.
-          # persist_message_completion will handle the final DB save of this association.
-          if current_participant_for_broadcast && active_record_assistant_message_for_this_turn.conversation_participant.nil?
-            active_record_assistant_message_for_this_turn.conversation_participant = current_participant_for_broadcast
-            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{active_record_assistant_message_for_this_turn.id}) for initial broadcast."
+          # Assign the correct participant IN MEMORY for the initial broadcast.
+          # The final DB persistence of this is handled by persist_message_completion.
+          if current_participant_for_broadcast && ar_message_shell_for_this_turn.conversation_participant_id != current_participant_for_broadcast.id
+            ar_message_shell_for_this_turn.conversation_participant = current_participant_for_broadcast
+            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] In-memory assignment of participant #{current_participant_for_broadcast.name} to new assistant message shell ID #{ar_message_shell_for_this_turn.id}."
           end
-
-          # Broadcast the new message shell ONCE.
+          
+          # Broadcast the new message shell (which includes participant info due to in-memory assignment)
           if current_participant_for_broadcast
-            broadcast_new_message(active_record_assistant_message_for_this_turn, current_participant_for_broadcast)
-            message_frame_broadcast = true # Ensure this flag is set if not already
-            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{active_record_assistant_message_for_this_turn.id} with participant: #{current_participant_for_broadcast.name}"
-            sleep 0.1 # UX delay only after the first shell broadcast
+            broadcast_new_message(ar_message_shell_for_this_turn, current_participant_for_broadcast)
+            message_frame_broadcast = true # Flag that the shell has been sent
+            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for Message ID #{ar_message_shell_for_this_turn.id} by #{current_participant_for_broadcast.name}."
+            sleep 0.1 # Small UX delay
           else
-            Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message shell."
+            Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] CRITICAL: current_participant_for_broadcast is nil. Cannot broadcast new message shell."
           end
         end
 
         # Ensure we have the message object to broadcast chunks to.
-        unless active_record_assistant_message_for_this_turn
-          Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] active_record_assistant_message_for_this_turn is still nil when trying to broadcast chunk. Skipping chunk."
+        unless ar_message_shell_for_this_turn
+          Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] ar_message_shell_for_this_turn is nil when trying to broadcast chunk. Skipping."
           next
         end
 
-        if chunk.content 
-          if is_first_chunk && message_frame_broadcast # message_frame_broadcast ensures the shell was sent
-            active_record_assistant_message_for_this_turn.broadcast_update_chunk(chunk.content)
+        if chunk.content && message_frame_broadcast # Only stream if shell was broadcast
+          if is_first_chunk
+            ar_message_shell_for_this_turn.broadcast_update_chunk(chunk.content)
             is_first_chunk = false
-          elsif message_frame_broadcast # Only append if the shell has been broadcasted
-            active_record_assistant_message_for_this_turn.broadcast_append_chunk(chunk.content)
+          else
+            ar_message_shell_for_this_turn.broadcast_append_chunk(chunk.content)
           end
         end
       end # End of ask block
       
-      Rails.logger.info "ask() method completed. Final result from ask method (not stream): #{result.inspect}"
+      Rails.logger.info "ask() method completed. Final result from ask method (not stream): #{result.inspect}" # This `result` is from the `ask` method itself, often nil for streaming.
       Rails.logger.info "Messages count after ask: #{messages.count}"
       Rails.logger.info "Assistant messages count after ask: #{messages.where(role: 'assistant').count}"
     rescue => e
@@ -265,46 +267,50 @@ class Conversation < ApplicationRecord
     end
     Rails.logger.info "-------------------------"
 
-    # The `message` argument is a RubyLLM::Message instance.
-    # `super(message)` calls acts_as_chat's internal persistence, which finds or creates
-    # an ActiveRecord `::Message` and updates it with content, tokens, etc.
-    # It should return the ActiveRecord `::Message` instance.
+    # The `message` argument is a RubyLLM::Message instance from the gem.
+    # `super(message)` calls acts_as_chat's internal persistence.
+    # This finds/creates an ActiveRecord `::Message` (the shell created by on_new_message)
+    # and updates it with content, tokens, etc., from the RubyLLM::Message.
+    # It should return the finalized ActiveRecord `::Message` instance.
     active_record_message = super(message)
 
     if active_record_message.is_a?(::Message) && active_record_message.persisted? && active_record_message.role == "assistant"
-      # This is an assistant message that has been persisted (created or updated) by acts_as_chat.
-      # We MUST ensure it's linked to the correct ConversationParticipant.
-      # The `current_turn_participant_id` on `self` (the Conversation instance)
-      # was set in `generate_one_speaker_turn!` right before `ask` was called.
-      # This ID represents whose turn it was.
+      # This is an assistant message that has been persisted by acts_as_chat.
+      # We now definitively set its ConversationParticipant.
+      # `self.current_turn_participant_id` was set in `generate_one_speaker_turn!`
+      # and represents whose turn it was when this message was initiated.
 
-      if self.current_turn_participant_id.present?
-        participant_for_this_turn = participants.find_by(id: self.current_turn_participant_id)
+      unless self.current_turn_participant_id.present?
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: self.current_turn_participant_id is BLANK for ActiveRecord Message ID #{active_record_message.id}. Cannot assign participant."
+        return active_record_message # Return the message, though it will be "Unknown"
+      end
 
-        if participant_for_this_turn
-          # If the message isn't already associated or is associated with the wrong participant, update it.
-          if active_record_message.conversation_participant_id != participant_for_this_turn.id
-            active_record_message.update_column(:conversation_participant_id, participant_for_this_turn.id)
-            # Also update the in-memory association for immediate consistency if the object is used further.
-            active_record_message.conversation_participant = participant_for_this_turn 
-            Rails.logger.info "[Conversation##persist_message_completion] Successfully associated ActiveRecord Message ID #{active_record_message.id} with participant: #{participant_for_this_turn.name} (ID: #{participant_for_this_turn.id})."
-          else
-            Rails.logger.info "[Conversation##persist_message_completion] ActiveRecord Message ID #{active_record_message.id} was already correctly associated with participant: #{participant_for_this_turn.name}."
-          end
-        else
-          Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find ConversationParticipant with ID: #{self.current_turn_participant_id} (from self.current_turn_participant_id) to associate with ActiveRecord Message ID #{active_record_message.id}."
-        end
+      participant_for_this_turn = participants.find_by(id: self.current_turn_participant_id)
+
+      unless participant_for_this_turn
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find ConversationParticipant with ID: #{self.current_turn_participant_id} to associate with ActiveRecord Message ID #{active_record_message.id}."
+        return active_record_message # Return the message, though it will be "Unknown"
+      end
+
+      # Forcefully associate the message with the correct participant.
+      # Using update_column to bypass validations/callbacks for this direct FK update.
+      if active_record_message.conversation_participant_id != participant_for_this_turn.id
+        active_record_message.update_column(:conversation_participant_id, participant_for_this_turn.id)
+        Rails.logger.info "[Conversation##persist_message_completion] Successfully set participant for ActiveRecord Message ID #{active_record_message.id} to: #{participant_for_this_turn.name} (ID: #{participant_for_this_turn.id})."
       else
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: self.current_turn_participant_id was BLANK when trying to associate ActiveRecord Message ID #{active_record_message.id}. Message will be orphaned from a participant."
+        Rails.logger.info "[Conversation##persist_message_completion] ActiveRecord Message ID #{active_record_message.id} already correctly associated with participant: #{participant_for_this_turn.name}."
       end
       
-      # Verify after attempting association
-      if active_record_message.reload.conversation_participant.nil?
-         Rails.logger.error "[Conversation##persist_message_completion] VERIFICATION FAILURE: ActiveRecord Message ID #{active_record_message.id} STILL has no participant after association attempt."
+      # Reload to confirm from DB for logging, and ensure in-memory object is fresh if used further.
+      active_record_message.reload 
+      if active_record_message.conversation_participant.nil?
+         Rails.logger.error "[Conversation##persist_message_completion] VERIFICATION FAILURE: ActiveRecord Message ID #{active_record_message.id} STILL has no participant after update_column and reload."
+      else
+         Rails.logger.info "[Conversation##persist_message_completion] VERIFICATION SUCCESS: ActiveRecord Message ID #{active_record_message.id} has participant: #{active_record_message.conversation_participant.name}."
       end
 
-    elsif message.role == "assistant"
-      Rails.logger.warn "[Conversation##persist_message_completion] `super(message)` did not return a persisted ActiveRecord::Message for an assistant role. Result: #{active_record_message.inspect}. RubyLLM::Message content: #{message.content&.truncate(50)}"
+    elsif message.role == "assistant" # This case means super didn't return a persisted AR Message
+      Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: `super(message)` did not return a persisted ActiveRecord::Message for an assistant role. Result: #{active_record_message.inspect}. RubyLLM::Message content: #{message.content&.truncate(50)}"
     end
     
     active_record_message # Return the ActiveRecord Message

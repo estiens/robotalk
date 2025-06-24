@@ -16,23 +16,24 @@ class Message < ApplicationRecord
 
   # Helper to broadcast chunks during streaming
   def broadcast_append_chunk(chunk_content)
-    # Ensure we're appending to the correct target
     target_id = ActionView::RecordIdentifier.dom_id(self, "content")
-
-    # Use Turbo::StreamsChannel to broadcast the append action
+    # Ensure content is HTML-safe if it's plain text being inserted as HTML
+    safe_chunk_content = ERB::Util.html_escape(chunk_content)
     Turbo::StreamsChannel.broadcast_append_to(
-      [ conversation, "messages" ],
-      target: target_id,
-      html: chunk_content
+      [ conversation, "messages" ], # Stream target
+      target: target_id,            # DOM ID to append to
+      html: safe_chunk_content      # The content to append
     )
   end
-  # Helper to broadcast the first chunk, replacing the placeholder
+
+  # Helper to broadcast the first chunk, replacing the placeholder content
   def broadcast_update_chunk(chunk_content)
     target_id = ActionView::RecordIdentifier.dom_id(self, "content")
+    safe_chunk_content = ERB::Util.html_escape(chunk_content)
     Turbo::StreamsChannel.broadcast_update_to(
-      [ conversation, "messages" ],
-      target: target_id,
-      html: chunk_content
+      [ conversation, "messages" ], # Stream target
+      target: target_id,            # DOM ID to update
+      html: safe_chunk_content      # The new content
     )
   end
 

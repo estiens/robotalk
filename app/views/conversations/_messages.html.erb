@@ -1,14 +1,15 @@
-<%# messages_for_view filters out "user" role messages and orders by creation time %>
-<% messages_for_view = local_assigns.fetch(:messages_to_display, conversation.messages.where.not(role: "user").order(:created_at)) %>
+<%# We only want to display assistant messages in the main timeline %>
+<% assistant_messages_to_display = conversation.messages.where(role: "assistant").order(:created_at) %>
 
-<% if messages_for_view.any? || conversation.generating? %> <%# Show card even if generating first message %>
+<% if assistant_messages_to_display.any? || conversation.generating? %> <%# Show card even if generating first message %>
   <div class="bg-base-100 shadow-xl card">
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <% assistant_messages = messages_for_view.filter { |m| m.role == 'assistant' }.sort_by(&:created_at) %>
-      <% system_messages = messages_for_view.filter { |m| m.role == 'system' }.sort_by(&:created_at) %>
+      <%# System messages can be shown in a separate, optional debug/info area if needed, but not in the main flow %>
+      <%# For now, we will not render system_messages directly in the timeline to avoid confusion %>
       
       <!-- System Messages (Collapsible, only if not empty and not generating initial message) -->
-      <% if system_messages.any? && !(conversation.generating? && assistant_messages.empty?) %>
+      <% system_messages = conversation.messages.where(role: 'system').order(:created_at) %>
+      <% if system_messages.any? && !(conversation.generating? && assistant_messages_to_display.empty?) %>
         <div class="mb-6 collapse collapse-arrow bg-base-200 border border-base-300">
           <input type="checkbox" /> 
           <div class="collapse-title font-medium text-sm">
@@ -35,9 +36,9 @@
       <% end %>
 
       <!-- Assistant Messages Timeline -->
-      <% if assistant_messages.any? %>
+      <% if assistant_messages_to_display.any? %>
         <div class="space-y-4">
-          <% assistant_messages.each_with_index do |message, index| %>
+          <% assistant_messages_to_display.each_with_index do |message, index| %>
             <%= render "conversations/message", message: message, conversation: conversation, index: index %>
           <% end %>
         </div>
