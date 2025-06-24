@@ -15,22 +15,22 @@
     </label>
   </div>
   
-  <ul tabindex="0" class="z-[101] bg-base-100 shadow-2xl mt-4 p-2 border border-base-300/50 rounded-box w-80 max-h-[80vh] overflow-y-auto dropdown-content grid grid-cols-1 gap-2">
-    <li class="menu-title col-span-full px-2 py-1">
+  <ul tabindex="0" class="z-[101] gap-2 grid grid-cols-1 bg-base-100 shadow-2xl mt-4 p-2 border border-base-300/50 rounded-box w-80 max-h-[80vh] overflow-y-auto dropdown-content">
+    <li class="col-span-full px-2 py-1 menu-title">
       <span class="font-semibold text-base-content/80">Select Theme</span>
     </li>
     <% available_themes.each do |theme| %>
       <li>
         <div data-theme="<%= theme %>" 
              data-action="click->theme#setSpecificTheme" 
-             class="bg-base-100 text-base-content rounded-lg w-full p-3 cursor-pointer hover:bg-base-200/60 transition-colors theme-item">
-          <div class="flex items-center justify-between">
+             class="bg-base-100 hover:bg-base-200/60 p-3 rounded-lg w-full text-base-content transition-colors cursor-pointer theme-item">
+          <div class="flex justify-between items-center">
             <span class="font-semibold capitalize"><%= theme.tr('-', ' ') %></span>
             <div class="flex items-center gap-2 -space-x-1">
-              <div class="w-5 h-5 rounded-full bg-primary ring-1 ring-base-content/20"></div>
-              <div class="w-5 h-5 rounded-full bg-secondary ring-1 ring-base-content/20"></div>
-              <div class="w-5 h-5 rounded-full bg-accent ring-1 ring-base-content/20"></div>
-              <div class="w-5 h-5 rounded-full bg-neutral ring-1 ring-base-content/20"></div>
+              <div class="bg-primary rounded-full ring-1 ring-base-content/20 w-5 h-5"></div>
+              <div class="bg-secondary rounded-full ring-1 ring-base-content/20 w-5 h-5"></div>
+              <div class="bg-accent rounded-full ring-1 ring-base-content/20 w-5 h-5"></div>
+              <div class="bg-neutral rounded-full ring-1 ring-base-content/20 w-5 h-5"></div>
             </div>
           </div>
         </div>
