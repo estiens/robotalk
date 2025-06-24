@@ -2,6 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["modelName"]
+
+  connect() {
+    this.hide() // Ensure it's hidden when the controller connects
+  }
   
   show(modelName = "AI Model") {
     this.modelNameTarget.textContent = modelName
