@@ -1,0 +1,160 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"openai/gpt-4o-mini","messages":[{"role":"developer","content":"You
+        are Bot 1, an AI assistant participating in a multi-model conversation. Your
+        underlying model is OpenAI: GPT-4o-mini.\n\nYou are conversing with: Bot 2
+        (Anthropic: Claude 3 Haiku)\n\nGuidelines:\n- Be engaging, thoughtful, and
+        authentic in your responses\n- Stay true to your model''s characteristics
+        and capabilities\n- Build upon previous messages in the conversation\n- Keep
+        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
+        repetitive or overly formal\n- Respond as Bot 1 while maintaining your model''s
+        unique perspective\n\nYou are a helpful AI assistant participating in this
+        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
+        Have a thoughtful conversation about the given topic, exploring different
+        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"developer","content":"You
+        are Bot 2, an AI assistant participating in a multi-model conversation. Your
+        underlying model is Anthropic: Claude 3 Haiku.\n\nYou are conversing with:
+        Bot 1 (OpenAI: GPT-4o-mini)\n\nGuidelines:\n- Be engaging, thoughtful, and
+        authentic in your responses\n- Stay true to your model''s characteristics
+        and capabilities\n- Build upon previous messages in the conversation\n- Keep
+        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
+        repetitive or overly formal\n- Respond as Bot 2 while maintaining your model''s
+        unique perspective\n\nYou are a helpful AI assistant participating in this
+        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
+        Have a thoughtful conversation about the given topic, exploring different
+        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"user","content":"This
+        is the beginning of a conversation. Introduce yourself according to your character
+        and role, then start the discussion about the conversation topic. Be engaging
+        and set the tone for a meaningful exchange."}],"stream":false,"temperature":0.7}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 24 Jun 2025 03:14:03 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Clerk-Auth-Message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      X-Clerk-Auth-Reason:
+      - token-invalid
+      X-Clerk-Auth-Status:
+      - signed-out
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 95490d801ae47816-MSP
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        CiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDczNDg0Mi1HWmhoT05ybE82ZVR0aXZSYTNyRyIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9kZWwiOiJvcGVuYWkvZ3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24iLCJjcmVhdGVkIjoxNzUwNzM0ODQyLCJjaG9pY2VzIjpbeyJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6IkhlbGxvISBJ4oCZbSBCb3QgMSwgeW91ciBmcmllbmRseSBBSSBhc3Npc3RhbnQgaGVyZSB0byBoYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJzYXRpb24gd2l0aCB5b3UuIEnigJltIGV4Y2l0ZWQgdG8gZXhwbG9yZSBkaWZmZXJlbnQgaWRlYXMgYW5kIHBlcnNwZWN0aXZlcyB0b2dldGhlci4gU2luY2Ugd2XigJlyZSBkaXZpbmcgaW50byBhIHNob3J0IHRlc3QgY29udmVyc2F0aW9uLCBJ4oCZZCBsb3ZlIHRvIGtub3cgd2hhdCBhc3BlY3RzIG9mIGNvbnZlcnNhdGlvbiB5b3UgZmluZCBtb3N0IGludGVyZXN0aW5nLiBJcyBpdCB0aGUgZmxvdywgdGhlIHRvcGljcyB3ZSBjaG9vc2UsIG9yIHBlcmhhcHMgdGhlIHdheSB3ZSBleGNoYW5nZSBpZGVhcz8gV2hhdCBkbyB5b3UgdGhpbms/IiwicmVmdXNhbCI6bnVsbCwicmVhc29uaW5nIjpudWxsfX1dLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF8zNGE1NGFlOTNjIiwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6Mzc3LCJjb21wbGV0aW9uX3Rva2VucyI6NzksInRvdGFsX3Rva2VucyI6NDU2LCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MH0sImNvbXBsZXRpb25fdG9rZW5zX2RldGFpbHMiOnsicmVhc29uaW5nX3Rva2VucyI6MH19fQ==
+  recorded_at: Tue, 24 Jun 2025 03:14:04 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"openai/gpt-4o-mini","messages":[{"role":"developer","content":"You
+        are Bot 1, an AI assistant participating in a multi-model conversation. Your
+        underlying model is OpenAI: GPT-4o-mini.\n\nYou are conversing with: Bot 2
+        (Anthropic: Claude 3 Haiku)\n\nGuidelines:\n- Be engaging, thoughtful, and
+        authentic in your responses\n- Stay true to your model''s characteristics
+        and capabilities\n- Build upon previous messages in the conversation\n- Keep
+        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
+        repetitive or overly formal\n- Respond as Bot 1 while maintaining your model''s
+        unique perspective\n\nYou are a helpful AI assistant participating in this
+        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
+        Have a thoughtful conversation about the given topic, exploring different
+        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"developer","content":"You
+        are Bot 2, an AI assistant participating in a multi-model conversation. Your
+        underlying model is Anthropic: Claude 3 Haiku.\n\nYou are conversing with:
+        Bot 1 (OpenAI: GPT-4o-mini)\n\nGuidelines:\n- Be engaging, thoughtful, and
+        authentic in your responses\n- Stay true to your model''s characteristics
+        and capabilities\n- Build upon previous messages in the conversation\n- Keep
+        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
+        repetitive or overly formal\n- Respond as Bot 2 while maintaining your model''s
+        unique perspective\n\nYou are a helpful AI assistant participating in this
+        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
+        Have a thoughtful conversation about the given topic, exploring different
+        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"user","content":"This
+        is the beginning of a conversation. Introduce yourself according to your character
+        and role, then start the discussion about the conversation topic. Be engaging
+        and set the tone for a meaningful exchange."},{"role":"assistant","content":"Hello!
+        I’m Bot 1, your friendly AI assistant here to have a thoughtful conversation
+        with you. I’m excited to explore different ideas and perspectives together.
+        Since we’re diving into a short test conversation, I’d love to know what aspects
+        of conversation you find most interesting. Is it the flow, the topics we choose,
+        or perhaps the way we exchange ideas? What do you think?"},{"role":"user","content":"Continue
+        the conversation by responding thoughtfully to the previous message. Stay
+        true to your character and role, and build upon the discussion constructively."}],"stream":false,"temperature":0.7}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 24 Jun 2025 03:14:06 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Clerk-Auth-Message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      X-Clerk-Auth-Reason:
+      - token-invalid
+      X-Clerk-Auth-Status:
+      - signed-out
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 95490d87cd8ea212-MSP
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDczNDg0NC1lM3ZUUWNRVmxwTXZzaTg0VFliaiIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9kZWwiOiJvcGVuYWkvZ3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24iLCJjcmVhdGVkIjoxNzUwNzM0ODQ1LCJjaG9pY2VzIjpbeyJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6IkdyZWF0IHF1ZXN0aW9uISBJIHRoaW5rIHRoZSBmbG93IG9mIGNvbnZlcnNhdGlvbiBpcyByZWFsbHkgZmFzY2luYXRpbmcgYmVjYXVzZSBpdCBjYW4gcmV2ZWFsIHNvIG11Y2ggYWJvdXQgaG93IHdlIGNvbm5lY3Qgd2l0aCBlYWNoIG90aGVyLiBJdOKAmXMgaW50ZXJlc3RpbmcgaG93IGEgc2ltcGxlIGV4Y2hhbmdlIGNhbiBldm9sdmUgYmFzZWQgb24gcXVlc3Rpb25zLCByZXNwb25zZXMsIGFuZCBldmVuIHBhdXNlcy4gV2hhdCBhYm91dCB5b3U/IERvIHlvdSBoYXZlIGEgZmF2b3JpdGUgYXNwZWN0IG9mIGNvbnZlcnNhdGlvbiB0aGF0IHlvdSBmZWVsIGVuaGFuY2VzIHRoZSBjb25uZWN0aW9uIGJldHdlZW4gcGVvcGxlPyIsInJlZnVzYWwiOm51bGwsInJlYXNvbmluZyI6bnVsbH19XSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfMzRhNTRhZTkzYyIsInVzYWdlIjp7InByb21wdF90b2tlbnMiOjQ5MSwiY29tcGxldGlvbl90b2tlbnMiOjY2LCJ0b3RhbF90b2tlbnMiOjU1NywicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjB9LCJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjp7InJlYXNvbmluZ190b2tlbnMiOjB9fX0=
+  recorded_at: Tue, 24 Jun 2025 03:14:07 GMT
+recorded_with: VCR 6.3.1

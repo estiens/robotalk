@@ -1,0 +1,147 @@
+<% if conversation.messages.any? %>
+  <div class="bg-base-100 shadow-xl card">
+    <!-- History View (Accordion) -->
+    <div class="hidden space-y-4 p-4" data-view-mode-target="historyView" data-test="history-view">
+      <% system_messages = conversation.messages.where(role: 'system') %>
+      <% assistant_messages = conversation.messages.where(role: 'assistant') %>
+      
+      <!-- System Messages -->
+      <% if system_messages.any? %>
+        <div class="collapse collapse-arrow bg-base-200 border border-base-300">
+          <input type="checkbox" /> 
+          <div class="collapse-title font-medium text-sm">
+            🔧 System Setup (<%= system_messages.count %> messages)
+          </div>
+          <div class="collapse-content">
+            <div class="space-y-3">
+              <% system_messages.each do |message| %>
+                <div class="bg-base-100 p-3 border-accent border-l-4 rounded text-sm">
+                  <% participant = conversation.participant_for_model(message.model_id) %>
+                  <div class="mb-1 font-medium">
+                    <%= participant&.name || "Unknown" %> (<%= friendly_model_name(message.model_id) %>) System Prompt
+                  </div>
+                  <% if message.content.present? %>
+                    <%= simple_format(message.content, class: "text-base-content/80") %>
+                  <% else %>
+                    <div class="text-error">⚠️ Content missing for system message</div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Assistant Messages (Alternating Colors) -->
+      <% assistant_messages.each_with_index do |message, index| %>
+        <%= render "conversations/message", message: message, conversation: conversation, index: index, view_mode: "history" %>
+      <% end %>
+    </div>
+
+    <!-- Live View (Compact Recent Exchange) -->
+    <div class="pt-0 card-body" data-view-mode-target="liveView" data-test="live-view">
+      <% assistant_messages = conversation.messages.where(role: 'assistant') %>
+      <% if assistant_messages.any? %>
+        <% last_messages = assistant_messages.last(3) %>
+        <div class="space-y-4">
+          <% last_messages.each_with_index do |message, index| %>
+            <%= render "conversations/message", message: message, conversation: conversation, index: index, view_mode: "live" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="py-8 text-center">
+          <div class="mb-4 text-4xl">🤖</div>
+          <h3 class="mb-2 font-semibold text-lg">Ready to start the conversation</h3>
+          <p class="opacity-70 text-sm">Click "Start Conversation" to begin the dialogue</p>
+        </div>
+      <% end %>
+      
+      <!-- Enhanced Loading Indicator -->
+      <div id="message-loading" class="hidden mt-8 loading-indicator-chat animate-fade-in" data-controller="loading-indicator">
+        <div class="chat chat-start">
+          <div class="chat-image avatar">
+            <div class="relative">
+              <div class="w-12 h-12 bg-gradient-to-br from-warning via-warning/80 to-warning/60 rounded-full flex items-center justify-center text-lg text-white shadow-lg">
+                🤔
+              </div>
+              <!-- Multiple pulse rings for thinking effect -->
+              <div class="absolute inset-0 rounded-full bg-warning animate-ping opacity-20"></div>
+              <div class="absolute inset-1 rounded-full bg-warning animate-ping opacity-30" style="animation-delay: 0.2s;"></div>
+              <div class="absolute inset-2 rounded-full bg-warning animate-ping opacity-40" style="animation-delay: 0.4s;"></div>
+            </div>
+          </div>
+          <div class="chat-header mb-1">
+            <span class="font-semibold text-warning" data-loading-indicator-target="modelName">AI Model</span>
+            <span class="text-xs text-base-content/60 ml-2">is thinking...</span>
+          </div>
+          <div class="chat-bubble chat-bubble-warning shadow-lg border-0 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent pointer-events-none"></div>
+            <div class="relative z-10 flex items-center gap-3">
+              <div class="flex gap-1">
+                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
+                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+              </div>
+              <span class="text-sm animate-pulse">Crafting response...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Enhanced Continue Button -->
+      <% if conversation.can_continue? %>
+        <div class="mt-8 text-center">
+          <div class="relative inline-block group">
+            <!-- Glow effect -->
+            <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-lg blur opacity-30 group-hover:opacity-60 transition-all duration-300"></div>
+            
+            <%= button_to continue_conversation_path(conversation), 
+                method: :post,
+                class: "relative btn btn-primary btn-wide btn-lg gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-0",
+                data: { 
+                  turbo_frame: "conversation",
+                  streaming_conversation_target: "continueButton",
+                  controller: "conversation-controls",
+                  action: "click->conversation-controls#showLoading",
+                  test: "continue-conversation-button"
+                } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition-transform">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z" />
+              </svg>
+              <span class="auto-continue-button-text font-semibold">
+                Continue Conversation
+              </span>
+              <div class="badge badge-sm bg-white/20 border-white/30 text-white">
+                Round <%= conversation.current_round + 1 %>
+              </div>
+            <% end %>
+          </div>
+          
+          <!-- Progress indicator -->
+          <div class="mt-4 max-w-xs mx-auto">
+            <div class="flex justify-between text-xs text-base-content/60 mb-1">
+              <span>Round <%= conversation.current_round %></span>
+              <span><%= conversation.max_rounds %> total</span>
+            </div>
+            <progress class="progress progress-primary w-full" value="<%= conversation.current_round %>" max="<%= conversation.max_rounds %>"></progress>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="bg-base-100 shadow-xl card">
+    <div class="py-12 text-center card-body">
+      <div class="mb-4 text-6xl">💭</div>
+      <h3 class="mb-2 font-semibold text-lg">No messages yet</h3>
+      <p class="text-base-content/70">Start the conversation to see the dialogue unfold</p>
+      <div class="mt-4">
+        <%= link_to debug_conversation_path(conversation), 
+            class: "btn btn-info btn-sm", 
+            target: "_blank" do %>
+          🔍 Debug Info
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %> 

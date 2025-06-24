@@ -1,0 +1,143 @@
+<%= turbo_frame_tag "conversation" do %>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-warning/10 to-error/10 rounded-box hero">
+    <div class="text-center hero-content">
+      <div class="max-w-4xl">
+        <div class="flex justify-between items-start mb-4">
+          <%= link_to conversation_path(@conversation), class: "btn btn-ghost btn-sm" do %>
+            ← Back to Conversation
+          <% end %>
+          <div class="badge badge-warning badge-lg">
+            Editing Conversation
+          </div>
+        </div>
+        
+        <h1 class="mb-4 font-bold text-4xl">
+          Edit Conversation Settings
+        </h1>
+        
+        <div class="mx-auto max-w-2xl alert alert-warning">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current w-6 h-6 shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">Warning</h3>
+            <div class="text-xs">Editing conversation settings may affect ongoing conversations. Changes will apply to future rounds.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="bg-base-100 shadow-xl card">
+    <div class="card-body">
+      <%= form_with model: @conversation, local: true, class: "space-y-6" do |form| %>
+        
+        <!-- Basic Settings -->
+        <div class="form-control">
+          <label class="label">
+            <span class="font-semibold label-text">Conversation Topic</span>
+          </label>
+          <%= form.text_area :conversation_topic, 
+              class: "textarea textarea-bordered h-24", 
+              placeholder: "What should the AI models discuss?" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="font-semibold label-text">Dialogue Instructions</span>
+          </label>
+          <%= form.text_area :dialogue_instructions, 
+              class: "textarea textarea-bordered h-24", 
+              placeholder: "Special instructions for how the conversation should flow..." %>
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="font-semibold label-text">Maximum Rounds</span>
+          </label>
+          <%= form.number_field :max_rounds, 
+              class: "input input-bordered", 
+              min: 1, max: 50, 
+              value: @conversation.max_rounds %>
+        </div>
+
+        <!-- Participants -->
+        <div class="divider">Participants</div>
+        
+        <%= form.fields_for :participants do |participant_form| %>
+          <% participant = participant_form.object %>
+          <div class="space-y-4 bg-base-200 p-4 rounded-lg">
+            <div class="flex items-center gap-4">
+              <div class="avatar placeholder">
+                <div class="bg-primary rounded-full w-12 text-primary-content">
+                  <span class="text-xl"><%= model_avatar_emoji(participant.model_id) %></span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-bold">Participant <%= participant.turn_order %></h3>
+              </div>
+            </div>
+
+            <div class="gap-4 grid grid-cols-1 md:grid-cols-2">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Name</span>
+                </label>
+                <%= participant_form.text_field :name, 
+                    class: "input input-bordered", 
+                    placeholder: "Participant name" %>
+              </div>
+
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Model</span>
+                </label>
+                <%= participant_form.select :model_id, 
+                    options_for_select(@available_models, participant.model_id), 
+                    {}, 
+                    class: "select select-bordered" %>
+              </div>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Character Prompt</span>
+              </label>
+              <%= participant_form.text_area :character_prompt, 
+                  class: "textarea textarea-bordered h-20", 
+                  placeholder: "Describe this participant's personality, role, and behavior..." %>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">System Prompt</span>
+              </label>
+              <%= participant_form.text_area :system_prompt, 
+                  class: "textarea textarea-bordered h-20", 
+                  placeholder: "Base system instructions for this model..." %>
+            </div>
+
+            <%= participant_form.hidden_field :turn_order %>
+          </div>
+        <% end %>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between pt-6">
+          <%= link_to "Cancel", conversation_path(@conversation), 
+              class: "btn btn-ghost" %>
+          <div class="flex gap-2">
+            <%= link_to "Debug Info", debug_conversation_path(@conversation), 
+                class: "btn btn-info", 
+                target: "_blank" %>
+            <%= form.submit "Update Conversation", 
+                class: "btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %> 

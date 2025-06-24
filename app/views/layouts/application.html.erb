@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html data-theme="light" class="scroll-smooth">
+  <head>
+    <title><%= content_for(:title) || "RoboConvo - AI Conversations" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%# DaisyUI CDN for components %>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gradient-to-br from-base-200 via-base-100 to-base-200 min-h-screen">
+    <!-- Navigation -->
+    <div class="navbar bg-base-100 shadow-lg sticky top-0 z-50 min-h-16">
+      <div class="navbar-start">
+        <%= link_to root_path, class: "btn btn-ghost text-xl normal-case" do %>
+          <span class="text-3xl">🤖</span>
+          <span class="hidden sm:inline ml-2 font-bold">RoboConvo</span>
+        <% end %>
+      </div>
+      
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1 gap-2">
+          <li>
+            <%= link_to conversations_path, class: "btn btn-ghost btn-sm" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+              </svg>
+              Conversations
+            <% end %>
+          </li>
+          <li>
+            <%= link_to new_conversation_path, class: "btn btn-primary btn-sm" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              New
+            <% end %>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="navbar-end">
+        <!-- Theme Switcher -->
+        <div class="hidden sm:block mr-2">
+          <%= render 'shared/theme_switcher' %>
+        </div>
+        
+        <!-- User Menu -->
+        <% if logged_in? %>
+          <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+              <div class="w-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-content font-bold">
+                <%= current_user.email[0].upcase %>
+              </div>
+            </div>
+            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+              <li class="menu-title">
+                <span><%= current_user.email %></span>
+              </li>
+              <li><%= link_to "Models", models_path %></li>
+              <li class="divider"></li>
+              <li><%= link_to logout_path, method: :delete, data: { turbo_method: :delete } do %>
+                <span class="text-error">Log Out</span>
+              <% end %></li>
+            </ul>
+          </div>
+        <% else %>
+          <div class="hidden sm:flex gap-2">
+            <%= link_to "Log In", login_path, class: "btn btn-ghost" %>
+            <%= link_to "Sign Up", signup_path, class: "btn btn-primary" %>
+          </div>
+        <% end %>
+        
+        <!-- Mobile menu -->
+        <div class="dropdown dropdown-end lg:hidden">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+            <li class="menu-title">
+              <span>Theme</span>
+            </li>
+            <li>
+              <div class="p-2">
+                <%= render 'shared/theme_switcher_mobile' %>
+              </div>
+            </li>
+            <li class="divider"></li>
+            <li><%= link_to "Conversations", conversations_path %></li>
+            <li><%= link_to "New Conversation", new_conversation_path %></li>
+            <li class="divider"></li>
+            <li><%= link_to "Models", models_path %></li>
+            <% if logged_in? %>
+              <li class="divider"></li>
+              <li><%= link_to logout_path, method: :delete, data: { turbo_method: :delete } do %>
+                <span class="text-error">Log Out</span>
+              <% end %></li>
+            <% else %>
+              <li class="divider"></li>
+              <li><%= link_to "Log In", login_path %></li>
+              <li><%= link_to "Sign Up", signup_path %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative flex-1 overflow-hidden">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-30 pointer-events-none">
+        <div class="top-10 left-10 absolute bg-primary/10 blur-3xl rounded-full w-32 h-32"></div>
+        <div class="top-32 right-20 absolute bg-secondary/10 blur-2xl rounded-full w-24 h-24"></div>
+        <div class="bottom-20 left-1/4 absolute bg-accent/10 blur-3xl rounded-full w-40 h-40"></div>
+        <div class="right-10 bottom-10 absolute bg-primary/10 blur-2xl rounded-full w-28 h-28"></div>
+      </div>
+      
+      <div class="z-10 relative">
+        <%= yield %>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center bg-base-200 text-base-content p-10 mt-16">
+      <aside>
+        <div class="text-4xl mb-4">🤖</div>
+        <p class="font-bold text-lg">RoboConvo</p>
+        <p class="text-base-content/70">AI Conversation Platform</p>
+        <p class="text-sm text-base-content/50 mt-4">
+          © <%= Date.current.year %> RoboConvo - Facilitating AI conversations
+        </p>
+      </aside>
+      <nav>
+        <div class="grid grid-flow-col gap-4">
+          <div class="badge badge-outline">Powered by OpenRouter</div>
+          <div class="badge badge-outline">Built with Rails 8</div>
+        </div>
+      </nav>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,365 @@
+<div class="py-8 min-h-screen">
+  <div class="mx-auto px-4 max-w-5xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2 font-bold text-transparent text-4xl" data-test="page-title">
+        New AI Conversation
+      </h1>
+      <p class="text-base-content/70">Set up a dialogue between AI models using OpenRouter</p>
+    </div>
+
+    <%= form_with model: @conversation, local: true, class: "space-y-6" do |form| %>
+      <!-- Error Messages -->
+      <% if @conversation.errors.any? %>
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold">Please fix the following errors:</h3>
+            <ul class="mt-2 text-sm list-disc list-inside">
+              <% @conversation.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Dialogue Instructions (moved up) -->
+      <div class="bg-base-100 shadow-xl border border-base-300 card">
+        <div class="card-body">
+          <h2 class="mb-4 text-primary text-xl card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            Dialogue Instructions
+          </h2>
+          <div class="form-control">
+            <textarea id="dialogue-instructions-textarea" 
+                      class="bg-base-200 focus:bg-base-100 textarea-bordered w-full h-32 text-base-content transition-colors textarea" 
+                      placeholder="Enter custom dialogue instructions (e.g., 'Have a thoughtful debate about the topic' or 'Brainstorm creative solutions together')..."></textarea>
+            <label class="label">
+              <span class="label-text-alt text-base-content/60">Define how the conversation should be structured and conducted (editable even when using templates)</span>
+            </label>
+          </div>
+          
+          <div class="mt-4 form-control">
+            <label class="label">
+              <span class="font-semibold text-base-content label-text">Or choose a template:</span>
+            </label>
+            <select id="dialogue-type" class="bg-base-200 w-full text-base-content select-bordered select" data-test="dialogue-type">
+              <option value="custom" selected>Custom Instructions</option>
+              <% dialogue_types_for_select.each do |category, types| %>
+                <optgroup label="<%= category %>">
+                  <% types.each do |name, key| %>
+                    <option value="<%= key %>"><%= name %></option>
+                  <% end %>
+                </optgroup>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Settings -->
+      <div class="bg-base-100 shadow-xl border border-base-300 card">
+        <div class="card-body">
+          <h2 class="mb-4 text-primary text-xl card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+            Conversation Settings
+          </h2>
+          
+          <div class="gap-4 grid lg:grid-cols-2">
+            <!-- Topic -->
+            <div class="form-control">
+              <%= form.label :conversation_topic, class: "label" do %>
+                <span class="font-semibold text-base-content label-text">Topic</span>
+              <% end %>
+              <%= form.text_field :conversation_topic, 
+                  class: "input input-bordered w-full bg-base-200 text-base-content",
+                  placeholder: "e.g., artificial intelligence, climate change...",
+                  data: { test: "conversation-topic" } %>
+              <label class="label">
+                <span class="label-text-alt text-base-content/60">The specific subject for discussion</span>
+              </label>
+            </div>
+
+            <!-- Max Rounds -->
+            <div class="form-control">
+              <%= form.label :max_rounds, class: "label" do %>
+                <span class="font-semibold text-base-content label-text">Maximum Rounds</span>
+              <% end %>
+              <%= form.number_field :max_rounds, 
+                  min: 1, max: 50, value: 10,
+                  class: "input input-bordered w-full bg-base-200 text-base-content",
+                  data: { test: "max-rounds" } %>
+              <label class="label">
+                <span class="label-text-alt text-base-content/60">Number of back-and-forth exchanges (1-50)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden field for dialogue instructions -->
+      <%= form.hidden_field :dialogue_instructions, id: "dialogue-instructions-field" %>
+
+      <!-- Participants Section -->
+      <div class="bg-base-100 shadow-xl border border-base-300 card" 
+           data-controller="participant-form"
+           data-participant-form-participant-index-value="<%= @conversation.participants.size %>"
+           data-participant-form-model-options-value="<%= @available_models.to_json %>"
+           data-participant-form-characters-value="<%= ConversationTemplates::CHARACTER_ARCHETYPES.to_json %>"
+           data-participant-form-dialogue-types-value="<%= ConversationTemplates::DIALOGUE_TYPES.to_json %>">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h2 class="text-primary text-xl card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                </svg>
+                AI Participants
+              </h2>
+              <p class="mt-1 text-sm text-base-content/60">Configure the AI models that will participate in your conversation</p>
+            </div>
+            <button type="button" 
+                    class="gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all btn btn-success transform"
+                    data-action="click->participant-form#addParticipant"
+                    data-participant-form-target="addButton">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Participant
+            </button>
+          </div>
+          
+          <div data-participant-form-target="container" class="space-y-6">
+            <%= form.fields_for :participants do |participant_form| %>
+              <%= render 'participant_form', participant_form: participant_form, available_models: @available_models %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-3">
+        <%= link_to conversations_path, class: "btn btn-ghost" do %>
+          Cancel
+        <% end %>
+        <%= form.submit "Create & View", class: "btn btn-primary", data: { "turbo-submits-with": "Creating...", test: "create-conversation" } %>
+        <%= form.submit "Generate in Background", name: "generate_in_background", class: "btn btn-secondary", data: { "turbo-submits-with": "Enqueuing..." } %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let participantIndex = <%= @conversation.participants.size %>;
+    const container = document.getElementById('participants-container');
+    const addButton = document.getElementById('add-participant');
+    const dialogueTypeSelect = document.getElementById('dialogue-type');
+    const dialogueInstructionsTextarea = document.getElementById('dialogue-instructions-textarea');
+    const topicTextarea = document.querySelector('#conversation_conversation_topic');
+    const maxRoundsInput = document.querySelector('#conversation_max_rounds');
+    const dialogueInstructionsField = document.getElementById('dialogue-instructions-field');
+    
+    const modelOptions = <%= raw @available_models.to_json %>;
+    const characters = <%= raw ConversationTemplates::CHARACTER_ARCHETYPES.to_json %>;
+    const dialogueTypes = <%= raw ConversationTemplates::DIALOGUE_TYPES.to_json %>;
+
+    // Handle dialogue type selection
+    dialogueTypeSelect.addEventListener('change', function() {
+      const selectedType = this.value;
+      
+      if (selectedType === 'custom') {
+        // Clear for custom instructions
+        dialogueInstructionsTextarea.value = '';
+        dialogueInstructionsTextarea.placeholder = 'Enter custom dialogue instructions (e.g., "Have a thoughtful debate about the topic" or "Brainstorm creative solutions together")...';
+        maxRoundsInput.value = 10;
+      } else if (selectedType && dialogueTypes[selectedType]) {
+        // Populate with template instructions
+        const dialogueType = dialogueTypes[selectedType];
+        // The conversation_topic field in templates contains the dialogue instructions
+        dialogueInstructionsTextarea.value = dialogueType.conversation_topic;
+        dialogueInstructionsTextarea.placeholder = 'Edit these template instructions as needed...';
+        maxRoundsInput.value = dialogueType.suggested_rounds || 10;
+        
+        // Add visual feedback that template was loaded
+        dialogueInstructionsTextarea.classList.add('bg-success');
+        dialogueInstructionsTextarea.classList.add('bg-opacity-10');
+        setTimeout(() => {
+          dialogueInstructionsTextarea.classList.remove('bg-success');
+          dialogueInstructionsTextarea.classList.remove('bg-opacity-10');
+          dialogueInstructionsTextarea.focus();
+          dialogueInstructionsTextarea.blur();
+        }, 500);
+      }
+      updateDialogueInstructions();
+    });
+
+    // Handle character selection for existing participants
+    document.querySelectorAll('.character-select').forEach(setupCharacterSelect);
+
+    function setupCharacterSelect(selectElement) {
+      selectElement.addEventListener('change', function() {
+        const selectedCharacter = this.value;
+        const participantDiv = this.closest('.participant-item');
+        
+        if (selectedCharacter && selectedCharacter !== 'custom') {
+          const character = characters[selectedCharacter];
+          if (character) {
+            const nameInput = participantDiv.querySelector('.participant-name');
+            if (nameInput) {
+              nameInput.value = character.default_name || character.name || selectedCharacter;
+            }
+            
+            const characterPromptTextarea = participantDiv.querySelector('.character-prompt');
+            if (characterPromptTextarea) {
+              characterPromptTextarea.value = character.prompt;
+              characterPromptTextarea.placeholder = 'Edit this character description as needed...';
+              
+              // Add visual feedback that character was loaded
+              characterPromptTextarea.classList.add('bg-success');
+              characterPromptTextarea.classList.add('bg-opacity-10');
+              setTimeout(() => {
+                characterPromptTextarea.classList.remove('bg-success');
+                characterPromptTextarea.classList.remove('bg-opacity-10');
+              }, 500);
+            }
+          }
+        } else if (selectedCharacter === 'custom') {
+          const characterPromptTextarea = participantDiv.querySelector('.character-prompt');
+          if (characterPromptTextarea) {
+            characterPromptTextarea.value = '';
+            characterPromptTextarea.placeholder = 'Enter your custom character description...';
+          }
+          
+          const nameInput = participantDiv.querySelector('.participant-name');
+          if (nameInput) {
+            nameInput.value = '';
+            nameInput.placeholder = 'Enter custom name...';
+          }
+        }
+      });
+    }
+
+    function addParticipant() {
+      const participantHtml = `
+        <div class="bg-base-200/50 border border-base-300 card participant-item">
+          <div class="p-4 card-body">
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="font-semibold text-base-content">Participant ${participantIndex + 1}</h4>
+              <button type="button" class="text-error btn btn-ghost btn-circle btn-sm remove-participant">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div class="gap-3 grid lg:grid-cols-3">
+              <div class="form-control">
+                <label class="label">
+                  <span class="text-xs text-base-content label-text">Name</span>
+                </label>
+                <input type="text" name="conversation[participants_attributes][${participantIndex}][name]" 
+                       placeholder="e.g. Dr. Smith" 
+                       required 
+                       class="bg-base-100 input-bordered w-full text-base-content input input-sm participant-name">
+              </div>
+              
+              <div class="form-control">
+                <label class="label">
+                  <span class="text-xs text-base-content label-text">Model</span>
+                </label>
+                <select name="conversation[participants_attributes][${participantIndex}][model_id]" 
+                        required 
+                        class="bg-base-100 w-full text-base-content select-bordered select-sm select">
+                  <option value="">Select model</option>
+                  ${modelOptions.map(option => `<option value="${option.value}">${option.text}</option>`).join('')}
+                </select>
+              </div>
+              
+              <div class="form-control">
+                <label class="label">
+                  <span class="text-xs text-base-content label-text">Turn Order</span>
+                </label>
+                <input type="number" 
+                       name="conversation[participants_attributes][${participantIndex}][turn_order]" 
+                       value="${participantIndex + 1}" 
+                       min="1" 
+                       required 
+                       class="bg-base-100 input-bordered w-full text-base-content input input-sm">
+              </div>
+            </div>
+            
+            <div class="mt-3 form-control">
+              <label class="label">
+                <span class="text-xs text-base-content label-text">Character Archetype (Optional)</span>
+              </label>
+              <select class="bg-base-100 w-full text-base-content select-bordered select-sm select character-select" data-participant-index="${participantIndex}">
+                <option value="">Choose a character archetype...</option>
+                ${Object.entries(characters).map(([key, character]) => {
+                  const name = character.default_name || character.name || key;
+                  return `<option value="${key}">${name}</option>`;
+                }).join('')}
+                <option value="custom">Custom Character</option>
+              </select>
+            </div>
+            
+            <div class="mt-3 form-control">
+              <label class="label">
+                <span class="text-xs text-base-content label-text">Character & Personality</span>
+              </label>
+              <textarea name="conversation[participants_attributes][${participantIndex}][character_prompt]" 
+                        rows="3" 
+                        class="bg-base-100 textarea-bordered w-full text-base-content textarea textarea-sm character-prompt" 
+                        placeholder="Define personality and role..."></textarea>
+            </div>
+            
+            <div class="mt-2 form-control">
+              <label class="label">
+                <span class="text-xs text-base-content label-text">Additional Instructions (Optional)</span>
+              </label>
+              <textarea name="conversation[participants_attributes][${participantIndex}][system_prompt]" 
+                        rows="2" 
+                        class="bg-base-100 textarea-bordered w-full text-base-content textarea textarea-sm" 
+                        placeholder="Any extra instructions..."></textarea>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      container.insertAdjacentHTML('beforeend', participantHtml);
+      
+      const newParticipant = container.lastElementChild;
+      const characterSelect = newParticipant.querySelector('.character-select');
+      setupCharacterSelect(characterSelect);
+      
+      participantIndex++;
+    }
+
+    addButton.addEventListener('click', addParticipant);
+
+    container.addEventListener('click', function(e) {
+      if (e.target.closest('.remove-participant')) {
+        const participantItem = e.target.closest('.participant-item');
+        if (container.children.length > 2) {
+          participantItem.remove();
+        } else {
+          alert('You must have at least 2 participants');
+        }
+      }
+    });
+
+    function updateDialogueInstructions() {
+      dialogueInstructionsField.value = dialogueInstructionsTextarea.value;
+    }
+
+    dialogueInstructionsTextarea.addEventListener('input', updateDialogueInstructions);
+    updateDialogueInstructions();
+  });
+</script>

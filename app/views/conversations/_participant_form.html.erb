@@ -1,0 +1,137 @@
+<div class="group bg-base-200/50 hover:bg-base-200/70 border border-base-300 transition-colors duration-200 card participant-item" data-test="participant-<%= participant_form.index %>">
+  <div class="p-4 card-body">
+    <!-- Header with participant info and remove button -->
+    <div class="flex justify-between items-start mb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br <%= participant_form.index == 0 ? 'from-primary to-primary/70' : 'from-secondary to-secondary/70' %> flex items-center justify-center text-white text-sm font-bold">
+          <%= participant_form.index + 1 %>
+        </div>
+        <h4 class="font-semibold text-base-content text-lg">Participant <%= participant_form.index + 1 %></h4>
+      </div>
+      <button type="button" 
+              class="hover:bg-error/10 text-error transition-colors btn btn-ghost btn-circle btn-sm remove-participant"
+              title="Remove participant"
+              data-test="remove-participant">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Basic participant details -->
+    <div class="gap-4 grid lg:grid-cols-3">
+      <div class="form-control">
+        <%= participant_form.label :name, class: "label" do %>
+          <span class="font-medium text-base-content label-text">Name</span>
+        <% end %>
+        <%= participant_form.text_field :name, 
+            placeholder: "e.g. Dr. Smith", 
+            required: true,
+            class: "input input-bordered w-full bg-base-100 text-base-content participant-name focus:border-primary transition-colors" %>
+      </div>
+      
+      <div class="form-control">
+        <%= participant_form.label :model_id, "Model", class: "label" do %>
+          <span class="font-medium text-base-content label-text">AI Model</span>
+        <% end %>
+        <%= participant_form.select :model_id, 
+            options_for_select(available_models.map { |m| [m[:text], m[:value]] }),
+            { prompt: "Select model..." },
+            { required: true, class: "select select-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors" } %>
+      </div>
+      
+      <div class="form-control">
+        <%= participant_form.label :turn_order, class: "label" do %>
+          <span class="font-medium text-base-content label-text">Turn Order</span>
+        <% end %>
+        <%= participant_form.number_field :turn_order, 
+            value: participant_form.index + 1,
+            min: 1,
+            required: true,
+            class: "input input-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors" %>
+      </div>
+    </div>
+    
+    <!-- Character archetype selection with improved UX -->
+    <div class="mt-6 form-control">
+      <label class="label">
+        <span class="font-medium text-base-content label-text">Character Archetype</span>
+        <span class="label-text-alt text-base-content/60">Optional - choose a personality template</span>
+      </label>
+      <select class="bg-base-100 focus:border-primary w-full text-base-content transition-colors select-bordered select character-select" 
+              data-participant-index="<%= participant_form.index %>">
+        <option value="">💭 Choose a character archetype...</option>
+        <optgroup label="🧠 Thinking Styles">
+          <% ConversationTemplates::CHARACTER_ARCHETYPES.select { |k, v| %w[analytical creative pragmatic philosophical].include?(k) }.each do |key, character| %>
+            <option value="<%= key %>">
+              <%= character[:default_name] || character[:name] || key.humanize %> - <%= character[:prompt].truncate(50) %>
+            </option>
+          <% end %>
+        </optgroup>
+        <optgroup label="💬 Communication Styles">
+          <% ConversationTemplates::CHARACTER_ARCHETYPES.select { |k, v| %w[socratic collaborative skeptical synthesizer].include?(k) }.each do |key, character| %>
+            <option value="<%= key %>">
+              <%= character[:default_name] || character[:name] || key.humanize %> - <%= character[:prompt].truncate(50) %>
+            </option>
+          <% end %>
+        </optgroup>
+        <optgroup label="🎭 Personalities">
+          <% ConversationTemplates::CHARACTER_ARCHETYPES.reject { |k, v| %w[analytical creative pragmatic philosophical socratic collaborative skeptical synthesizer].include?(k) }.each do |key, character| %>
+            <option value="<%= key %>">
+              <%= character[:default_name] || character[:name] || key.humanize %> - <%= character[:prompt].truncate(50) %>
+            </option>
+          <% end %>
+        </optgroup>
+        <option value="custom">✏️ Custom Character</option>
+      </select>
+    </div>
+    
+    <!-- Character description - collapsible for cleaner UX -->
+    <div class="collapse collapse-arrow bg-base-100/50 mt-4" data-character-section>
+      <input type="checkbox" checked />
+      <div class="collapse-title font-medium text-sm">
+        🎭 Character & Personality Details
+      </div>
+      <div class="collapse-content">
+        <div class="form-control">
+          <%= participant_form.label :character_prompt, class: "label" do %>
+            <span class="font-medium text-base-content label-text">Character Description</span>
+            <span class="label-text-alt text-base-content/60">Define personality, role, and behavior</span>
+          <% end %>
+          <%= participant_form.text_area :character_prompt, 
+              rows: 4,
+              class: "textarea textarea-bordered w-full bg-base-100 text-base-content character-prompt focus:border-primary transition-colors resize-none",
+              placeholder: "Describe this participant's personality, role, communication style, and any special characteristics..." %>
+          <label class="label">
+            <span class="label-text-alt text-base-content/50">This will influence how the AI model behaves in the conversation</span>
+          </label>
+        </div>
+        
+        <div class="mt-4 form-control">
+          <%= participant_form.label :system_prompt, class: "label" do %>
+            <span class="font-medium text-base-content label-text">Additional Instructions</span>
+            <span class="label-text-alt text-base-content/60">Optional technical instructions</span>
+          <% end %>
+          <%= participant_form.text_area :system_prompt, 
+              rows: 2,
+              class: "textarea textarea-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors resize-none",
+              placeholder: "Any extra technical instructions for this model..." %>
+          <label class="label">
+            <span class="label-text-alt text-base-content/50">Advanced: Custom system-level instructions</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Preview section that shows when character is selected -->
+    <div class="hidden bg-success/10 mt-4 p-3 border border-success/20 rounded-lg character-preview">
+      <div class="flex items-start gap-3">
+        <div class="text-2xl">✨</div>
+        <div>
+          <h5 class="font-semibold text-success-content">Character Applied!</h5>
+          <p class="text-success-content/80 text-sm character-preview-text"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

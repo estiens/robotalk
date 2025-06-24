@@ -1,0 +1,186 @@
+<%= turbo_frame_tag "conversation" do %>
+<div class="space-y-6" data-controller="view-mode" data-view-mode-default-value="live" data-action="turbo:frame-load->view-mode#setInitialMode">
+  <!-- Compact Header -->
+  <div class="relative bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 shadow-lg p-6 border border-base-300 rounded-2xl overflow-hidden neural-pattern">
+    <div class="z-10 relative flex lg:flex-row flex-col justify-between items-start gap-4">
+      <!-- Left side: Navigation and Title -->
+      <div class="flex-1">
+        <%= link_to conversations_path, class: "btn btn-ghost btn-sm mb-4" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Back
+        <% end %>
+        
+        <h1 class="mb-2 font-bold text-2xl lg:text-3xl">
+          <% @conversation.participants.ordered.each_with_index do |p, i| %>
+            <span class="inline-flex items-center gap-2">
+              <span class="text-2xl"><%= model_avatar_emoji(p.model_id) %></span>
+              <span><%= friendly_model_name(p.model_id) %></span>
+            </span>
+            <% if i < @conversation.participants.count - 1 %>
+              <span class="mx-2 text-base-content/40">↔</span>
+            <% end %>
+          <% end %>
+        </h1>
+        
+        <% if @conversation.conversation_topic.present? %>
+          <p class="text-base-content/70" data-test="conversation-topic">
+            <span class="font-semibold">Topic:</span> <%= @conversation.conversation_topic %>
+          </p>
+        <% end %>
+      </div>
+      
+      <!-- Right side: Actions and Status -->
+      <div class="flex flex-wrap items-center gap-2">
+        <%= link_to edit_conversation_path(@conversation), class: "btn btn-outline btn-sm" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+          </svg>
+          Edit
+        <% end %>
+        <div class="badge badge-lg <%= @conversation.can_continue? ? 'badge-success' : 'badge-neutral' %> gap-2" data-test="round-indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Round <%= @conversation.current_round %>/<%= @conversation.max_rounds %>
+        </div>
+      </div>
+    </div>
+    
+    <% if conversation_has_content_issues?(@conversation) %>
+      <div class="mt-4 alert alert-error">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current w-6 h-6 shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+        <div>
+          <h3 class="font-bold">Content Issues Detected</h3>
+          <div class="text-xs">
+            <%= content_missing_count(@conversation) %> message(s) have missing content. 
+            <%= link_to "View debug info", debug_conversation_path(@conversation), class: "link link-hover", target: "_blank" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Participants Cards -->
+  <div class="gap-4 grid grid-cols-1 lg:grid-cols-2">
+    <% @conversation.participants.ordered.each_with_index do |participant, index| %>
+      <div class="bg-base-100 shadow-lg hover:shadow-xl border border-base-200 transition-shadow duration-200 card">
+        <div class="p-4 card-body">
+          <div class="flex items-center gap-4">
+            <div class="avatar placeholder">
+              <div class="bg-<%= index == 0 ? 'primary' : 'secondary' %> text-primary-content rounded-full w-14 h-14">
+                <span class="text-2xl"><%= model_avatar_emoji(participant.model_id) %></span>
+              </div>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-bold text-lg"><%= participant.name || "Participant #{index + 1}" %></h3>
+              <p class="text-sm text-base-content/70"><%= friendly_model_name(participant.model_id) %></p>
+            </div>
+            <div class="badge-outline badge">Turn <%= participant.turn_order %></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="bg-base-100 shadow-xl border border-base-300 card" data-controller="streaming-conversation" 
+       data-streaming-conversation-conversation-id-value="<%= @conversation.id %>"
+       data-streaming-conversation-next-model-value="<%= @conversation.can_continue? ? @conversation.next_speaker : '' %>">
+    <div class="card-body">
+      <% if @conversation.messages.empty? %>
+        <!-- Start Button -->
+        <div class="py-8 text-center">
+          <h3 class="mb-4 font-semibold text-xl">Ready to begin?</h3>
+          <p class="mb-6 text-base-content/70">Start the conversation between your AI models</p>
+          <%= button_to start_conversation_path(@conversation), 
+              method: :post,
+              class: "btn btn-success btn-lg gap-2",
+              data: { 
+                turbo_frame: "conversation",
+                streaming_conversation_target: "startButton",
+                controller: "conversation-controls",
+                action: "click->conversation-controls#showLoading",
+                test: "start-conversation-button"
+              } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+            </svg>
+            Start Conversation
+          <% end %>
+        </div>
+      <% elsif @conversation.can_continue? %>
+        <!-- Auto-continue Toggle -->
+        <div class="bg-primary/5 p-4 border border-primary/20 rounded-lg">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="text-3xl">⚡</div>
+              <div>
+                <h4 class="font-semibold text-lg">Auto-continue Mode</h4>
+                <p class="text-sm text-base-content/70">Automatically advance through all rounds</p>
+              </div>
+            </div>
+            <input type="checkbox" 
+                   class="toggle toggle-primary toggle-lg"
+                   data-controller="auto-continue" 
+                   data-action="change->auto-continue#toggle"
+                   data-auto-continue-conversation-id-value="<%= @conversation.id %>"
+                   data-auto-continue-max-rounds-value="<%= @conversation.max_rounds %>"
+                   data-auto-continue-active-value="false"
+                   data-test="auto-continue-toggle" />
+          </div>
+          <div id="auto-continue-status" class="hidden mt-3">
+            <div class="flex items-center gap-2 text-primary text-sm">
+              <span class="loading loading-spinner loading-sm"></span>
+              <span>Auto-continuing conversation...</span>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <!-- Conversation Complete -->
+        <div class="py-8 text-center">
+          <div class="mb-4 text-5xl">✅</div>
+          <h3 class="mb-2 font-semibold text-xl" data-test="conversation-complete-message">Conversation Complete</h3>
+          <p class="text-base-content/70">All <%= @conversation.max_rounds %> rounds have been completed</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- View Mode Toggle -->
+  <% if @conversation.messages.any? %>
+    <div class="flex justify-center">
+      <div class="bg-base-200 tabs tabs-boxed tabs-lg">
+        <button class="tab tab-active" 
+                data-action="click->view-mode#switchMode" 
+                data-view-mode-target="toggle"
+                data-mode="history"
+                data-test="history-view-button">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Full History
+        </button>
+        <button class="tab tab-active" 
+                data-action="click->view-mode#switchMode" 
+                data-view-mode-target="toggle"
+                data-mode="live"
+                data-test="live-view-button">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+          </svg>
+          Live View
+        </button>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Messages Display -->
+  <div id="conversation-messages" data-streaming-conversation-target="messagesContainer">
+    <%= render partial: "conversations/messages", locals: { conversation: @conversation } %>
+  </div>
+</div>
+<% end %>

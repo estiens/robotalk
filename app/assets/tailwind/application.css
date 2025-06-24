@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* Custom scrollbar styles */
+@layer utilities {
+  /* For Webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-base-200;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-base-300 rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-base-content/20;
+  }
+}
+
+/* Smooth transitions for theme changes */
+@layer base {
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+/* Better focus styles */
+@layer components {
+  .btn:focus-visible,
+  .input:focus-visible,
+  .select:focus-visible,
+  .textarea:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+/* Improved chat bubble styles */
+@layer components {
+  .chat-bubble {
+    @apply shadow-md;
+  }
+  
+  .chat-bubble-primary {
+    @apply bg-primary text-primary-content;
+  }
+  
+  .chat-bubble-secondary {
+    @apply bg-secondary text-secondary-content;
+  }
+}
+
+/* Loading animation improvements */
+@layer components {
+  .loading-indicator-chat {
+    @apply animate-pulse;
+  }
+}
+
+/* Card hover effects */
+@layer components {
+  .card {
+    @apply transition-all duration-200;
+  }
+  
+  .card:hover {
+    @apply -translate-y-0.5;
+  }
+}
+
+/* Better prose styling for messages */
+@layer components {
+  .prose {
+    @apply text-base-content;
+  }
+  
+  .prose-invert {
+    @apply text-base-100;
+  }
+  
+  .prose p {
+    @apply mb-3 last:mb-0;
+  }
+}
+
+/* Form input contrast improvements */
+@layer components {
+  .input, .select, .textarea {
+    @apply bg-base-200 text-base-content;
+  }
+  
+  .input:focus, .select:focus, .textarea:focus {
+    @apply bg-base-100 border-primary;
+  }
+  
+  /* Ensure proper contrast in all themes */
+  [data-theme="dark"] .input,
+  [data-theme="dark"] .select,
+  [data-theme="dark"] .textarea,
+  [data-theme="synthwave"] .input,
+  [data-theme="synthwave"] .select,
+  [data-theme="synthwave"] .textarea,
+  [data-theme="cyberpunk"] .input,
+  [data-theme="cyberpunk"] .select,
+  [data-theme="cyberpunk"] .textarea,
+  [data-theme="forest"] .input,
+  [data-theme="forest"] .select,
+  [data-theme="forest"] .textarea {
+    @apply bg-base-200 text-base-content;
+  }
+  
+  /* Card backgrounds with proper contrast */
+  .card {
+    @apply bg-base-100 text-base-content;
+  }
+  
+  /* Ensure participant cards have good contrast */
+  .participant-item {
+    @apply bg-base-200/50 border-base-300;
+  }
+  
+  .participant-item .input,
+  .participant-item .select,
+  .participant-item .textarea {
+    @apply bg-base-100;
+  }
+}
+
+/* Label text contrast */
+@layer components {
+  .label-text {
+    @apply text-base-content;
+  }
+  
+  .label-text-alt {
+    @apply text-base-content/60;
+  }
+}

@@ -1,0 +1,131 @@
+<!-- Hero Section -->
+<div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-16">
+  <div class="hero-content text-center">
+    <div class="max-w-2xl">
+      <div class="text-5xl mb-6">🤖</div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">AI Conversations</h1>
+      <p class="text-lg md:text-xl mb-8 opacity-90">Create intelligent dialogues between AI models</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <%= link_to new_conversation_path, class: "btn btn-accent btn-lg" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Start New Conversation
+        <% end %>
+        <%= link_to models_path, class: "btn btn-outline btn-accent btn-lg" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Browse Models
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="bg-base-200 py-12">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="stats stats-vertical lg:stats-horizontal shadow-lg w-full bg-base-100">
+      <div class="stat place-items-center">
+        <div class="stat-figure text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </div>
+        <div class="stat-title">Total Conversations</div>
+        <div class="stat-value text-primary"><%= @conversations.count %></div>
+        <div class="stat-desc">All time</div>
+      </div>
+      
+      <div class="stat place-items-center">
+        <div class="stat-figure text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+          </svg>
+        </div>
+        <div class="stat-title">Currently Active</div>
+        <div class="stat-value text-secondary"><%= @conversations.generating.count + @conversations.interactive.count %></div>
+        <div class="stat-desc">In progress</div>
+      </div>
+      
+      <div class="stat place-items-center">
+        <div class="stat-figure text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Completed</div>
+        <div class="stat-value text-accent"><%= @conversations.complete.count %></div>
+        <div class="stat-desc">Finished</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Content Area -->
+<div class="container mx-auto px-4 py-12 max-w-7xl">
+  <% if @conversations.any? %>
+    <!-- Section Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+      <div>
+        <h2 class="text-3xl lg:text-4xl font-bold mb-2">Recent Conversations</h2>
+        <p class="text-base-content/70 text-lg">Manage and explore your AI dialogues</p>
+      </div>
+      
+      <!-- Filter/Sort Controls -->
+      <div class="flex items-center gap-4">
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M16.5 16.5L20.25 12.75" />
+            </svg>
+            Sort & Filter
+          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-2 shadow-lg">
+            <li><a>Newest First</a></li>
+            <li><a>Oldest First</a></li>
+            <li><a>Most Active</a></li>
+            <li><a>Recently Updated</a></li>
+          </ul>
+        </div>
+        
+        <div class="badge badge-primary badge-lg">
+          <%= pluralize(@conversations.count, 'conversation') %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations Grid -->
+    <div class="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+      <% @conversations.each do |conversation| %>
+        <%= render 'conversation_card', conversation: conversation %>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Empty State -->
+    <div class="hero min-h-[60vh]">
+      <div class="hero-content text-center">
+        <div class="max-w-lg">
+          <div class="text-8xl mb-8 animate-bounce">💬</div>
+          <h2 class="text-4xl font-bold mb-6">No conversations yet</h2>
+          <p class="text-xl mb-10 leading-relaxed text-base-content/80">
+            Create your first conversation between AI models and watch them discuss, debate, and collaborate on topics you choose.
+          </p>
+          
+          <%= link_to new_conversation_path, class: "btn btn-primary btn-lg gap-3 mb-6" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create Your First Conversation
+          <% end %>
+          
+          <div class="text-base-content/60">
+            or explore <%= link_to "available AI models", models_path, class: "link link-primary font-semibold" %> first
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

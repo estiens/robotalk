@@ -1,0 +1,52 @@
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full">
+    <div class="card bg-base-100 shadow-xl border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-3xl font-bold text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6">
+          Sign Up
+        </h2>
+        
+        <%= form_with(model: @user, url: signup_path, local: true, class: "space-y-4") do |form| %>
+          <% if @user.errors.any? %>
+            <div class="alert alert-error">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 class="font-bold">Please fix the following errors:</h3>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                  <% @user.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="form-control">
+            <%= form.label :email, class: "label" do %>
+              <span class="label-text font-semibold">Email</span>
+            <% end %>
+            <%= form.email_field :email, class: "input input-bordered w-full bg-base-200", required: true, placeholder: "your@email.com" %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :password, class: "label" do %>
+              <span class="label-text font-semibold">Password</span>
+            <% end %>
+            <%= form.password_field :password, class: "input input-bordered w-full bg-base-200", required: true, placeholder: "Enter your password" %>
+          </div>
+
+          <div class="form-control mt-6">
+            <%= form.submit "Sign Up", class: "btn btn-primary w-full" %>
+          </div>
+          
+          <div class="text-center mt-4">
+            <span class="text-base-content/70">Already have an account?</span>
+            <%= link_to "Log in", login_path, class: "link link-primary ml-1" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

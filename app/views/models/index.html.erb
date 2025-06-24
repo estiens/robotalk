@@ -1,0 +1,190 @@
+<div class="mx-auto px-4 py-8 max-w-7xl container">
+  <div class="mb-8">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="mb-2 font-bold text-gray-900 text-3xl">Available Models</h1>
+        <p class="text-gray-600">Overview of all available AI models from RubyLLM</p>
+      </div>
+      <%= link_to "← Back to Conversations", conversations_path, 
+          class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    </div>
+  </div>
+
+  <% if @error %>
+    <div class="bg-red-50 mb-6 p-4 border border-red-200 rounded-md">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="w-5 h-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="font-medium text-red-800 text-sm">Error loading models</h3>
+          <div class="mt-2 text-red-700 text-sm">
+            <%= @error %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @models.any? %>
+    <div class="bg-white shadow-md border border-gray-200 rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="divide-y divide-gray-200 min-w-full" data-controller="sortable-table">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="hover:bg-gray-100 px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider cursor-pointer" data-action="click->sortable-table#sort" data-column="name">
+                Name
+                <span class="ml-1">↕️</span>
+              </th>
+              <th scope="col" class="hover:bg-gray-100 px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider cursor-pointer" data-action="click->sortable-table#sort" data-column="provider">
+                Provider
+                <span class="ml-1">↕️</span>
+              </th>
+              <th scope="col" class="hover:bg-gray-100 px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider cursor-pointer" data-action="click->sortable-table#sort" data-column="family">
+                Family
+                <span class="ml-1">↕️</span>
+              </th>
+              <th scope="col" class="hover:bg-gray-100 px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider cursor-pointer" data-action="click->sortable-table#sort" data-column="context_window">
+                Context Window
+                <span class="ml-1">↕️</span>
+              </th>
+              <th scope="col" class="hover:bg-gray-100 px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider cursor-pointer" data-action="click->sortable-table#sort" data-column="max_output_tokens">
+                Max Output
+                <span class="ml-1">↕️</span>
+              </th>
+              <th scope="col" class="px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider">
+                Capabilities
+              </th>
+              <th scope="col" class="px-6 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider">
+                Pricing (per 1M tokens)
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200" data-sortable-table-target="tbody">
+            <% @models.each do |model| %>
+              <tr class="hover:bg-gray-50" data-model-id="<%= model.id %>" data-model-name="<%= model.name %>" data-model-provider="<%= model.provider %>" data-model-family="<%= model.family %>" data-model-context-window="<%= model.context_window %>" data-model-max-output-tokens="<%= model.max_output_tokens %>">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="font-medium text-gray-900 text-sm">
+                      <%= model.name %>
+                    </div>
+                  </div>
+                  <div class="text-gray-500 text-xs">
+                    ID: <%= model.id %>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center bg-blue-100 px-2.5 py-0.5 rounded-full font-medium text-blue-800 text-xs">
+                    <%= model.provider.capitalize %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-gray-900 text-sm whitespace-nowrap">
+                  <%= model.family %>
+                </td>
+                <td class="px-6 py-4 text-gray-900 text-sm whitespace-nowrap">
+                  <%= number_with_delimiter(model.context_window) %>
+                </td>
+                <td class="px-6 py-4 text-gray-900 text-sm whitespace-nowrap">
+                  <%= number_with_delimiter(model.max_output_tokens) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% (model.capabilities || []).each do |capability| %>
+                    <span class="inline-flex items-center bg-green-100 mr-1 px-2 py-1 rounded-md font-medium text-green-800 text-xs">
+                      <%= capability %>
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 text-gray-900 text-sm whitespace-nowrap">
+                  <% if model.pricing&.text_tokens&.standard %>
+                    <div class="text-xs">
+                      <div>In: $<%= model.pricing.text_tokens.standard.input_per_million %></div>
+                      <div>Out: $<%= model.pricing.text_tokens.standard.output_per_million %></div>
+                    </div>
+                  <% else %>
+                    <span class="text-gray-500">N/A</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-4 text-gray-500 text-sm">
+      Total: <%= @models.count %> models available
+    </div>
+  <% else %>
+    <div class="bg-white shadow-md p-12 border border-gray-200 rounded-lg text-center">
+      <div class="mb-4 text-gray-400">
+        <svg class="mx-auto w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 class="mb-2 font-medium text-gray-900 text-lg">No models available</h3>
+      <p class="text-gray-500">Unable to load models from RubyLLM.</p>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const controller = {
+      sortDirection: 'asc',
+      sortColumn: 'name',
+      
+      sort: function(event) {
+        const column = event.target.closest('[data-column]').dataset.column;
+        const tbody = document.querySelector('[data-sortable-table-target="tbody"]');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        if (this.sortColumn === column) {
+          this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.sortDirection = 'asc';
+          this.sortColumn = column;
+        }
+        
+        rows.sort((a, b) => {
+          let aVal = this.getColumnValue(a, column);
+          let bVal = this.getColumnValue(b, column);
+          
+          if (column === 'context_window' || column === 'max_output_tokens') {
+            aVal = parseInt(aVal) || 0;
+            bVal = parseInt(bVal) || 0;
+          }
+          
+          if (this.sortDirection === 'asc') {
+            return aVal > bVal ? 1 : -1;
+          } else {
+            return aVal < bVal ? 1 : -1;
+          }
+        });
+        
+        rows.forEach(row => tbody.appendChild(row));
+        this.updateSortIndicators(column);
+      },
+      
+      getColumnValue: function(row, column) {
+        return row.dataset[`model${column.charAt(0).toUpperCase() + column.slice(1).replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())}`] || '';
+      },
+      
+      updateSortIndicators: function(activeColumn) {
+        document.querySelectorAll('[data-column] span').forEach(span => {
+          span.textContent = '↕️';
+        });
+        
+        const activeSpan = document.querySelector(`[data-column="${activeColumn}"] span`);
+        if (activeSpan) {
+          activeSpan.textContent = this.sortDirection === 'asc' ? '↑' : '↓';
+        }
+      }
+    };
+    
+    document.querySelectorAll('[data-action="click->sortable-table#sort"]').forEach(element => {
+      element.addEventListener('click', (event) => controller.sort(event));
+    });
+  });
+</script>

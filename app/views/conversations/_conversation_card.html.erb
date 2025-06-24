@@ -1,0 +1,136 @@
+<div class="group relative">
+  <!-- Gradient Border Effect -->
+  <div class="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl blur opacity-20 group-hover:opacity-40 transition-all duration-300"></div>
+  
+  <div class="relative bg-base-100 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
+    <!-- Status Indicator Bar -->
+    <div class="h-1 w-full <%= conversation.generating? ? 'bg-gradient-to-r from-info via-warning to-info animate-pulse' : conversation.can_continue? ? 'bg-gradient-to-r from-success to-primary' : conversation.failed? ? 'bg-error' : 'bg-neutral' %>"></div>
+    
+    <div class="p-6">
+      <!-- Header with Status -->
+      <div class="flex justify-between items-start mb-4">
+        <% case conversation.status.to_sym %>
+        <% when :generating %>
+          <div class="flex items-center gap-2 text-info">
+            <div class="w-2 h-2 bg-info rounded-full animate-ping"></div>
+            <span class="text-sm font-medium">Generating...</span>
+          </div>
+        <% when :failed %>
+          <div class="flex items-center gap-2 text-error">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            <span class="text-sm font-medium">Failed</span>
+          </div>
+        <% else %>
+          <div class="flex items-center gap-2 <%= conversation.can_continue? ? 'text-success' : 'text-neutral' %>">
+            <% if conversation.messages.empty? && conversation.interactive? %>
+              <div class="w-2 h-2 bg-warning rounded-full animate-pulse"></div>
+              <span class="text-sm font-medium">Ready to Start</span>
+            <% elsif conversation.can_continue? %>
+              <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <span class="text-sm font-medium">Round <%= conversation.current_round %>/<%= conversation.max_rounds %></span>
+            <% else %>
+              <div class="w-2 h-2 bg-neutral rounded-full"></div>
+              <span class="text-sm font-medium">Complete</span>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="text-xs text-base-content/50 bg-base-200 px-2 py-1 rounded-full">
+          <%= conversation.created_at.strftime("%b %d") %>
+        </div>
+      </div>
+
+      <!-- AI Participants with Animation -->
+      <div class="mb-4">
+        <div class="flex items-center justify-center gap-3 mb-3">
+          <% conversation.participants.ordered.each_with_index do |p, i| %>
+            <div class="relative group/avatar">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br <%= i == 0 ? 'from-primary to-primary/70' : 'from-secondary to-secondary/70' %> flex items-center justify-center text-white text-lg shadow-lg transform group-hover:scale-110 transition-all duration-200">
+                <%= model_avatar_emoji(p.model_id) %>
+              </div>
+              <!-- Pulse ring for active conversations -->
+              <% if conversation.can_continue? && !conversation.generating? %>
+                <div class="absolute inset-0 rounded-full bg-<%= i == 0 ? 'primary' : 'secondary' %> animate-ping opacity-20"></div>
+              <% end %>
+            </div>
+            <% if i < conversation.participants.count - 1 %>
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-base-content/40">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                </svg>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <!-- Model Names -->
+        <div class="text-center">
+          <% conversation.participants.ordered.each_with_index do |p, i| %>
+            <span class="text-sm font-medium text-base-content/80">
+              <%= p.name || friendly_model_name(p.model_id) %>
+            </span>
+            <% if i < conversation.participants.count - 1 %>
+              <span class="text-base-content/40 mx-2">vs</span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Topic Preview -->
+      <% if conversation.conversation_topic.present? %>
+        <div class="bg-gradient-to-r from-base-200/50 to-base-300/30 rounded-lg p-3 mb-4">
+          <div class="text-xs font-semibold text-primary/80 uppercase tracking-wider mb-1">Topic</div>
+          <p class="text-sm text-base-content/80 line-clamp-2 leading-relaxed"><%= conversation.conversation_topic %></p>
+        </div>
+      <% end %>
+      
+      <!-- Message Preview (if conversation has started) -->
+      <% if conversation.messages.where(role: 'assistant').any? %>
+        <% last_message = conversation.messages.where(role: 'assistant').last %>
+        <% participant = conversation.participant_for_model(last_message.model_id) %>
+        <div class="bg-base-50 rounded-lg p-3 mb-4 border-l-4 border-primary/30">
+          <div class="text-xs text-base-content/60 mb-1">Latest from <%= participant&.name || 'AI' %>:</div>
+          <p class="text-sm text-base-content/70 line-clamp-2">
+            <%= truncate(last_message.content, length: 100) %>
+          </p>
+        </div>
+      <% end %>
+      
+      <!-- Actions -->
+      <div class="flex justify-between items-center mt-4 pt-4 border-t border-base-200">
+        <%= link_to conversation_path(conversation), class: "btn btn-ghost btn-sm group/view" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 group-hover/view:scale-110 transition-transform">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          View
+        <% end %>
+
+        <% if conversation.interactive? && !conversation.generating? %>
+          <% if conversation.messages.empty? %>
+            <%= button_to start_conversation_path(conversation),
+                method: :post,
+                class: "btn btn-success btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
+                data: { test: "start-conversation-button" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+              </svg>
+              Start
+            <% end %>
+          <% elsif conversation.can_continue? %>
+            <%= button_to continue_conversation_path(conversation),
+                method: :post,
+                class: "btn btn-primary btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
+                data: { test: "continue-conversation-button" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z" />
+              </svg>
+              Continue
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

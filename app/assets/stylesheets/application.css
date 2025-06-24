@@ -1,0 +1,547 @@
+/*
+ * This is a manifest file that'll be compiled into application.css.
+ *
+ * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
+ * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
+ * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
+ * depending on specificity.
+ *
+ * Consider organizing styles into separate files for maintainability.
+ */
+
+/* Improve DaisyUI contrast and readability */
+html[data-theme="light"] {
+  --primary: #2563eb;
+  --primary-content: #ffffff;
+  --secondary: #7c3aed;
+  --secondary-content: #ffffff;
+  --accent: #059669;
+  --accent-content: #ffffff;
+  --neutral: #374151;
+  --neutral-content: #ffffff;
+  --base-100: #ffffff;
+  --base-200: #f9fafb;
+  --base-300: #e5e7eb;
+  --base-content: #1f2937;
+}
+
+/* Enhanced Navbar Styling */
+.navbar {
+  min-height: 4rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.navbar:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Theme Switcher Improvements */
+.theme-item {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.theme-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-item-mobile {
+  min-height: 3rem;
+  transition: all 0.2s ease;
+}
+
+.theme-item-mobile:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-item-mobile:active {
+  transform: scale(0.98);
+}
+
+/* Dropdown positioning improvements */
+.dropdown-content {
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.dropdown-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+/* Mobile menu improvements */
+@media (max-width: 1024px) {
+  .navbar-end {
+    gap: 0.5rem;
+  }
+  
+  .dropdown-content {
+    max-width: calc(100vw - 2rem);
+    right: 0;
+  }
+}
+
+/* Ensure theme switcher is always accessible */
+@media (max-width: 640px) {
+  .navbar-start {
+    flex: 1;
+  }
+  
+  .navbar-end {
+    gap: 0.25rem;
+  }
+}
+
+/* Force better button contrast */
+.btn-primary {
+  background-color: #2563eb !important;
+  color: white !important;
+  border-color: #2563eb !important;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.btn-secondary {
+  background-color: #7c3aed !important;
+  color: white !important;
+  border-color: #7c3aed !important;
+}
+
+.btn-secondary:hover {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+.btn-success {
+  background-color: #059669 !important;
+  color: white !important;
+  border-color: #059669 !important;
+}
+
+.btn-success:hover {
+  background-color: #047857 !important;
+  border-color: #047857 !important;
+}
+
+/* Chat bubble improvements */
+.chat-bubble-primary {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border: 1px solid #93c5fd !important;
+}
+
+.chat-bubble-secondary {
+  background-color: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid #c4b5fd !important;
+}
+
+/* Collapse improvements */
+.collapse-title {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+.collapse-content {
+  color: #374151 !important;
+}
+
+/* Form improvements */
+.form-control {
+  margin-bottom: 1rem;
+}
+
+.label {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+.input, .textarea, .select {
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Auto-continue and loading improvements */
+.auto-continue-button-text {
+  transition: all 0.3s ease;
+}
+
+.loading-indicator-chat {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* View mode transitions */
+[data-view-mode-target="historyView"],
+[data-view-mode-target="liveView"] {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Chat bubble spacing improvements */
+.chat + .chat {
+  margin-top: 1rem;
+}
+
+/* Better loading states */
+.btn:disabled {
+  opacity: 0.7 !important;
+}
+
+/* Improved contrast for dark themes */
+html[data-theme="dark"] .chat-bubble-primary {
+  background-color: #1e3a8a !important;
+  color: #dbeafe !important;
+  border: 1px solid #3b82f6 !important;
+}
+
+html[data-theme="dark"] .chat-bubble-secondary {
+  background-color: #581c87 !important;
+  color: #ede9fe !important;
+  border: 1px solid #8b5cf6 !important;
+}
+
+/* Enhanced Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced chat bubble animations */
+.chat-start .chat-bubble {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.chat-end .chat-bubble {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.group:hover .animate-pulse-glow {
+  animation-play-state: running;
+}
+
+/* Enhanced button interactions */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover, .btn-secondary:hover, .btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading indicator improvements */
+.loading-indicator-chat {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Progress bar styling */
+.progress::-webkit-progress-bar {
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+}
+
+.progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* Badge improvements */
+.badge {
+  transition: all 0.2s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+/* Card hover effects */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Expandable message improvements */
+.expandable-message[data-expanded="true"] {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Status indicators */
+.status-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient text effects */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(30deg); }
+}
+
+/* Neural pattern background */
+.neural-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 768px) {
+  .chat-bubble {
+    max-width: 85%;
+  }
+  
+  .btn-wide {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .navbar {
+    padding: 0.5rem;
+  }
+}
+
+/* Dark theme neural pattern */
+html[data-theme="dark"] .neural-pattern::before {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+}
+
+/* Hero section improvements */
+.hero-section {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+/* Conversation grid improvements */
+.conversation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .conversation-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+}
+
+/* Status card improvements */
+.status-card {
+  transition: all 0.3s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Section spacing improvements */
+.section-spacing {
+  margin: 2rem 0;
+}
+
+.section-spacing:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Glass effect improvements */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"] .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Empty state improvements */
+.empty-state-icon {
+  animation: floatAnimation 3s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.empty-state-plus {
+  animation: pulseScale 2s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Typography improvements */
+.page-title {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-title {
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Focus improvements */
+.btn:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Dropdown improvements */
+.dropdown-content {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+html[data-theme="dark"] .dropdown-content {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Navbar improvements */
+.navbar {
+  backdrop-filter: blur(10px);
+}
+
+.navbar:hover {
+  backdrop-filter: blur(15px);
+}
+
+html[data-theme="dark"] .navbar:hover {
+  background: rgba(31, 41, 55, 0.95);
+}
+
+/* Footer improvements */
+.footer-enhanced {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+html[data-theme="dark"] .footer-enhanced {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}

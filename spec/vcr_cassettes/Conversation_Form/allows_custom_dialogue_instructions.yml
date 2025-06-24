@@ -1,0 +1,29 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://127.0.0.1:3001/__identify__
+    body:
+      encoding: US-ASCII
+      base64_string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '4'
+    body:
+      encoding: UTF-8
+      base64_string: 'ODUxMg==
+
+        '
+  recorded_at: Tue, 24 Jun 2025 03:52:33 GMT
+recorded_with: VCR 6.3.1
