@@ -154,6 +154,7 @@ class Conversation < ApplicationRecord
     end
 
     broadcast_controls # Always broadcast controls as streaming is always on
+    # self.current_turn_participant_id = nil # Let it be overwritten by the next turn
   end
 
   def generate_one_round! # Removed stream parameter
@@ -264,41 +265,46 @@ class Conversation < ApplicationRecord
     end
     Rails.logger.info "-------------------------"
 
-    # Now call super. acts_as_chat's super method should handle saving the message.
-    # It uses the attributes from the RubyLLM::Message (like content, tokens)
-    # to update the ActiveRecord Message shell that was created earlier.
-    # We need to ensure our conversation_participant is also persisted.
+    # The `message` argument is a RubyLLM::Message instance.
+    # `super(message)` calls acts_as_chat's internal persistence, which finds or creates
+    # an ActiveRecord `::Message` and updates it with content, tokens, etc.
+    # It should return the ActiveRecord `::Message` instance.
+    active_record_message = super(message)
 
-    active_record_message = super(message) # This should return the persisted ActiveRecord Message instance
-
-    # After super has run and potentially saved the message,
-    # explicitly ensure our conversation_participant is set on the ActiveRecord message.
     if active_record_message.is_a?(::Message) && active_record_message.persisted? && active_record_message.role == "assistant"
-      if current_turn_participant_id.present?
-        participant_to_assign = participants.find_by(id: current_turn_participant_id)
-        if participant_to_assign
-          if active_record_message.conversation_participant != participant_to_assign
-            active_record_message.update!(conversation_participant: participant_to_assign) # Use update! to save immediately or raise error
-            Rails.logger.info "[Conversation##persist_message_completion] Updated ActiveRecord Message ID #{active_record_message.id} with participant: #{participant_to_assign.name} (ID: #{participant_to_assign.id})."
+      # This is an assistant message that has been persisted (created or updated) by acts_as_chat.
+      # We MUST ensure it's linked to the correct ConversationParticipant.
+      # The `current_turn_participant_id` on `self` (the Conversation instance)
+      # was set in `generate_one_speaker_turn!` right before `ask` was called.
+      # This ID represents whose turn it was.
+
+      if self.current_turn_participant_id.present?
+        participant_for_this_turn = participants.find_by(id: self.current_turn_participant_id)
+
+        if participant_for_this_turn
+          # If the message isn't already associated or is associated with the wrong participant, update it.
+          if active_record_message.conversation_participant_id != participant_for_this_turn.id
+            active_record_message.update_column(:conversation_participant_id, participant_for_this_turn.id)
+            # Also update the in-memory association for immediate consistency if the object is used further.
+            active_record_message.conversation_participant = participant_for_this_turn 
+            Rails.logger.info "[Conversation##persist_message_completion] Successfully associated ActiveRecord Message ID #{active_record_message.id} with participant: #{participant_for_this_turn.name} (ID: #{participant_for_this_turn.id})."
           else
-            Rails.logger.info "[Conversation##persist_message_completion] ActiveRecord Message ID #{active_record_message.id} already had correct participant: #{active_record_message.conversation_participant.name}."
+            Rails.logger.info "[Conversation##persist_message_completion] ActiveRecord Message ID #{active_record_message.id} was already correctly associated with participant: #{participant_for_this_turn.name}."
           end
         else
-          Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find participant (ID: #{current_turn_participant_id}) to assign to ActiveRecord Message ID #{active_record_message.id} after super."
+          Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: Could not find ConversationParticipant with ID: #{self.current_turn_participant_id} (from self.current_turn_participant_id) to associate with ActiveRecord Message ID #{active_record_message.id}."
         end
       else
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: current_turn_participant_id was BLANK when trying to assign to ActiveRecord Message ID #{active_record_message.id} after super."
+        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL: self.current_turn_participant_id was BLANK when trying to associate ActiveRecord Message ID #{active_record_message.id}. Message will be orphaned from a participant."
       end
-
-      # Final verification log
+      
+      # Verify after attempting association
       if active_record_message.reload.conversation_participant.nil?
-        Rails.logger.error "[Conversation##persist_message_completion] CRITICAL FAILURE FINAL CHECK: ActiveRecord Message ID #{active_record_message.id} (assistant) STILL has no participant after explicit update."
-      else
-        Rails.logger.info "[Conversation##persist_message_completion] FINAL CHECK: ActiveRecord Message ID #{active_record_message.id} (assistant) has participant: #{active_record_message.conversation_participant.name}."
+         Rails.logger.error "[Conversation##persist_message_completion] VERIFICATION FAILURE: ActiveRecord Message ID #{active_record_message.id} STILL has no participant after association attempt."
       end
 
-    elsif message.role == "assistant" # Fallback logging if super didn't return an AR Message
-        Rails.logger.warn "[Conversation##persist_message_completion] Verification step: result of super was not a persisted ActiveRecord::Message. Result: #{active_record_message.inspect}. Original RubyLLM::Message (content: #{message.content&.truncate(50)})"
+    elsif message.role == "assistant"
+      Rails.logger.warn "[Conversation##persist_message_completion] `super(message)` did not return a persisted ActiveRecord::Message for an assistant role. Result: #{active_record_message.inspect}. RubyLLM::Message content: #{message.content&.truncate(50)}"
     end
     
     active_record_message # Return the ActiveRecord Message
