@@ -5,46 +5,29 @@
   <% display_round_number = message.round_number || "?" %>
     
   <div class="chat <%= is_first_participant ? 'chat-start' : 'chat-end' %> group/message animate-fade-in-up <%= participant_class(participant) if participant %>" style="animation-delay: <%= local_assigns.fetch(:index, 0) * 0.1 %>s;">
-      <!-- Enhanced Avatar with Glow Effect -->
+      <!-- Avatar -->
       <div class="chat-image avatar">
-        <div class="relative">
-          <div class="w-12 h-12 rounded-full bg-<%= is_first_participant ? 'primary' : 'secondary' %> flex items-center justify-center text-lg text-primary-content shadow-lg transform group-hover/message:scale-110 transition-all duration-300">
-            <%= model_avatar_emoji(avatar_model_id) %>
-          </div>
-          <!-- Thinking pulse ring -->
-          <% unless message.content.present? %>
-            <div class="absolute inset-0 rounded-full bg-<%= is_first_participant ? 'primary' : 'secondary' %> animate-ping opacity-30"></div>
-          <% end %>
-          <!-- Status indicator -->
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full <%= message.content.present? ? 'bg-success' : 'bg-warning animate-pulse' %> border-2 border-base-100 flex items-center justify-center">
-            <% if message.content.present? %>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2 h-2 text-success-content">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            <% else %>
-              <div class="w-1.5 h-1.5 bg-warning-content rounded-full animate-pulse"></div>
-            <% end %>
-          </div>
+        <div class="w-12 h-12 rounded-full bg-<%= is_first_participant ? 'primary' : 'secondary' %> flex items-center justify-center text-lg text-primary-content shadow-md transform group-hover/message:scale-110 transition-transform duration-300">
+          <%= model_avatar_emoji(avatar_model_id) %>
         </div>
       </div>
       
-      <!-- Enhanced Header -->
-      <div class="chat-header mb-1">
-        <div class="flex items-center gap-2 <%= is_first_participant ? 'justify-start' : 'justify-end' %>">
-          <span class="font-semibold text-base text-<%= is_first_participant ? 'primary' : 'secondary' %>">
+      <!-- Chat Header -->
+      <div class="chat-header mb-1.5">
+        <div class="flex items-center gap-2.5 <%= is_first_participant ? 'justify-start' : 'justify-end' %>">
+          <span class="font-semibold text-base-content">
             <%= participant&.name || "Unknown" %>
           </span>
-          <div class="flex items-center gap-1 text-xs text-base-content/60">
-            <span class="badge badge-sm badge-outline">Round <%= display_round_number %></span>
-            <span class="opacity-50">•</span>
+          <div class="flex items-center gap-1.5 text-xs text-base-content/60">
+            <span class="badge badge-xs badge-ghost">R<%= display_round_number %></span>
             <time><%= message.created_at.strftime("%I:%M %p") %></time>
           </div>
         </div>
       </div>
       
-      <!-- Enhanced Chat Bubble -->
+      <!-- Chat Bubble -->
       <div class="relative">
-        <div class="chat-bubble <%= is_first_participant ? 'chat-bubble-primary' : 'chat-bubble-secondary' %> text-base max-w-3xl shadow-lg border-0 relative overflow-hidden group-hover/message:shadow-xl transition-all duration-300">
+        <div class="chat-bubble <%= is_first_participant ? 'bg-base-100' : 'bg-base-300' %> text-base-content text-base max-w-3xl shadow-md border-0 relative overflow-hidden group-hover/message:shadow-lg transition-shadow duration-300">
           
           <div class="relative z-10" id="<%= dom_id(message, "content") %>">
             <% if message.content.present? %>
