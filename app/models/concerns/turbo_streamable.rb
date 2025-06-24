@@ -1,8 +1,6 @@
 module TurboStreamable
   extend ActiveSupport::Concern
 
-  private
-
   # Broadcast conversation frame update to handle layout transitions  
   def broadcast_conversation_update
     broadcast_replace_to(
@@ -10,16 +8,6 @@ module TurboStreamable
       target: "conversation",
       template: "conversations/show",
       locals: { conversation: self }
-    )
-  end
-
-  # Broadcast conversation controls update
-  def broadcast_controls
-    broadcast_replace_to(
-      self,
-      target: "conversation-controls-container",
-      partial: "conversations/controls",
-      locals: { conversation: self.reload }
     )
   end
 
@@ -35,6 +23,17 @@ module TurboStreamable
         conversation: self,
         index: messages.where(role: "assistant").count - 1
       }
+    )
+  end
+
+  # Broadcast conversation controls update
+  # This is now public
+  def broadcast_controls
+    broadcast_replace_to(
+      self,
+      target: "conversation-controls-container",
+      partial: "conversations/controls",
+      locals: { conversation: self.reload } # Ensure fresh data
     )
   end
 end
