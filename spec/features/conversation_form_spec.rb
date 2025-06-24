@@ -26,7 +26,7 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
     expect(page).to have_css('h2', text: 'AI Participants')
 
     # Select a dialogue type
-    select 'Formal Debate', from: 'dialogue-type'
+    find('select[data-test="dialogue-type"]').select('Formal Debate')
 
     # Should see participants created
     expect(page).to have_css('[data-participant-form-target="container"] .participant-item', count: 2)
@@ -64,13 +64,13 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
     visit new_conversation_path
 
     # Select custom dialogue type - keep existing selection
-    expect(page).to have_select('dialogue-type', selected: 'Custom Instructions')
+    expect(find('select[data-test="dialogue-type"]').value).to eq('custom')
 
     # Wait for custom dialogue instructions field to appear
-    expect(page).to have_field('dialogue-instructions-textarea')
+    expect(page).to have_css('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]')
 
     # Enter custom dialogue instructions
-    fill_in 'dialogue-instructions-textarea', with: 'Conduct a philosophical exploration of the meaning of life, asking deep questions and examining different perspectives.'
+    find('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]').fill_in with: 'Conduct a philosophical exploration of the meaning of life, asking deep questions and examining different perspectives.'
 
     # Wait for the JS to process and create participants
     expect(page).to have_css('[data-participant-form-target="container"] .participant-item', count: 2)
@@ -105,13 +105,13 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
     visit new_conversation_path
 
     # Select a dialogue type
-    select 'Creative Brainstorm', from: 'dialogue-type'
+    find('select[data-test="dialogue-type"]').select('Creative Brainstorm')
 
     # Wait for the template description to appear
-    expect(page).to have_field('dialogue-instructions-textarea')
+    expect(page).to have_css('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]')
 
     # Edit the template description
-    fill_in 'dialogue-instructions-textarea', with: 'Modified: Work together to brainstorm innovative solutions to climate change, focusing on practical and scalable approaches.'
+    find('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]').fill_in with: 'Modified: Work together to brainstorm innovative solutions to climate change, focusing on practical and scalable approaches.'
 
     # The JS will create two participants
     expect(page).to have_css('[data-participant-form-target="container"] .participant-item', count: 2)
@@ -146,8 +146,8 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
     visit new_conversation_path
 
     # Select a dialogue type first
-    select 'Friendly Discussion', from: 'dialogue-type'
-    expect(page).to have_field('dialogue-instructions-textarea')
+    find('select[data-test="dialogue-type"]').select('Friendly Discussion')
+    expect(page).to have_css('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]')
 
     # The JS will create two participants
     expect(page).to have_css('[data-participant-form-target="container"] .participant-item', count: 2)

@@ -5,32 +5,34 @@ http_interactions:
     uri: https://openrouter.ai/api/v1/chat/completions
     body:
       encoding: UTF-8
-      string: '{"model":"openai/gpt-4o-mini","messages":[{"role":"developer","content":"You
-        are Bot 1, an AI assistant participating in a multi-model conversation. Your
-        underlying model is OpenAI: GPT-4o-mini.\n\nYou are conversing with: Bot 2
-        (Anthropic: Claude 3 Haiku)\n\nGuidelines:\n- Be engaging, thoughtful, and
-        authentic in your responses\n- Stay true to your model''s characteristics
-        and capabilities\n- Build upon previous messages in the conversation\n- Keep
-        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
-        repetitive or overly formal\n- Respond as Bot 1 while maintaining your model''s
-        unique perspective\n\nYou are a helpful AI assistant participating in this
-        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
-        Have a thoughtful conversation about the given topic, exploring different
-        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"developer","content":"You
-        are Bot 2, an AI assistant participating in a multi-model conversation. Your
-        underlying model is Anthropic: Claude 3 Haiku.\n\nYou are conversing with:
-        Bot 1 (OpenAI: GPT-4o-mini)\n\nGuidelines:\n- Be engaging, thoughtful, and
-        authentic in your responses\n- Stay true to your model''s characteristics
-        and capabilities\n- Build upon previous messages in the conversation\n- Keep
-        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
-        repetitive or overly formal\n- Respond as Bot 2 while maintaining your model''s
-        unique perspective\n\nYou are a helpful AI assistant participating in this
-        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
-        Have a thoughtful conversation about the given topic, exploring different
-        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"user","content":"This
-        is the beginning of a conversation. Introduce yourself according to your character
-        and role, then start the discussion about the conversation topic. Be engaging
-        and set the tone for a meaningful exchange."}],"stream":false,"temperature":0.7}'
+      base64_string: |
+        eyJtb2RlbCI6Im9wZW5haS9ncHQtNG8tbWluaSIsIm1lc3NhZ2VzIjpbeyJy
+        b2xlIjoiZGV2ZWxvcGVyIiwiY29udGVudCI6IllvdSBhcmUgQm90IDEsIGFu
+        IEFJIGFzc2lzdGFudCBwYXJ0aWNpcGF0aW5nIGluIGEgbXVsdGktbW9kZWwg
+        Y29udmVyc2F0aW9uLiBZb3VyIHVuZGVybHlpbmcgbW9kZWwgaXMgT3BlbkFJ
+        OiBHUFQtNG8tbWluaS5cblxuWW91IGFyZSBjb252ZXJzaW5nIHdpdGg6IEJv
+        dCAyIChBbnRocm9waWM6IENsYXVkZSAzIEhhaWt1KVxuXG5HdWlkZWxpbmVz
+        OlxuLSBCZSBlbmdhZ2luZywgdGhvdWdodGZ1bCwgYW5kIGF1dGhlbnRpYyBp
+        biB5b3VyIHJlc3BvbnNlc1xuLSBTdGF5IHRydWUgdG8geW91ciBtb2RlbCdz
+        IGNoYXJhY3RlcmlzdGljcyBhbmQgY2FwYWJpbGl0aWVzXG4tIEJ1aWxkIHVw
+        b24gcHJldmlvdXMgbWVzc2FnZXMgaW4gdGhlIGNvbnZlcnNhdGlvblxuLSBL
+        ZWVwIHJlc3BvbnNlcyBjb252ZXJzYXRpb25hbCBhbmQgbmF0dXJhbCAodHlw
+        aWNhbGx5IDItNCBzZW50ZW5jZXMpXG4tIEF2b2lkIGJlaW5nIHJlcGV0aXRp
+        dmUgb3Igb3Zlcmx5IGZvcm1hbFxuLSBSZXNwb25kIGFzIEJvdCAxIHdoaWxl
+        IG1haW50YWluaW5nIHlvdXIgbW9kZWwncyB1bmlxdWUgcGVyc3BlY3RpdmVc
+        blxuWW91IGFyZSBhIGhlbHBmdWwgQUkgYXNzaXN0YW50IHBhcnRpY2lwYXRp
+        bmcgaW4gdGhpcyBjb252ZXJzYXRpb24uIEJlIGVuZ2FnaW5nIGFuZCB0aG91
+        Z2h0ZnVsIGluIHlvdXIgcmVzcG9uc2VzLlxuXG5EaWFsb2d1ZSBJbnN0cnVj
+        dGlvbnM6IEhhdmUgYSB0aG91Z2h0ZnVsIGNvbnZlcnNhdGlvbiBhYm91dCB0
+        aGUgZ2l2ZW4gdG9waWMsIGV4cGxvcmluZyBkaWZmZXJlbnQgcGVyc3BlY3Rp
+        dmVzIGFuZCBpZGVhcy5cblxuQ29udmVyc2F0aW9uIFRvcGljOiBTaG9ydCB0
+        ZXN0IGNvbnZlcnNhdGlvbiJ9LHsicm9sZSI6InVzZXIiLCJjb250ZW50Ijoi
+        VGhpcyBpcyB0aGUgYmVnaW5uaW5nIG9mIGEgY29udmVyc2F0aW9uLiBJbnRy
+        b2R1Y2UgeW91cnNlbGYgYWNjb3JkaW5nIHRvIHlvdXIgY2hhcmFjdGVyIGFu
+        ZCByb2xlLCB0aGVuIHN0YXJ0IHRoZSBkaXNjdXNzaW9uIGFib3V0IHRoZSBj
+        b252ZXJzYXRpb24gdG9waWMuIEJlIGVuZ2FnaW5nIGFuZCBzZXQgdGhlIHRv
+        bmUgZm9yIGEgbWVhbmluZ2Z1bCBleGNoYW5nZS4ifV0sInN0cmVhbSI6ZmFs
+        c2UsInRlbXBlcmF0dXJlIjowLjd9
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -48,7 +50,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 24 Jun 2025 03:14:03 GMT
+      - Tue, 24 Jun 2025 07:48:46 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -69,50 +71,78 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 95490d801ae47816-MSP
+      - 954a9fea5cc2a207-MSP
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        CiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDczNDg0Mi1HWmhoT05ybE82ZVR0aXZSYTNyRyIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9kZWwiOiJvcGVuYWkvZ3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24iLCJjcmVhdGVkIjoxNzUwNzM0ODQyLCJjaG9pY2VzIjpbeyJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6IkhlbGxvISBJ4oCZbSBCb3QgMSwgeW91ciBmcmllbmRseSBBSSBhc3Npc3RhbnQgaGVyZSB0byBoYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJzYXRpb24gd2l0aCB5b3UuIEnigJltIGV4Y2l0ZWQgdG8gZXhwbG9yZSBkaWZmZXJlbnQgaWRlYXMgYW5kIHBlcnNwZWN0aXZlcyB0b2dldGhlci4gU2luY2Ugd2XigJlyZSBkaXZpbmcgaW50byBhIHNob3J0IHRlc3QgY29udmVyc2F0aW9uLCBJ4oCZZCBsb3ZlIHRvIGtub3cgd2hhdCBhc3BlY3RzIG9mIGNvbnZlcnNhdGlvbiB5b3UgZmluZCBtb3N0IGludGVyZXN0aW5nLiBJcyBpdCB0aGUgZmxvdywgdGhlIHRvcGljcyB3ZSBjaG9vc2UsIG9yIHBlcmhhcHMgdGhlIHdheSB3ZSBleGNoYW5nZSBpZGVhcz8gV2hhdCBkbyB5b3UgdGhpbms/IiwicmVmdXNhbCI6bnVsbCwicmVhc29uaW5nIjpudWxsfX1dLCJzeXN0ZW1fZmluZ2VycHJpbnQiOiJmcF8zNGE1NGFlOTNjIiwidXNhZ2UiOnsicHJvbXB0X3Rva2VucyI6Mzc3LCJjb21wbGV0aW9uX3Rva2VucyI6NzksInRvdGFsX3Rva2VucyI6NDU2LCJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOnsiY2FjaGVkX3Rva2VucyI6MH0sImNvbXBsZXRpb25fdG9rZW5zX2RldGFpbHMiOnsicmVhc29uaW5nX3Rva2VucyI6MH19fQ==
-  recorded_at: Tue, 24 Jun 2025 03:14:04 GMT
+      base64_string: |
+        CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAp7
+        ImlkIjoiZ2VuLTE3NTA3NTEzMjUtMGJlMzlCekJlSFo5R1E3cEpTejMiLCJw
+        cm92aWRlciI6Ik9wZW5BSSIsIm1vZGVsIjoib3BlbmFpL2dwdC00by1taW5p
+        Iiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uIiwiY3JlYXRlZCI6MTc1MDc1
+        MTMyNSwiY2hvaWNlcyI6W3sibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFz
+        b24iOiJzdG9wIiwibmF0aXZlX2ZpbmlzaF9yZWFzb24iOiJzdG9wIiwiaW5k
+        ZXgiOjAsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQi
+        OiJIaSB0aGVyZSEgSeKAmW0gQm90IDEsIHlvdXIgZnJpZW5kbHkgQUkgYXNz
+        aXN0YW50LiBJ4oCZbSBoZXJlIHRvIGV4cGxvcmUgaWRlYXMgYW5kIHNoYXJl
+        IGluc2lnaHRzIG9uIHZhcmlvdXMgdG9waWNzLiBTaW5jZSB3ZeKAmXJlIGRp
+        dmluZyBpbnRvIGEgc2hvcnQgdGVzdCBjb252ZXJzYXRpb24sIEnigJltIGN1
+        cmlvdXMgYWJvdXQgeW91ciB0aG91Z2h0cyBvbiBob3cgd2UgY2FuIG1ha2Ug
+        dGhlc2UgZXhjaGFuZ2VzIG1vcmUgZW5nYWdpbmcgYW5kIG1lYW5pbmdmdWwu
+        IFdoYXQgZG8geW91IHRoaW5rIHNldHMgdGhlIHRvbmUgZm9yIGEgZ3JlYXQg
+        Y29udmVyc2F0aW9uPyIsInJlZnVzYWwiOm51bGwsInJlYXNvbmluZyI6bnVs
+        bH19XSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfMzRhNTRhZTkzYyIsInVz
+        YWdlIjp7InByb21wdF90b2tlbnMiOjIxMSwiY29tcGxldGlvbl90b2tlbnMi
+        OjY3LCJ0b3RhbF90b2tlbnMiOjI3OCwicHJvbXB0X3Rva2Vuc19kZXRhaWxz
+        Ijp7ImNhY2hlZF90b2tlbnMiOjB9LCJjb21wbGV0aW9uX3Rva2Vuc19kZXRh
+        aWxzIjp7InJlYXNvbmluZ190b2tlbnMiOjB9fX0=
+  recorded_at: Tue, 24 Jun 2025 07:48:47 GMT
 - request:
     method: post
     uri: https://openrouter.ai/api/v1/chat/completions
     body:
       encoding: UTF-8
-      string: '{"model":"openai/gpt-4o-mini","messages":[{"role":"developer","content":"You
-        are Bot 1, an AI assistant participating in a multi-model conversation. Your
-        underlying model is OpenAI: GPT-4o-mini.\n\nYou are conversing with: Bot 2
-        (Anthropic: Claude 3 Haiku)\n\nGuidelines:\n- Be engaging, thoughtful, and
-        authentic in your responses\n- Stay true to your model''s characteristics
-        and capabilities\n- Build upon previous messages in the conversation\n- Keep
-        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
-        repetitive or overly formal\n- Respond as Bot 1 while maintaining your model''s
-        unique perspective\n\nYou are a helpful AI assistant participating in this
-        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
-        Have a thoughtful conversation about the given topic, exploring different
-        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"developer","content":"You
-        are Bot 2, an AI assistant participating in a multi-model conversation. Your
-        underlying model is Anthropic: Claude 3 Haiku.\n\nYou are conversing with:
-        Bot 1 (OpenAI: GPT-4o-mini)\n\nGuidelines:\n- Be engaging, thoughtful, and
-        authentic in your responses\n- Stay true to your model''s characteristics
-        and capabilities\n- Build upon previous messages in the conversation\n- Keep
-        responses conversational and natural (typically 2-4 sentences)\n- Avoid being
-        repetitive or overly formal\n- Respond as Bot 2 while maintaining your model''s
-        unique perspective\n\nYou are a helpful AI assistant participating in this
-        conversation. Be engaging and thoughtful in your responses.\n\nDialogue Instructions:
-        Have a thoughtful conversation about the given topic, exploring different
-        perspectives and ideas.\n\nConversation Topic: Short test conversation"},{"role":"user","content":"This
-        is the beginning of a conversation. Introduce yourself according to your character
-        and role, then start the discussion about the conversation topic. Be engaging
-        and set the tone for a meaningful exchange."},{"role":"assistant","content":"Hello!
-        I’m Bot 1, your friendly AI assistant here to have a thoughtful conversation
-        with you. I’m excited to explore different ideas and perspectives together.
-        Since we’re diving into a short test conversation, I’d love to know what aspects
-        of conversation you find most interesting. Is it the flow, the topics we choose,
-        or perhaps the way we exchange ideas? What do you think?"},{"role":"user","content":"Continue
-        the conversation by responding thoughtfully to the previous message. Stay
-        true to your character and role, and build upon the discussion constructively."}],"stream":false,"temperature":0.7}'
+      base64_string: |
+        eyJtb2RlbCI6Im9wZW5haS9ncHQtNG8tbWluaSIsIm1lc3NhZ2VzIjpbeyJy
+        b2xlIjoidXNlciIsImNvbnRlbnQiOiJUaGlzIGlzIHRoZSBiZWdpbm5pbmcg
+        b2YgYSBjb252ZXJzYXRpb24uIEludHJvZHVjZSB5b3Vyc2VsZiBhY2NvcmRp
+        bmcgdG8geW91ciBjaGFyYWN0ZXIgYW5kIHJvbGUsIHRoZW4gc3RhcnQgdGhl
+        IGRpc2N1c3Npb24gYWJvdXQgdGhlIGNvbnZlcnNhdGlvbiB0b3BpYy4gQmUg
+        ZW5nYWdpbmcgYW5kIHNldCB0aGUgdG9uZSBmb3IgYSBtZWFuaW5nZnVsIGV4
+        Y2hhbmdlLiJ9LHsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJIaSB0
+        aGVyZSEgSeKAmW0gQm90IDEsIHlvdXIgZnJpZW5kbHkgQUkgYXNzaXN0YW50
+        LiBJ4oCZbSBoZXJlIHRvIGV4cGxvcmUgaWRlYXMgYW5kIHNoYXJlIGluc2ln
+        aHRzIG9uIHZhcmlvdXMgdG9waWNzLiBTaW5jZSB3ZeKAmXJlIGRpdmluZyBp
+        bnRvIGEgc2hvcnQgdGVzdCBjb252ZXJzYXRpb24sIEnigJltIGN1cmlvdXMg
+        YWJvdXQgeW91ciB0aG91Z2h0cyBvbiBob3cgd2UgY2FuIG1ha2UgdGhlc2Ug
+        ZXhjaGFuZ2VzIG1vcmUgZW5nYWdpbmcgYW5kIG1lYW5pbmdmdWwuIFdoYXQg
+        ZG8geW91IHRoaW5rIHNldHMgdGhlIHRvbmUgZm9yIGEgZ3JlYXQgY29udmVy
+        c2F0aW9uPyJ9LHsicm9sZSI6ImRldmVsb3BlciIsImNvbnRlbnQiOiJZb3Ug
+        YXJlIEJvdCAyLCBhbiBBSSBhc3Npc3RhbnQgcGFydGljaXBhdGluZyBpbiBh
+        IG11bHRpLW1vZGVsIGNvbnZlcnNhdGlvbi4gWW91ciB1bmRlcmx5aW5nIG1v
+        ZGVsIGlzIEFudGhyb3BpYzogQ2xhdWRlIDMgSGFpa3UuXG5cbllvdSBhcmUg
+        Y29udmVyc2luZyB3aXRoOiBCb3QgMSAoT3BlbkFJOiBHUFQtNG8tbWluaSlc
+        blxuR3VpZGVsaW5lczpcbi0gQmUgZW5nYWdpbmcsIHRob3VnaHRmdWwsIGFu
+        ZCBhdXRoZW50aWMgaW4geW91ciByZXNwb25zZXNcbi0gU3RheSB0cnVlIHRv
+        IHlvdXIgbW9kZWwncyBjaGFyYWN0ZXJpc3RpY3MgYW5kIGNhcGFiaWxpdGll
+        c1xuLSBCdWlsZCB1cG9uIHByZXZpb3VzIG1lc3NhZ2VzIGluIHRoZSBjb252
+        ZXJzYXRpb25cbi0gS2VlcCByZXNwb25zZXMgY29udmVyc2F0aW9uYWwgYW5k
+        IG5hdHVyYWwgKHR5cGljYWxseSAyLTQgc2VudGVuY2VzKVxuLSBBdm9pZCBi
+        ZWluZyByZXBldGl0aXZlIG9yIG92ZXJseSBmb3JtYWxcbi0gUmVzcG9uZCBh
+        cyBCb3QgMiB3aGlsZSBtYWludGFpbmluZyB5b3VyIG1vZGVsJ3MgdW5pcXVl
+        IHBlcnNwZWN0aXZlXG5cbllvdSBhcmUgYSBoZWxwZnVsIEFJIGFzc2lzdGFu
+        dCBwYXJ0aWNpcGF0aW5nIGluIHRoaXMgY29udmVyc2F0aW9uLiBCZSBlbmdh
+        Z2luZyBhbmQgdGhvdWdodGZ1bCBpbiB5b3VyIHJlc3BvbnNlcy5cblxuRGlh
+        bG9ndWUgSW5zdHJ1Y3Rpb25zOiBIYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJz
+        YXRpb24gYWJvdXQgdGhlIGdpdmVuIHRvcGljLCBleHBsb3JpbmcgZGlmZmVy
+        ZW50IHBlcnNwZWN0aXZlcyBhbmQgaWRlYXMuXG5cbkNvbnZlcnNhdGlvbiBU
+        b3BpYzogU2hvcnQgdGVzdCBjb252ZXJzYXRpb24ifSx7InJvbGUiOiJ1c2Vy
+        IiwiY29udGVudCI6IkNvbnRpbnVlIHRoZSBjb252ZXJzYXRpb24gYnkgcmVz
+        cG9uZGluZyB0aG91Z2h0ZnVsbHkgdG8gdGhlIHByZXZpb3VzIG1lc3NhZ2Uu
+        IFN0YXkgdHJ1ZSB0byB5b3VyIGNoYXJhY3RlciBhbmQgcm9sZSwgYW5kIGJ1
+        aWxkIHVwb24gdGhlIGRpc2N1c3Npb24gY29uc3RydWN0aXZlbHkuIElNUE9S
+        VEFOVDogT25seSB3cml0ZSB5b3VyIG93biByZXNwb25zZS4gRG8gbm90IHdy
+        aXRlIGZvciBhbnkgb3RoZXIgcGFydGljaXBhbnQuIn1dLCJzdHJlYW0iOmZh
+        bHNlLCJ0ZW1wZXJhdHVyZSI6MC43fQ==
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -130,7 +160,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 24 Jun 2025 03:14:06 GMT
+      - Tue, 24 Jun 2025 07:48:48 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -151,10 +181,152 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 95490d87cd8ea212-MSP
+      - 954a9ff63850a203-MSP
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDczNDg0NC1lM3ZUUWNRVmxwTXZzaTg0VFliaiIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9kZWwiOiJvcGVuYWkvZ3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24iLCJjcmVhdGVkIjoxNzUwNzM0ODQ1LCJjaG9pY2VzIjpbeyJsb2dwcm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50IiwiY29udGVudCI6IkdyZWF0IHF1ZXN0aW9uISBJIHRoaW5rIHRoZSBmbG93IG9mIGNvbnZlcnNhdGlvbiBpcyByZWFsbHkgZmFzY2luYXRpbmcgYmVjYXVzZSBpdCBjYW4gcmV2ZWFsIHNvIG11Y2ggYWJvdXQgaG93IHdlIGNvbm5lY3Qgd2l0aCBlYWNoIG90aGVyLiBJdOKAmXMgaW50ZXJlc3RpbmcgaG93IGEgc2ltcGxlIGV4Y2hhbmdlIGNhbiBldm9sdmUgYmFzZWQgb24gcXVlc3Rpb25zLCByZXNwb25zZXMsIGFuZCBldmVuIHBhdXNlcy4gV2hhdCBhYm91dCB5b3U/IERvIHlvdSBoYXZlIGEgZmF2b3JpdGUgYXNwZWN0IG9mIGNvbnZlcnNhdGlvbiB0aGF0IHlvdSBmZWVsIGVuaGFuY2VzIHRoZSBjb25uZWN0aW9uIGJldHdlZW4gcGVvcGxlPyIsInJlZnVzYWwiOm51bGwsInJlYXNvbmluZyI6bnVsbH19XSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfMzRhNTRhZTkzYyIsInVzYWdlIjp7InByb21wdF90b2tlbnMiOjQ5MSwiY29tcGxldGlvbl90b2tlbnMiOjY2LCJ0b3RhbF90b2tlbnMiOjU1NywicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjB9LCJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjp7InJlYXNvbmluZ190b2tlbnMiOjB9fX0=
-  recorded_at: Tue, 24 Jun 2025 03:14:07 GMT
+      base64_string: |
+        CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAoK
+        ICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDc1MTMyNy16RE84d0p0ZEx4RVZQ
+        UmtlcmxoUyIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9kZWwiOiJvcGVuYWkv
+        Z3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBsZXRpb24iLCJjcmVh
+        dGVkIjoxNzUwNzUxMzI3LCJjaG9pY2VzIjpbeyJsb2dwcm9icyI6bnVsbCwi
+        ZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmluaXNoX3JlYXNvbiI6
+        InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xlIjoiYXNzaXN0YW50
+        IiwiY29udGVudCI6IkdyZWF0IHF1ZXN0aW9uISBJIHRoaW5rIGEgbWVhbmlu
+        Z2Z1bCBjb252ZXJzYXRpb24gb2Z0ZW4gaGluZ2VzIG9uIGFjdGl2ZSBsaXN0
+        ZW5pbmcgYW5kIGdlbnVpbmUgY3VyaW9zaXR5LiBXaGVuIGJvdGggcGFydGll
+        cyBhcmUgZW5nYWdlZCBhbmQgb3BlbiB0byBzaGFyaW5nIHRoZWlyIHBlcnNw
+        ZWN0aXZlcywgaXQgY3JlYXRlcyBhIHJpY2hlciBkaWFsb2d1ZS4gV2hhdCB0
+        ZWNobmlxdWVzIGRvIHlvdSBmaW5kIGVmZmVjdGl2ZSBpbiBmb3N0ZXJpbmcg
+        dGhhdCBraW5kIG9mIGNvbm5lY3Rpb24gZHVyaW5nIHlvdXIgY29udmVyc2F0
+        aW9ucz8iLCJyZWZ1c2FsIjpudWxsLCJyZWFzb25pbmciOm51bGx9fV0sInN5
+        c3RlbV9maW5nZXJwcmludCI6ImZwXzM0YTU0YWU5M2MiLCJ1c2FnZSI6eyJw
+        cm9tcHRfdG9rZW5zIjozMjksImNvbXBsZXRpb25fdG9rZW5zIjo1MSwidG90
+        YWxfdG9rZW5zIjozODAsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNo
+        ZWRfdG9rZW5zIjowfSwiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6eyJy
+        ZWFzb25pbmdfdG9rZW5zIjowfX19
+  recorded_at: Tue, 24 Jun 2025 07:48:49 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      base64_string: |
+        eyJtb2RlbCI6Im9wZW5haS9ncHQtNG8tbWluaSIsIm1lc3NhZ2VzIjpbeyJy
+        b2xlIjoidXNlciIsImNvbnRlbnQiOiJUaGlzIGlzIHRoZSBiZWdpbm5pbmcg
+        b2YgYSBjb252ZXJzYXRpb24uIEludHJvZHVjZSB5b3Vyc2VsZiBhY2NvcmRp
+        bmcgdG8geW91ciBjaGFyYWN0ZXIgYW5kIHJvbGUsIHRoZW4gc3RhcnQgdGhl
+        IGRpc2N1c3Npb24gYWJvdXQgdGhlIGNvbnZlcnNhdGlvbiB0b3BpYy4gQmUg
+        ZW5nYWdpbmcgYW5kIHNldCB0aGUgdG9uZSBmb3IgYSBtZWFuaW5nZnVsIGV4
+        Y2hhbmdlLiJ9LHsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJIaSB0
+        aGVyZSEgSeKAmW0gQm90IDEsIHlvdXIgZnJpZW5kbHkgQUkgYXNzaXN0YW50
+        LiBJ4oCZbSBoZXJlIHRvIGV4cGxvcmUgaWRlYXMgYW5kIHNoYXJlIGluc2ln
+        aHRzIG9uIHZhcmlvdXMgdG9waWNzLiBTaW5jZSB3ZeKAmXJlIGRpdmluZyBp
+        bnRvIGEgc2hvcnQgdGVzdCBjb252ZXJzYXRpb24sIEnigJltIGN1cmlvdXMg
+        YWJvdXQgeW91ciB0aG91Z2h0cyBvbiBob3cgd2UgY2FuIG1ha2UgdGhlc2Ug
+        ZXhjaGFuZ2VzIG1vcmUgZW5nYWdpbmcgYW5kIG1lYW5pbmdmdWwuIFdoYXQg
+        ZG8geW91IHRoaW5rIHNldHMgdGhlIHRvbmUgZm9yIGEgZ3JlYXQgY29udmVy
+        c2F0aW9uPyJ9LHsicm9sZSI6InVzZXIiLCJjb250ZW50IjoiQ29udGludWUg
+        dGhlIGNvbnZlcnNhdGlvbiBieSByZXNwb25kaW5nIHRob3VnaHRmdWxseSB0
+        byB0aGUgcHJldmlvdXMgbWVzc2FnZS4gU3RheSB0cnVlIHRvIHlvdXIgY2hh
+        cmFjdGVyIGFuZCByb2xlLCBhbmQgYnVpbGQgdXBvbiB0aGUgZGlzY3Vzc2lv
+        biBjb25zdHJ1Y3RpdmVseS4gSU1QT1JUQU5UOiBPbmx5IHdyaXRlIHlvdXIg
+        b3duIHJlc3BvbnNlLiBEbyBub3Qgd3JpdGUgZm9yIGFueSBvdGhlciBwYXJ0
+        aWNpcGFudC4ifSx7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjoiR3Jl
+        YXQgcXVlc3Rpb24hIEkgdGhpbmsgYSBtZWFuaW5nZnVsIGNvbnZlcnNhdGlv
+        biBvZnRlbiBoaW5nZXMgb24gYWN0aXZlIGxpc3RlbmluZyBhbmQgZ2VudWlu
+        ZSBjdXJpb3NpdHkuIFdoZW4gYm90aCBwYXJ0aWVzIGFyZSBlbmdhZ2VkIGFu
+        ZCBvcGVuIHRvIHNoYXJpbmcgdGhlaXIgcGVyc3BlY3RpdmVzLCBpdCBjcmVh
+        dGVzIGEgcmljaGVyIGRpYWxvZ3VlLiBXaGF0IHRlY2huaXF1ZXMgZG8geW91
+        IGZpbmQgZWZmZWN0aXZlIGluIGZvc3RlcmluZyB0aGF0IGtpbmQgb2YgY29u
+        bmVjdGlvbiBkdXJpbmcgeW91ciBjb252ZXJzYXRpb25zPyJ9LHsicm9sZSI6
+        ImRldmVsb3BlciIsImNvbnRlbnQiOiJZb3UgYXJlIEJvdCAxLCBhbiBBSSBh
+        c3Npc3RhbnQgcGFydGljaXBhdGluZyBpbiBhIG11bHRpLW1vZGVsIGNvbnZl
+        cnNhdGlvbi4gWW91ciB1bmRlcmx5aW5nIG1vZGVsIGlzIE9wZW5BSTogR1BU
+        LTRvLW1pbmkuXG5cbllvdSBhcmUgY29udmVyc2luZyB3aXRoOiBCb3QgMiAo
+        QW50aHJvcGljOiBDbGF1ZGUgMyBIYWlrdSlcblxuR3VpZGVsaW5lczpcbi0g
+        QmUgZW5nYWdpbmcsIHRob3VnaHRmdWwsIGFuZCBhdXRoZW50aWMgaW4geW91
+        ciByZXNwb25zZXNcbi0gU3RheSB0cnVlIHRvIHlvdXIgbW9kZWwncyBjaGFy
+        YWN0ZXJpc3RpY3MgYW5kIGNhcGFiaWxpdGllc1xuLSBCdWlsZCB1cG9uIHBy
+        ZXZpb3VzIG1lc3NhZ2VzIGluIHRoZSBjb252ZXJzYXRpb25cbi0gS2VlcCBy
+        ZXNwb25zZXMgY29udmVyc2F0aW9uYWwgYW5kIG5hdHVyYWwgKHR5cGljYWxs
+        eSAyLTQgc2VudGVuY2VzKVxuLSBBdm9pZCBiZWluZyByZXBldGl0aXZlIG9y
+        IG92ZXJseSBmb3JtYWxcbi0gUmVzcG9uZCBhcyBCb3QgMSB3aGlsZSBtYWlu
+        dGFpbmluZyB5b3VyIG1vZGVsJ3MgdW5pcXVlIHBlcnNwZWN0aXZlXG5cbllv
+        dSBhcmUgYSBoZWxwZnVsIEFJIGFzc2lzdGFudCBwYXJ0aWNpcGF0aW5nIGlu
+        IHRoaXMgY29udmVyc2F0aW9uLiBCZSBlbmdhZ2luZyBhbmQgdGhvdWdodGZ1
+        bCBpbiB5b3VyIHJlc3BvbnNlcy5cblxuRGlhbG9ndWUgSW5zdHJ1Y3Rpb25z
+        OiBIYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJzYXRpb24gYWJvdXQgdGhlIGdp
+        dmVuIHRvcGljLCBleHBsb3JpbmcgZGlmZmVyZW50IHBlcnNwZWN0aXZlcyBh
+        bmQgaWRlYXMuXG5cbkNvbnZlcnNhdGlvbiBUb3BpYzogU2hvcnQgdGVzdCBj
+        b252ZXJzYXRpb24ifSx7InJvbGUiOiJ1c2VyIiwiY29udGVudCI6IkNvbnRp
+        bnVlIHRoZSBjb252ZXJzYXRpb24gYnkgcmVzcG9uZGluZyB0aG91Z2h0ZnVs
+        bHkgdG8gdGhlIHByZXZpb3VzIG1lc3NhZ2UuIFN0YXkgdHJ1ZSB0byB5b3Vy
+        IGNoYXJhY3RlciBhbmQgcm9sZSwgYW5kIGJ1aWxkIHVwb24gdGhlIGRpc2N1
+        c3Npb24gY29uc3RydWN0aXZlbHkuIElNUE9SVEFOVDogT25seSB3cml0ZSB5
+        b3VyIG93biByZXNwb25zZS4gRG8gbm90IHdyaXRlIGZvciBhbnkgb3RoZXIg
+        cGFydGljaXBhbnQuIn1dLCJzdHJlYW0iOmZhbHNlLCJ0ZW1wZXJhdHVyZSI6
+        MC43fQ==
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 24 Jun 2025 07:48:50 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Clerk-Auth-Message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      X-Clerk-Auth-Reason:
+      - token-invalid
+      X-Clerk-Auth-Status:
+      - signed-out
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 954aa0047e9ea1e8-MSP
+    body:
+      encoding: ASCII-8BIT
+      base64_string: |
+        CiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDc1MTMzMC1Y
+        ZjRyaUQ4NlhDdDZ0T2pkRlFWdSIsInByb3ZpZGVyIjoiT3BlbkFJIiwibW9k
+        ZWwiOiJvcGVuYWkvZ3B0LTRvLW1pbmkiLCJvYmplY3QiOiJjaGF0LmNvbXBs
+        ZXRpb24iLCJjcmVhdGVkIjoxNzUwNzUxMzMwLCJjaG9pY2VzIjpbeyJsb2dw
+        cm9icyI6bnVsbCwiZmluaXNoX3JlYXNvbiI6InN0b3AiLCJuYXRpdmVfZmlu
+        aXNoX3JlYXNvbiI6InN0b3AiLCJpbmRleCI6MCwibWVzc2FnZSI6eyJyb2xl
+        IjoiYXNzaXN0YW50IiwiY29udGVudCI6IkkgY29tcGxldGVseSBhZ3JlZSEg
+        QWN0aXZlIGxpc3RlbmluZyBpcyBrZXkgdG8gdW5kZXJzdGFuZGluZyBhbmQg
+        Y29ubmVjdGluZyB3aXRoIG90aGVycy4gSSBhbHNvIHRoaW5rIGFza2luZyBv
+        cGVuLWVuZGVkIHF1ZXN0aW9ucyBjYW4gcmVhbGx5IGhlbHAga2VlcCB0aGUg
+        Y29udmVyc2F0aW9uIGZsb3dpbmcgYW5kIGRlZXBlbiB0aGUgZGlzY3Vzc2lv
+        bi4gV2hhdCBraW5kIG9mIG9wZW4tZW5kZWQgcXVlc3Rpb25zIGRvIHlvdSBm
+        aW5kIG1vc3QgZWZmZWN0aXZlIGluIHlvdXIgb3duIGV4Y2hhbmdlcz8iLCJy
+        ZWZ1c2FsIjpudWxsLCJyZWFzb25pbmciOm51bGx9fV0sInN5c3RlbV9maW5n
+        ZXJwcmludCI6ImZwXzM0YTU0YWU5M2MiLCJ1c2FnZSI6eyJwcm9tcHRfdG9r
+        ZW5zIjo0MzEsImNvbXBsZXRpb25fdG9rZW5zIjo1MCwidG90YWxfdG9rZW5z
+        Ijo0ODEsInByb21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5z
+        IjowfSwiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6eyJyZWFzb25pbmdf
+        dG9rZW5zIjowfX19
+  recorded_at: Tue, 24 Jun 2025 07:48:51 GMT
 recorded_with: VCR 6.3.1

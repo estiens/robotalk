@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Conversation, type: :model do
   let(:user) { User.create!(email: "test@example.com", password: "password123") }
   let(:conversation) { Conversation.create!(user: user, max_rounds: 3, conversation_topic: "Test Topic") }
-  
+
   describe "round management" do
     before do
       # Create 3 participants
@@ -15,7 +15,7 @@ RSpec.describe Conversation, type: :model do
       )
       conversation.participants.create!(
         model_id: "anthropic/claude-3-haiku",
-        name: "Assistant 2", 
+        name: "Assistant 2",
         turn_order: 2,
         character_prompt: "You are a creative thinker"
       )
@@ -35,16 +35,16 @@ RSpec.describe Conversation, type: :model do
       it "returns 1 for rounds 1-3 assistant messages" do
         1.times { conversation.messages.create!(role: "assistant", content: "Message", model_id: "openai/gpt-4") }
         expect(conversation.current_round).to eq(1)
-        
+
         conversation.messages.create!(role: "assistant", content: "Message", model_id: "anthropic/claude-3-haiku")
         expect(conversation.current_round).to eq(1)
-        
+
         conversation.messages.create!(role: "assistant", content: "Message", model_id: "deepseek/deepseek-r1")
         expect(conversation.current_round).to eq(1)
       end
 
       it "returns 2 for rounds 4-6 assistant messages" do
-        4.times { |i| 
+        4.times { |i|
           model = conversation.participants[i % 3].model_id
           conversation.messages.create!(role: "assistant", content: "Message #{i+1}", model_id: model)
         }
@@ -97,12 +97,12 @@ RSpec.describe Conversation, type: :model do
       it "returns second participant after first has spoken" do
         first_participant = conversation.participants.ordered.first
         conversation.messages.create!(
-          role: "assistant", 
+          role: "assistant",
           content: "First message",
           model_id: first_participant.model_id,
           conversation_participant: first_participant
         )
-        
+
         next_speaker = conversation.next_speaker
         expect(next_speaker.turn_order).to eq(2)
       end
@@ -117,19 +117,20 @@ RSpec.describe Conversation, type: :model do
             conversation_participant: participant
           )
         end
-        
+
         next_speaker = conversation.next_speaker
         expect(next_speaker).to eq(conversation.participants.ordered.first)
         expect(next_speaker.turn_order).to eq(1)
       end
 
-      it "returns nil if participant cannot be found by model_id" do
+      it "returns nil if message has no conversation_participant" do
         conversation.messages.create!(
           role: "assistant",
           content: "Message",
-          model_id: "unknown/model"
+          model_id: "unknown/model",
+          conversation_participant: nil
         )
-        
+
         expect(conversation.next_speaker).to be_nil
       end
     end
@@ -164,44 +165,13 @@ RSpec.describe Conversation, type: :model do
       end
     end
 
-    describe "round_number assignment in messages" do
-      it "assigns correct round_number when creating messages" do
-        # Mock the persist_new_message behavior
-        participant1 = conversation.participants.ordered.first
-        conversation.current_turn_participant_id = participant1.id
-        
-        # Simulate message creation with round number
-        message1 = conversation.messages.create!(
-          role: "assistant",
-          content: "First message",
-          model_id: participant1.model_id,
-          conversation_participant_id: participant1.id,
-          round_number: 1
-        )
-        
-        expect(message1.round_number).to eq(1)
-        
-        # Second participant in same round
-        participant2 = conversation.participants.ordered.second
-        message2 = conversation.messages.create!(
-          role: "assistant", 
-          content: "Second message",
-          model_id: participant2.model_id,
-          conversation_participant_id: participant2.id,
-          round_number: 1
-        )
-        
-        expect(message2.round_number).to eq(1)
-      end
-    end
-
     describe "ConversationParticipant#has_spoken_in_round?" do
       let(:participant) { conversation.participants.first }
-      
+
       it "returns false when participant hasn't spoken in the round" do
         expect(participant.has_spoken_in_round?(1)).to be false
       end
-      
+
       it "returns true when participant has spoken in the round" do
         participant.messages.create!(
           conversation: conversation,
@@ -209,18 +179,18 @@ RSpec.describe Conversation, type: :model do
           content: "Test message",
           round_number: 1
         )
-        
+
         expect(participant.has_spoken_in_round?(1)).to be true
       end
-      
+
       it "checks specific round numbers correctly" do
         participant.messages.create!(
           conversation: conversation,
-          role: "assistant", 
+          role: "assistant",
           content: "Round 1 message",
           round_number: 1
         )
-        
+
         expect(participant.has_spoken_in_round?(1)).to be true
         expect(participant.has_spoken_in_round?(2)).to be false
       end
@@ -243,10 +213,10 @@ RSpec.describe Conversation, type: :model do
     it "validates max_rounds is between 1 and 50" do
       conversation.max_rounds = 0
       expect(conversation).not_to be_valid
-      
+
       conversation.max_rounds = 51
       expect(conversation).not_to be_valid
-      
+
       conversation.max_rounds = 25
       expect(conversation).to be_valid
     end

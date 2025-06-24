@@ -27,7 +27,7 @@ RSpec.describe 'Semantic LLM Conversation', type: :system do
 
     # Fill in conversation details
     find('[data-test="conversation-topic"]').fill_in with: 'AI Philosophy Debate'
-    fill_in 'dialogue-instructions-textarea', with: 'Debate whether artificial intelligence can achieve true consciousness.'
+    find('textarea[data-dialogue-form-target="dialogueInstructionsTextarea"]').fill_in with: 'Debate whether artificial intelligence can achieve true consciousness.'
     find('[data-test="max-rounds"]').fill_in with: '2'
 
     within('[data-test="participant-0"]') do
