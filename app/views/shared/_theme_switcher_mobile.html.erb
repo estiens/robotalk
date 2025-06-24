@@ -1,43 +1,16 @@
 <div class="gap-2 grid grid-cols-2" data-controller="theme">
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="light">
-    <div class="bg-base-100 border border-base-content/20 rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Light</span>
-  </button>
-  
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="dark">
-    <div class="bg-neutral rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Dark</span>
-  </button>
-  
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="synthwave">
-    <div class="bg-gradient-to-br from-pink-500 to-purple-600 rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Synthwave</span>
-  </button>
-  
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="cyberpunk">
-    <div class="bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Cyberpunk</span>
-  </button>
-  
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="valentine">
-    <div class="bg-gradient-to-br from-pink-400 to-pink-600 rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Valentine</span>
-  </button>
-  
-  <button class="flex justify-center items-center gap-2 hover:bg-base-200 p-3 border border-base-300 rounded-lg transition-colors theme-item-mobile" 
-          data-action="click->theme#setSpecificTheme" 
-          data-theme="forest">
-    <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-full w-3 h-3"></div>
-    <span class="font-medium text-sm">Forest</span>
-  </button>
-</div> 
+  <% available_themes.each do |theme| %>
+    <div data-theme="<%= theme %>" 
+         data-action="click->theme#setSpecificTheme" 
+         class="bg-base-100 text-base-content rounded-lg w-full p-3 cursor-pointer hover:bg-base-200/60 transition-colors theme-item-mobile">
+      <div class="space-y-2 text-center">
+        <div class="flex items-center justify-center gap-2">
+          <div class="w-4 h-4 rounded-full bg-primary ring-1 ring-base-content/20"></div>
+          <div class="w-4 h-4 rounded-full bg-secondary ring-1 ring-base-content/20"></div>
+          <div class="w-4 h-4 rounded-full bg-accent ring-1 ring-base-content/20"></div>
+        </div>
+        <div class="font-medium text-sm capitalize"><%= theme.tr('-', ' ') %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
