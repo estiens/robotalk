@@ -1,12 +1,12 @@
 <!-- Controls Section -->
-<div class="bg-base-100 shadow-xl border border-base-300 card" data-controller="streaming-conversation"
+<div class="bg-base-100 shadow-xl border border-base-300/50 card" data-controller="streaming-conversation"
      data-streaming-conversation-conversation-id-value="<%= conversation.id %>"
      data-streaming-conversation-next-model-value="<%= conversation.can_continue? ? conversation.next_speaker : '' %>">
   <div class="card-body">
     <% if conversation.messages.empty? %>
       <!-- Start Button -->
       <div id="start-conversation-controls" class="py-8 text-center">
-        <h3 class="mb-4 font-semibold text-xl">Ready to begin?</h3>
+        <h3 class="mb-4 font-semibold text-xl text-primary">Ready to begin?</h3>
         <p class="mb-6 text-base-content/70">Start the conversation between your AI models</p>
         <%= button_to start_conversation_path(conversation),
             method: :post,
@@ -32,7 +32,7 @@
             <div class="flex items-center gap-3">
               <div class="text-3xl">⚡</div>
               <div>
-                <h4 class="font-semibold text-lg">Auto-continue Mode</h4>
+                <h4 class="font-semibold text-lg text-primary-focus">Auto-continue Mode</h4>
                 <p class="text-sm text-base-content/70">Automatically advance through all rounds</p>
               </div>
             </div>
@@ -84,7 +84,7 @@
       <!-- Conversation Complete -->
       <div class="py-8 text-center">
         <div class="mb-4 text-5xl">✅</div>
-        <h3 class="mb-2 font-semibold text-xl" data-test="conversation-complete-message">Conversation Complete</h3>
+        <h3 class="mb-2 font-semibold text-xl text-success" data-test="conversation-complete-message">Conversation Complete</h3>
         <p class="text-base-content/70">All <%= conversation.max_rounds %> rounds have been completed</p>
       </div>
     <% end %>

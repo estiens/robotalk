@@ -1,17 +1,17 @@
 <div data-controller="conversation-updater" class="max-w-4xl mx-auto">
   
   <!-- Conversation Header Card -->
-  <div class="bg-base-100 rounded-lg shadow-sm border border-base-200/50 mb-6">
+  <div class="bg-base-100 rounded-lg shadow-sm border border-base-300/40 mb-6">
     <div class="p-4 sm:p-6">
       <!-- Breadcrumb -->
-      <div class="flex items-center text-sm text-base-content/60 mb-4">
+      <div class="flex items-center text-sm text-base-content/80 mb-4">
         <%= link_to conversations_path, class: "hover:text-primary transition-colors" do %>
           Conversations
         <% end %>
         <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
         </svg>
-        <span class="text-base-content">Current Chat</span>
+        <span class="font-medium text-base-content">Current Chat</span>
       </div>
 
       <!-- Participants & Topic -->
@@ -80,7 +80,7 @@
   </div>
 
   <!-- Unified Status & Controls Bar -->
-  <div class="bg-base-100 rounded-lg shadow-sm border border-base-200/50 mb-6"
+  <div class="bg-base-100 rounded-lg shadow-sm border border-base-300/40 mb-6"
        data-controller="streaming-conversation"
        data-streaming-conversation-conversation-id-value="<%= conversation.id %>"
        data-streaming-conversation-next-model-value="<%= conversation.next_speaker&.model_id %>">
@@ -125,7 +125,7 @@
 
           <!-- Next Speaker -->
           <% if conversation.next_speaker && conversation.can_continue? %>
-            <div class="flex items-center space-x-2 px-3 py-2 bg-base-200/50 rounded-lg">
+            <div class="flex items-center space-x-2 px-3 py-2 bg-base-200 rounded-lg">
               <span class="text-xs text-base-content/60">Next:</span>
               <div class="w-5 h-5 rounded-full bg-<%= conversation.next_speaker.turn_order == 1 ? 'primary' : 'secondary' %> flex items-center justify-center">
                 <span class="text-xs text-white">

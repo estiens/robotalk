@@ -26,7 +26,7 @@
       <% end %>
 
       <!-- Dialogue Instructions Section -->
-      <div class="bg-base-100 shadow-xl border border-base-300/50 rounded-2xl card"
+      <div class="bg-base-100 shadow-xl border border-primary/20 rounded-2xl card"
            data-controller="dialogue-form"
            data-dialogue-form-types-value="<%= ConversationTemplates::DIALOGUE_TYPES.to_json %>">
         <div class="card-body">
@@ -101,7 +101,7 @@
       <%= form.hidden_field :dialogue_instructions, "data-dialogue-form-target": "dialogueInstructionsField" %>
 
       <!-- Participants Section -->
-      <div class="bg-base-100 shadow-xl border border-base-300/50 rounded-2xl card" 
+      <div class="bg-base-100 shadow-xl border border-secondary/20 rounded-2xl card" 
            data-controller="participant-form"
            data-participant-form-participant-index-value="<%= @conversation.participants.size %>"
            data-participant-form-model-options-value="<%= @available_models.to_json %>"

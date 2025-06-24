@@ -26,7 +26,7 @@
 
   <body class="bg-base-200 min-h-screen">
     <!-- Modern Navigation Header -->
-    <header class="top-0 z-[100] sticky bg-base-100/95 shadow-lg backdrop-blur-sm border-b border-base-300/50">
+    <header class="top-0 z-[100] sticky bg-base-100/95 shadow-xl backdrop-blur-sm border-b border-base-300/50">
       <div class="mx-auto px-4 sm:px-6 lg:px-8 container">
         <div class="flex justify-between items-center h-20">
           
@@ -67,9 +67,9 @@
                     <%= current_user.email[0].upcase %>
                   </div>
                 </label>
-                <ul tabindex="0" class="z-[101] bg-base-100 shadow-lg mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
+                <ul tabindex="0" class="z-[101] bg-base-100 shadow-xl mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
                   <li class="menu-title">
-                    <span class="opacity-60 text-xs"><%= current_user.email %></span>
+                    <span class="text-xs text-base-content/60"><%= current_user.email %></span>
                   </li>
                   <li><%= link_to models_path do %>Models<% end %></li>
                   <li><hr class="my-1"></li>
@@ -93,7 +93,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                   </svg>
                 </label>
-                <ul tabindex="0" class="z-[101] bg-base-100 shadow-lg mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
+                <ul tabindex="0" class="z-[101] bg-base-100 shadow-xl mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
                   <li><%= link_to "Conversations", conversations_path %></li>
                   <li><%= link_to "New Chat", new_conversation_path %></li>
                   <li><hr class="my-1"></li>

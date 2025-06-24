@@ -19,7 +19,7 @@
             <%= participant&.name || "Unknown" %>
           </span>
           <div class="flex items-center gap-1.5 text-xs text-base-content/60">
-            <span class="badge badge-xs badge-ghost">R<%= display_round_number %></span>
+            <span class="badge badge-xs badge-outline">R<%= display_round_number %></span>
             <time><%= message.created_at.strftime("%I:%M %p") %></time>
           </div>
         </div>
@@ -27,7 +27,7 @@
       
       <!-- Chat Bubble -->
       <div class="relative">
-        <div class="chat-bubble <%= is_first_participant ? 'bg-base-100' : 'bg-base-300' %> text-base-content text-base max-w-3xl shadow-md border-0 relative overflow-hidden group-hover/message:shadow-lg transition-shadow duration-300">
+        <div class="chat-bubble <%= is_first_participant ? 'chat-bubble-primary' : 'chat-bubble-secondary' %> text-base max-w-3xl shadow-lg border-0 relative overflow-hidden group-hover/message:shadow-xl transition-shadow duration-300">
           
           <div class="relative z-10" id="<%= dom_id(message, "content") %>">
             <% if message.content.present? %>
@@ -71,10 +71,10 @@
       </div>
       
       <!-- Enhanced Footer with More Details -->
-      <div class="chat-footer opacity-50 group-hover/message:opacity-70 transition-opacity">
+      <div class="chat-footer opacity-60 group-hover/message:opacity-80 transition-opacity">
         <div class="flex items-center gap-2 text-xs mt-1 <%= is_first_participant ? '' : 'justify-end' %>">
           <% if message.metadata&.dig('response_time_ms') %>
-            <div class="badge badge-xs badge-ghost gap-1">
+            <div class="badge badge-xs badge-outline gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -82,7 +82,7 @@
             </div>
           <% end %>
           <% if message.metadata&.dig('total_tokens') %>
-            <div class="badge badge-xs badge-ghost gap-1">
+            <div class="badge badge-xs badge-outline gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
               </svg>
