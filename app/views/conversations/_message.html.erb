@@ -37,10 +37,10 @@
               <% if should_truncate %>
                 <div data-controller="expandable-message">
                   <div data-expandable-message-target="preview">
-                    <%= simple_format(truncate(message.content, length: 800, separator: '. '), class: "leading-relaxed text-base-content/90") %>
+                    <%= simple_format(truncate(message.content, length: 800, separator: '. '), class: "leading-relaxed") %>
                   </div>
                   <div data-expandable-message-target="full" class="hidden">
-                    <%= simple_format(message.content, class: "leading-relaxed text-base-content/90") %>
+                    <%= simple_format(message.content, class: "leading-relaxed") %>
                   </div>
                   <div class="mt-3 text-center">
                     <button class="btn btn-xs btn-ghost gap-1" 
@@ -54,7 +54,7 @@
                   </div>
                 </div>
               <% else %>
-                <%= simple_format(message.content, class: "leading-relaxed text-base-content/90") %>
+                <%= simple_format(message.content, class: "leading-relaxed") %>
               <% end %>
             <% else %>
               <div class="flex items-center gap-3 py-2">

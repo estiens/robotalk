@@ -80,7 +80,7 @@
   </div>
 
   <!-- Unified Status & Controls Bar -->
-  <div class="bg-base-100 rounded-lg shadow-sm border border-base-300/40 mb-6"
+  <div class="bg-neutral text-neutral-content rounded-lg shadow-lg border border-base-300/40 mb-6"
        data-controller="streaming-conversation"
        data-streaming-conversation-conversation-id-value="<%= conversation.id %>"
        data-streaming-conversation-next-model-value="<%= conversation.next_speaker&.model_id %>">
@@ -97,10 +97,10 @@
               </span>
             </div>
             <div>
-              <div class="text-sm font-medium text-base-content" data-test="round-indicator">
+              <div class="text-sm font-medium text-neutral-content" data-test="round-indicator">
                 Round <%= [conversation.current_round, 1].max %>/<%= conversation.max_rounds %>
               </div>
-              <div class="text-xs text-base-content/60">
+              <div class="text-xs text-neutral-content/60">
                 <% if conversation.messages.any? %>
                   <%= pluralize(conversation.messages.where(role: 'assistant').count, 'message') %> exchanged
                 <% else %>
@@ -113,7 +113,7 @@
           <!-- Progress Bar -->
           <% if conversation.messages.any? %>
             <div class="hidden sm:block w-24">
-              <div class="flex justify-between text-xs text-base-content/60 mb-1">
+              <div class="flex justify-between text-xs text-neutral-content/60 mb-1">
                 <span><%= [conversation.current_round, 1].max %></span>
                 <span><%= conversation.max_rounds %></span>
               </div>
@@ -125,14 +125,14 @@
 
           <!-- Next Speaker -->
           <% if conversation.next_speaker && conversation.can_continue? %>
-            <div class="flex items-center space-x-2 px-3 py-2 bg-base-200 rounded-lg">
-              <span class="text-xs text-base-content/60">Next:</span>
+            <div class="flex items-center space-x-2 px-3 py-2 bg-neutral-focus rounded-lg">
+              <span class="text-xs text-neutral-content/60">Next:</span>
               <div class="w-5 h-5 rounded-full bg-<%= conversation.next_speaker.turn_order == 1 ? 'primary' : 'secondary' %> flex items-center justify-center">
                 <span class="text-xs text-white">
                   <%= model_avatar_emoji(conversation.next_speaker.model_id) %>
                 </span>
               </div>
-              <span class="text-sm font-medium"><%= conversation.next_speaker.name %></span>
+              <span class="text-sm font-medium text-neutral-content"><%= conversation.next_speaker.name %></span>
             </div>
           <% end %>
         </div>
@@ -143,7 +143,7 @@
             <!-- Auto-continue Toggle -->
             <div class="flex items-center space-x-2">
               <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-sm">Auto</span>
+                <span class="label-text text-sm text-neutral-content">Auto</span>
                 <input type="checkbox"
                        class="toggle toggle-primary toggle-sm"
                        data-controller="auto-continue"
