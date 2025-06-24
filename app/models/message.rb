@@ -4,6 +4,8 @@ class Message < ApplicationRecord
   belongs_to :conversation_participant, optional: true # For identifying the speaker
   has_many :tool_calls, dependent: :destroy
 
+  validates :conversation_participant_id, presence: true, if: -> { role == "assistant" }
+
   before_create :set_round_number
   after_create :advance_conversation_round_if_needed # Restore this callback
 
