@@ -24,8 +24,37 @@
           Start Conversation
         <% end %>
       </div>
+      
+      <!-- Auto-continue Toggle for new conversations -->
+      <% if conversation.can_continue? %>
+        <div class="bg-primary/5 p-4 border border-primary/20 rounded-lg">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="text-3xl">⚡</div>
+              <div>
+                <h4 class="font-semibold text-lg">Auto-continue Mode</h4>
+                <p class="text-sm text-base-content/70">Automatically advance through all rounds</p>
+              </div>
+            </div>
+            <input type="checkbox"
+                   class="toggle toggle-primary toggle-lg"
+                   data-controller="auto-continue"
+                   data-action="change->auto-continue#toggle"
+                   data-auto-continue-conversation-id-value="<%= conversation.id %>"
+                   data-auto-continue-max-rounds-value="<%= conversation.max_rounds %>"
+                   data-auto-continue-active-value="false"
+                   data-test="auto-continue-toggle" />
+          </div>
+          <div id="auto-continue-status" class="hidden mt-3">
+            <div class="flex items-center gap-2 text-primary text-sm">
+              <span class="loading loading-spinner loading-sm"></span>
+              <span>Auto-continuing conversation...</span>
+            </div>
+          </div>
+        </div>
+      <% end %>
     <% elsif conversation.can_continue? %>
-      <!-- Auto-continue Toggle -->
+      <!-- Auto-continue Toggle for ongoing conversations -->
       <div class="bg-primary/5 p-4 border border-primary/20 rounded-lg">
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-3">

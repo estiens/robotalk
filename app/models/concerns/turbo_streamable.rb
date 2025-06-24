@@ -3,12 +3,12 @@ module TurboStreamable
 
   private
 
-  # Broadcast round indicator update
-  def broadcast_round_indicator
+  # Broadcast conversation frame update to handle layout transitions  
+  def broadcast_conversation_update
     broadcast_replace_to(
       self,
-      target: "round-indicator",
-      partial: "conversations/round_indicator",
+      target: "conversation",
+      template: "conversations/show",
       locals: { conversation: self }
     )
   end

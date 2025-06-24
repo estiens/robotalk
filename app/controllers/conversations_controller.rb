@@ -197,7 +197,7 @@ class ConversationsController < ApplicationController
   end
 
   def get_available_models
-    RubyLLM::Models.all.map do |model|
+    RubyLLM::Models.all.sort_by { |model| model.created_at || Time.at(0) }.reverse.map do |model|
       { value: model.id, text: model.name }
     end
   rescue => e

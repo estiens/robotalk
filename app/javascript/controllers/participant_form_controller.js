@@ -17,6 +17,13 @@ export default class extends Controller {
     // Setup character selects for existing participants
     this.element.querySelectorAll('.character-select').forEach(select => {
       this.setupCharacterSelect(select)
+      // Ensure preview is hidden initially for existing participants
+      const participantDiv = select.closest('.participant-item')
+      const previewSection = participantDiv?.querySelector('.character-preview')
+      if (previewSection) {
+        previewSection.classList.add('hidden')
+        previewSection.style.display = 'none'
+      }
     })
   }
 
@@ -135,12 +142,14 @@ export default class extends Controller {
 
   updateParticipantNumbers() {
     this.containerTarget.querySelectorAll('.participant-item').forEach((item, index) => {
-      const numberBadge = item.querySelector('.w-8.h-8')
       const title = item.querySelector('h4')
-      const turnOrderInput = item.querySelector('input[name*="turn_order"]')
+      const turnOrderInput = item.querySelector('.turn-order-input, input[name*="turn_order"]')
       
-      if (numberBadge) numberBadge.textContent = index + 1
-      if (title) title.textContent = `Participant ${index + 1}`
+      if (title) {
+        title.textContent = `Participant ${index + 1}`
+        // Update color class based on index
+        title.className = `font-semibold text-lg ${index % 2 === 0 ? 'text-primary' : 'text-secondary'}`
+      }
       if (turnOrderInput) turnOrderInput.value = index + 1
     })
   }
@@ -177,121 +186,85 @@ export default class extends Controller {
 
   buildParticipantHTML() {
     return `
-      <div class="card bg-base-200/50 border border-base-300 participant-item group hover:bg-base-200/70 transition-colors duration-200" data-test="participant-${this.participantIndexValue}">
-        <div class="card-body p-4">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br ${this.participantIndexValue % 2 === 0 ? 'from-primary to-primary/70' : 'from-secondary to-secondary/70'} flex items-center justify-center text-white text-sm font-bold">
-                ${this.participantIndexValue + 1}
-              </div>
-              <h4 class="font-semibold text-base-content text-lg">Participant ${this.participantIndexValue + 1}</h4>
-            </div>
+      <div class="group bg-base-200/50 hover:bg-base-200/70 border border-base-300 transition-colors duration-200 rounded-lg participant-item" data-test="participant-${this.participantIndexValue}">
+        <div class="p-3">
+          <div class="flex justify-between items-center mb-3">
+            <h4 class="font-semibold text-base ${this.participantIndexValue % 2 === 0 ? 'text-primary' : 'text-secondary'}">
+              Participant ${this.participantIndexValue + 1}
+            </h4>
             <button type="button" 
-                    class="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10 transition-colors remove-participant"
+                    class="hover:bg-error/10 text-error transition-colors btn btn-ghost btn-circle btn-xs remove-participant"
                     data-action="click->participant-form#removeParticipant"
                     data-test="remove-participant"
                     title="Remove participant">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
           
-          <div class="grid gap-4 lg:grid-cols-3">
+          <div class="grid grid-cols-2 gap-3">
             <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium text-base-content">Name</span>
+              <label class="label py-1">
+                <span class="text-sm font-medium text-base-content label-text">Name</span>
               </label>
               <input type="text" 
                      name="conversation[participants_attributes][${this.participantIndexValue}][name]" 
                      placeholder="e.g. Dr. Smith" 
                      required 
-                     class="input input-bordered w-full bg-base-100 text-base-content participant-name focus:border-primary transition-colors">
+                     class="input input-sm input-bordered w-full bg-base-100 text-base-content participant-name focus:border-primary transition-colors">
             </div>
             
             <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium text-base-content">AI Model</span>
+              <label class="label py-1">
+                <span class="text-sm font-medium text-base-content label-text">AI Model</span>
               </label>
               <select name="conversation[participants_attributes][${this.participantIndexValue}][model_id]" 
                       required 
-                      class="select select-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors">
+                      class="select select-sm select-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors">
                 <option value="">Select model...</option>
                 ${this.modelOptionsValue.map(option => `<option value="${option.value}">${option.text}</option>`).join('')}
               </select>
             </div>
-            
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium text-base-content">Turn Order</span>
-              </label>
-              <input type="number" 
-                     name="conversation[participants_attributes][${this.participantIndexValue}][turn_order]" 
-                     value="${this.participantIndexValue + 1}" 
-                     min="1" 
-                     required 
-                     class="input input-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors">
-            </div>
           </div>
           
-          <div class="form-control mt-6">
-            <label class="label">
-              <span class="label-text font-medium text-base-content">Character Archetype</span>
-              <span class="label-text-alt text-base-content/60">Optional - choose a personality template</span>
-            </label>
-            <select class="select select-bordered w-full bg-base-100 text-base-content character-select focus:border-primary transition-colors" 
+          <input type="hidden" 
+                 name="conversation[participants_attributes][${this.participantIndexValue}][turn_order]" 
+                 value="${this.participantIndexValue + 1}" 
+                 class="turn-order-input">
+          
+          <div class="mt-3 form-control">
+            <select class="select select-sm select-bordered w-full bg-base-100 text-base-content character-select" 
                     data-participant-index="${this.participantIndexValue}">
-              <option value="">💭 Choose a character archetype...</option>
+              <option value="">Choose personality (optional)...</option>
               ${this.buildCharacterOptions()}
-              <option value="custom">✏️ Custom Character</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
           
-          <div class="collapse collapse-arrow bg-base-100/50 mt-4" data-character-section>
-            <input type="checkbox" checked />
-            <div class="collapse-title font-medium text-sm">
-              🎭 Character & Personality Details
-            </div>
-            <div class="collapse-content">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium text-base-content">Character Description</span>
-                  <span class="label-text-alt text-base-content/60">Define personality, role, and behavior</span>
-                </label>
-                <textarea name="conversation[participants_attributes][${this.participantIndexValue}][character_prompt]" 
-                          rows="4" 
-                          class="textarea textarea-bordered w-full bg-base-100 text-base-content character-prompt focus:border-primary transition-colors resize-none" 
-                          placeholder="Describe this participant's personality, role, communication style, and any special characteristics..."></textarea>
-                <label class="label">
-                  <span class="label-text-alt text-base-content/50">This will influence how the AI model behaves in the conversation</span>
-                </label>
-              </div>
-              
-              <div class="form-control mt-4">
-                <label class="label">
-                  <span class="label-text font-medium text-base-content">Additional Instructions</span>
-                  <span class="label-text-alt text-base-content/60">Optional technical instructions</span>
-                </label>
-                <textarea name="conversation[participants_attributes][${this.participantIndexValue}][system_prompt]" 
-                          rows="2" 
-                          class="textarea textarea-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors resize-none" 
-                          placeholder="Any extra technical instructions for this model..."></textarea>
-                <label class="label">
-                  <span class="label-text-alt text-base-content/50">Advanced: Custom system-level instructions</span>
-                </label>
-              </div>
+          <div class="hidden mt-1 character-preview" style="display: none;">
+            <div class="text-xs text-success flex items-center gap-1">
+              <span>✨</span>
+              <span class="character-preview-text"></span>
             </div>
           </div>
           
-          <div class="hidden mt-4 p-3 bg-success/10 border border-success/20 rounded-lg character-preview">
-            <div class="flex items-start gap-3">
-              <div class="text-2xl">✨</div>
-              <div>
-                <h5 class="font-semibold text-success-content">Character Applied!</h5>
-                <p class="text-sm text-success-content/80 character-preview-text"></p>
-              </div>
-            </div>
+          <div class="mt-2 form-control">
+            <textarea name="conversation[participants_attributes][${this.participantIndexValue}][character_prompt]" 
+                      rows="2" 
+                      class="textarea textarea-sm textarea-bordered w-full bg-base-100 text-base-content character-prompt focus:border-primary transition-colors resize-none" 
+                      placeholder="Custom character description (optional)..."></textarea>
           </div>
+          
+          <details class="mt-2">
+            <summary class="text-xs text-base-content/60 cursor-pointer hover:text-base-content">Advanced system prompt</summary>
+            <div class="mt-2">
+              <textarea name="conversation[participants_attributes][${this.participantIndexValue}][system_prompt]" 
+                        rows="1" 
+                        class="textarea textarea-sm textarea-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors resize-none" 
+                        placeholder="Technical instructions for the model..."></textarea>
+            </div>
+          </details>
         </div>
       </div>
     `

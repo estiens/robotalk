@@ -123,6 +123,11 @@ RSpec.describe 'LLM Conversation', type: :feature do
       find('[data-test="start-conversation-button"]').click
       expect(page).to have_selector('[data-test="round-indicator"]', wait: 30)
 
+      # Debug: Save page content to see what's actually there
+      puts "=== PAGE CONTENT AFTER START ==="
+      puts page.html
+      puts "================================"
+      
       # Wait for auto-continue toggle to appear after conversation starts
       expect(page).to have_selector('[data-test="auto-continue-toggle"]', wait: 30)
       find('[data-test="auto-continue-toggle"]').click

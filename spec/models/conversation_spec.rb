@@ -28,41 +28,49 @@ RSpec.describe Conversation, type: :model do
     end
 
     describe "#current_round" do
-      it "returns 0 when no assistant messages exist" do
-        expect(conversation.current_round).to eq(0)
-      end
-
-      it "returns 1 for rounds 1-3 assistant messages" do
-        1.times { conversation.messages.create!(role: "assistant", content: "Message", model_id: "openai/gpt-4") }
-        expect(conversation.current_round).to eq(1)
-
-        conversation.messages.create!(role: "assistant", content: "Message", model_id: "anthropic/claude-3-haiku")
-        expect(conversation.current_round).to eq(1)
-
-        conversation.messages.create!(role: "assistant", content: "Message", model_id: "deepseek/deepseek-r1")
+      it "starts at 1 when no assistant messages exist" do
         expect(conversation.current_round).to eq(1)
       end
 
-      it "returns 2 for rounds 4-6 assistant messages" do
-        4.times { |i|
-          model = conversation.participants[i % 3].model_id
-          conversation.messages.create!(role: "assistant", content: "Message #{i+1}", model_id: model)
-        }
+      it "stays at 1 until all participants speak, then advances to 2" do
+        participants = conversation.participants.ordered
+        
+        conversation.messages.create!(role: "assistant", content: "Message", model_id: participants[0].model_id, conversation_participant: participants[0])
+        expect(conversation.current_round).to eq(1)
+
+        conversation.messages.create!(role: "assistant", content: "Message", model_id: participants[1].model_id, conversation_participant: participants[1])
+        expect(conversation.current_round).to eq(1)
+
+        conversation.messages.create!(role: "assistant", content: "Message", model_id: participants[2].model_id, conversation_participant: participants[2])
+        conversation.reload
         expect(conversation.current_round).to eq(2)
       end
 
-      it "correctly calculates partial rounds using ceil" do
-        # With 3 participants, 4 messages = ceil(4/3) = 2
+      it "advances to 2 after round 1 completes" do
+        participants = conversation.participants.ordered
         4.times { |i|
-          model = conversation.participants[i % 3].model_id
-          conversation.messages.create!(role: "assistant", content: "Message", model_id: model)
+          participant = participants[i % 3]
+          conversation.messages.create!(role: "assistant", content: "Message #{i+1}", model_id: participant.model_id, conversation_participant: participant)
         }
+        conversation.reload
+        expect(conversation.current_round).to eq(2)
+      end
+
+      it "advances correctly with partial rounds" do
+        # With 3 participants, after 4 messages we should be in round 2
+        participants = conversation.participants.ordered
+        4.times { |i|
+          participant = participants[i % 3]
+          conversation.messages.create!(role: "assistant", content: "Message", model_id: participant.model_id, conversation_participant: participant)
+        }
+        conversation.reload
         expect(conversation.current_round).to eq(2)
       end
 
       it "handles zero participants gracefully" do
         conversation.participants.destroy_all
-        expect(conversation.current_round).to eq(0)
+        conversation.reload
+        expect(conversation.current_round).to eq(1)
       end
     end
 

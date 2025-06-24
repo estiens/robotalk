@@ -53,17 +53,18 @@ class Message < ApplicationRecord
   def advance_conversation_round_if_needed
     return unless role == "assistant" && conversation.present?
 
+    # Broadcast conversation update to trigger layout transitions (temporarily disabled)
+    # conversation.broadcast_conversation_update if conversation.respond_to?(:broadcast_conversation_update)
+
     # Check if this message completes a round
     current_round_messages = conversation.messages.where(role: "assistant", round_number: round_number).count
     num_participants = conversation.participants.count
     
     # If all participants have spoken in this round, advance to next round
-    if current_round_messages == num_participants && conversation.current_round < round_number
-      conversation.update_column(:current_round, round_number)
-      Rails.logger.info "Advanced conversation #{conversation.id} to round #{round_number}"
-      
-      # Broadcast the round indicator update
-      conversation.broadcast_round_indicator if conversation.respond_to?(:broadcast_round_indicator)
+    if current_round_messages == num_participants && conversation.current_round <= round_number
+      next_round = round_number + 1
+      conversation.update_column(:current_round, next_round)
+      Rails.logger.info "Advanced conversation #{conversation.id} from round #{round_number} to round #{next_round}"
     end
   end
 end

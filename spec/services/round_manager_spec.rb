@@ -19,32 +19,35 @@ RSpec.describe RoundManager, type: :service do
     it "stays at 1 for rounds 1-3 assistant messages" do
       participants = conversation.participants.ordered
       
-      conversation.messages.create!(
+      message1 = conversation.messages.create!(
         role: "assistant", 
         content: "Message", 
         model_id: participants[0].model_id,
         conversation_participant: participants[0]
       )
+      conversation.reload
       expect(conversation.current_round).to eq(1)
 
-      conversation.messages.create!(
+      message2 = conversation.messages.create!(
         role: "assistant", 
         content: "Message", 
         model_id: participants[1].model_id,
         conversation_participant: participants[1]
       )
+      conversation.reload
       expect(conversation.current_round).to eq(1)
 
-      conversation.messages.create!(
+      message3 = conversation.messages.create!(
         role: "assistant", 
         content: "Message", 
         model_id: participants[2].model_id,
         conversation_participant: participants[2]
       )
+      conversation.reload
       expect(conversation.current_round).to eq(2)
     end
 
-    it "advances to 2 when all participants have spoken in round 1" do
+    it "advances to 2 after round 1 completes, then continues in round 2" do
       participants = conversation.participants.ordered
       4.times { |i|
         participant = participants[i % 3]
@@ -55,6 +58,7 @@ RSpec.describe RoundManager, type: :service do
           conversation_participant: participant
         )
       }
+      conversation.reload
       expect(conversation.current_round).to eq(2)
     end
 
