@@ -1,38 +1,38 @@
 
 <!-- Stats Section -->
 <div class="mb-12">
-  <div class="stats stats-vertical lg:stats-horizontal shadow-lg w-full bg-neutral text-neutral-content">
-      <div class="stat place-items-center">
-        <div class="stat-figure text-primary">
+  <div class="bg-neutral shadow-lg w-full text-neutral-content stats stats-vertical lg:stats-horizontal">
+      <div class="place-items-center stat">
+        <div class="text-primary stat-figure">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <div class="stat-title text-neutral-content/70">Total Conversations</div>
-        <div class="stat-value text-primary"><%= @conversations.count %></div>
-        <div class="stat-desc text-neutral-content/70">All time</div>
+        <div class="text-neutral-content/70 stat-title">Total Conversations</div>
+        <div class="text-primary stat-value"><%= @conversations.count %></div>
+        <div class="text-neutral-content/70 stat-desc">All time</div>
       </div>
       
-      <div class="stat place-items-center">
-        <div class="stat-figure text-secondary">
+      <div class="place-items-center stat">
+        <div class="text-secondary stat-figure">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
           </svg>
         </div>
-        <div class="stat-title text-neutral-content/70">Currently Active</div>
-        <div class="stat-value text-secondary"><%= @conversations.generating.count + @conversations.interactive.count %></div>
-        <div class="stat-desc text-neutral-content/70">In progress</div>
+        <div class="text-neutral-content/70 stat-title">Currently Active</div>
+        <div class="text-secondary stat-value"><%= @conversations.generating.count + @conversations.interactive.count %></div>
+        <div class="text-neutral-content/70 stat-desc">In progress</div>
       </div>
       
-      <div class="stat place-items-center">
-        <div class="stat-figure text-accent">
+      <div class="place-items-center stat">
+        <div class="text-accent stat-figure">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <div class="stat-title text-neutral-content/70">Completed</div>
-        <div class="stat-value text-accent"><%= @conversations.complete.count %></div>
-        <div class="stat-desc text-neutral-content/70">Finished</div>
+        <div class="text-neutral-content/70 stat-title">Completed</div>
+        <div class="text-accent stat-value"><%= @conversations.complete.count %></div>
+        <div class="text-neutral-content/70 stat-desc">Finished</div>
       </div>
     </div>
 </div>
@@ -41,9 +41,9 @@
 <%= turbo_stream_from "conversations" %> <%# Add stream subscription for the index page %>
 <% if @conversations.any? %>
     <!-- Section Header -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+    <div class="flex lg:flex-row flex-col justify-between items-start lg:items-center gap-6 mb-12">
       <div>
-        <h1 class="text-3xl lg:text-4xl font-bold mb-2 bg-clip-text bg-gradient-to-r from-primary to-secondary text-transparent">Conversations</h1>
+        <h1 class="bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2 font-bold text-transparent text-3xl lg:text-4xl">Conversations</h1>
         <p class="text-base-content/70 text-lg">Manage and explore your AI dialogues</p>
       </div>
       
@@ -56,11 +56,11 @@
             </svg>
             Sort
           </div>
-          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg">
-            <li><a class="disabled">Newest First</a></li>
-            <li><a class="disabled">Oldest First</a></li>
-            <li><a class="disabled">Most Active</a></li>
-            <li><a class="disabled">Recently Updated</a></li>
+          <ul tabindex="0" class="z-10 bg-base-100 shadow-lg p-2 rounded-box w-56 dropdown-content menu">
+            <li><a>Newest First</a></li>
+            <li><a>Oldest First</a></li>
+            <li><a>Most Active</a></li>
+            <li><a>Recently Updated</a></li>
           </ul>
         </div>
         
@@ -71,19 +71,19 @@
     </div>
 
     <!-- Conversations Grid -->
-    <div id="conversations" class="grid gap-8 md:grid-cols-2 xl:grid-cols-3"> <%# Add id for broadcast target %>
+    <div id="conversations" class="gap-8 grid md:grid-cols-2 xl:grid-cols-3"> <%# Add id for broadcast target %>
       <% @conversations.each_with_index do |conversation, index| %>
         <%= render 'conversation_card', conversation: conversation, index: index %>
       <% end %>
     </div>
   <% else %>
     <!-- Empty State -->
-    <div class="hero min-h-[60vh]">
-      <div class="hero-content text-center">
+    <div class="min-h-[60vh] hero">
+      <div class="text-center hero-content">
         <div class="max-w-lg">
-          <div class="text-8xl mb-8 animate-bounce">💬</div>
-          <h2 class="text-4xl font-bold mb-6">No conversations yet</h2>
-          <p class="text-xl mb-10 leading-relaxed text-base-content/80">
+          <div class="mb-8 text-8xl animate-bounce">💬</div>
+          <h2 class="mb-6 font-bold text-4xl">No conversations yet</h2>
+          <p class="mb-10 text-base-content/80 text-xl leading-relaxed">
             Create your first conversation between AI models and watch them discuss, debate, and collaborate on topics you choose.
           </p>
           
