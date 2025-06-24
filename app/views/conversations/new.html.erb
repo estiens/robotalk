@@ -39,7 +39,7 @@
             <div class="form-control">
               <textarea data-dialogue-form-target="dialogueInstructionsTextarea"
                         data-action="input->dialogue-form#syncHiddenField"
-                        class="bg-base-300 focus:bg-base-100/50 textarea-bordered w-full h-32 text-base-content transition-colors textarea"
+                        class="bg-base-300/60 focus:bg-base-100/50 textarea-bordered w-full h-32 text-base-content transition-colors textarea"
                         placeholder="Enter custom dialogue instructions..."></textarea>
               <label class="label">
                 <span class="label-text-alt text-base-content/60">Define how the conversation should be structured and conducted.</span>
@@ -52,7 +52,7 @@
               </label>
               <select data-dialogue-form-target="dialogueType"
                       data-action="change->dialogue-form#updateInstructions"
-                      class="bg-base-300 w-full text-base-content select-bordered select"
+                      class="bg-base-300/60 w-full text-base-content select-bordered select"
                       data-test="dialogue-type">
                 <option value="custom" selected>Custom Instructions</option>
                 <% dialogue_types_for_select.each do |category, types| %>
@@ -72,7 +72,7 @@
                   <span class="font-semibold text-base-content label-text">Topic</span>
                 <% end %>
                 <%= form.text_field :conversation_topic, 
-                    class: "input input-bordered w-full bg-base-300 text-base-content",
+                    class: "input input-bordered w-full bg-base-300/60 text-base-content",
                     placeholder: "e.g., artificial intelligence, climate change...",
                     data: { test: "conversation-topic" } %>
                 <label class="label">
@@ -87,7 +87,7 @@
                 <% end %>
                 <%= form.number_field :max_rounds, 
                     min: 1, max: 50, value: 10,
-                    class: "input input-bordered w-full bg-base-300 text-base-content text-center",
+                    class: "input input-bordered w-full bg-base-300/60 text-base-content text-center",
                     data: { test: "max-rounds" } %>
                 <label class="label">
                   <span class="label-text-alt text-base-content/60">1-50</span>
