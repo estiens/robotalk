@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div class="stat-title text-neutral-content/70">Total Conversations</div>
-        <div class="stat-value text-neutral-content"><%= @conversations.count %></div>
+        <div class="stat-value text-primary"><%= @conversations.count %></div>
         <div class="stat-desc text-neutral-content/70">All time</div>
       </div>
       
@@ -20,7 +20,7 @@
           </svg>
         </div>
         <div class="stat-title text-neutral-content/70">Currently Active</div>
-        <div class="stat-value text-neutral-content"><%= @conversations.generating.count + @conversations.interactive.count %></div>
+        <div class="stat-value text-secondary"><%= @conversations.generating.count + @conversations.interactive.count %></div>
         <div class="stat-desc text-neutral-content/70">In progress</div>
       </div>
       
@@ -31,7 +31,7 @@
           </svg>
         </div>
         <div class="stat-title text-neutral-content/70">Completed</div>
-        <div class="stat-value text-neutral-content"><%= @conversations.complete.count %></div>
+        <div class="stat-value text-accent"><%= @conversations.complete.count %></div>
         <div class="stat-desc text-neutral-content/70">Finished</div>
       </div>
     </div>
@@ -57,7 +57,7 @@
             </svg>
             Sort
           </div>
-          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-56 p-2 shadow-lg">
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-lg">
             <li><a>Newest First</a></li>
             <li><a>Oldest First</a></li>
             <li><a>Most Active</a></li>
