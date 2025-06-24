@@ -93,49 +93,58 @@ class Conversation < ApplicationRecord
     end
 
     Rails.logger.info "About to call ask() method (streaming is always on)"
+    
+    # Variable to hold the ActiveRecord assistant message for this turn
+    # acts_as_chat creates this message shell via on_new_message callback when ask/complete is called.
+    # We expect persist_message_completion to be called after the stream to finalize it.
+    active_record_assistant_message_for_this_turn = nil
+
     begin
-      result = ask(prompt) do |chunk| # 'ask' calls 'complete', which calls on_new_message, then persist_message_completion
-        # The assistant_message is created by acts_as_chat's on_new_message hook (empty at first)
-        # and then updated by our persist_message_completion (which is like on_end_message)
-        # For streaming, we need the latest assistant message.
-        assistant_message = messages.where(role: "assistant").order(:created_at).last
-        
-        if assistant_message.nil?
-          Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: assistant_message is nil inside ask block. This should not happen."
-          next # or break, or raise
-        end
-
-        # Ensure participant is assigned to the message object before first broadcast
-        if current_participant_for_broadcast && assistant_message.conversation_participant.nil?
-          assistant_message.conversation_participant = current_participant_for_broadcast
-          # Note: This in-memory assignment won't be saved to DB until persist_message_completion runs fully,
-          # but it's crucial for the initial broadcast_new_message to have the participant info.
-          Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{assistant_message.id}) for broadcast."
-        end
-
-        if chunk.content # Only process if there's actual content in the chunk
-          unless message_frame_broadcast
-            if current_participant_for_broadcast
-              # Pass the potentially updated assistant_message (with participant assigned in memory)
-              broadcast_new_message(assistant_message, current_participant_for_broadcast)
-              message_frame_broadcast = true
-              Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{assistant_message.id} with participant: #{current_participant_for_broadcast.name}"
-            else
-              Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message."
-            end
-            sleep 0.1 # Only sleep during streaming for UX
+      result = ask(prompt) do |chunk|
+        # On the first chunk, identify the assistant message created for this turn.
+        if active_record_assistant_message_for_this_turn.nil?
+          # Fetch the latest assistant message, which should be the one acts_as_chat just created.
+          active_record_assistant_message_for_this_turn = messages.where(role: "assistant").order(:created_at).last
+          if active_record_assistant_message_for_this_turn.nil?
+            Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: active_record_assistant_message_for_this_turn is nil after first chunk. This should not happen."
+            next # Skip this chunk if we can't find the message
           end
 
-          if is_first_chunk
-            assistant_message.broadcast_update_chunk(chunk.content)
-            is_first_chunk = false
+          # Assign participant in-memory for the initial broadcast.
+          # persist_message_completion will handle the final DB save of this association.
+          if current_participant_for_broadcast && active_record_assistant_message_for_this_turn.conversation_participant.nil?
+            active_record_assistant_message_for_this_turn.conversation_participant = current_participant_for_broadcast
+            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{active_record_assistant_message_for_this_turn.id}) for initial broadcast."
+          end
+
+          # Broadcast the new message shell ONCE.
+          if current_participant_for_broadcast
+            broadcast_new_message(active_record_assistant_message_for_this_turn, current_participant_for_broadcast)
+            message_frame_broadcast = true # Ensure this flag is set if not already
+            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{active_record_assistant_message_for_this_turn.id} with participant: #{current_participant_for_broadcast.name}"
+            sleep 0.1 # UX delay only after the first shell broadcast
           else
-            assistant_message.broadcast_append_chunk(chunk.content)
+            Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message shell."
+          end
+        end
+
+        # Ensure we have the message object to broadcast chunks to.
+        unless active_record_assistant_message_for_this_turn
+          Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] active_record_assistant_message_for_this_turn is still nil when trying to broadcast chunk. Skipping chunk."
+          next
+        end
+
+        if chunk.content 
+          if is_first_chunk && message_frame_broadcast # message_frame_broadcast ensures the shell was sent
+            active_record_assistant_message_for_this_turn.broadcast_update_chunk(chunk.content)
+            is_first_chunk = false
+          elsif message_frame_broadcast # Only append if the shell has been broadcasted
+            active_record_assistant_message_for_this_turn.broadcast_append_chunk(chunk.content)
           end
         end
       end # End of ask block
       
-      Rails.logger.info "ask() method completed, result: #{result.inspect}" # result here is from the ask method itself, not the stream.
+      Rails.logger.info "ask() method completed. Final result from ask method (not stream): #{result.inspect}"
       Rails.logger.info "Messages count after ask: #{messages.count}"
       Rails.logger.info "Assistant messages count after ask: #{messages.where(role: 'assistant').count}"
     rescue => e
