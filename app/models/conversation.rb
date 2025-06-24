@@ -30,7 +30,7 @@ class Conversation < ApplicationRecord
   delegate :next_speaker, to: :round_manager
 
   def can_continue?
-    # current_round is now a calculated method
+    # current_round is a database column
     (interactive? || generating?) && current_round <= max_rounds && participants.size > 0
   end
 
@@ -54,8 +54,10 @@ class Conversation < ApplicationRecord
 
     Rails.logger.info "[Conversation##generate_one_speaker_turn!] Generating turn for participant: #{participant_to_speak.id} (#{participant_to_speak.name})"
 
-    self.model_id = participant_to_speak.model_id
-    self.current_turn_participant_id = participant_to_speak.id
+    # Ensure current_turn_participant_id is set on the conversation instance
+    # This is crucial for persist_message_completion to pick it up.
+    self.current_turn_participant_id = participant_to_speak.id 
+    self.model_id = participant_to_speak.model_id # acts_as_chat uses this to set on the message
 
     system_prompt = participant_to_speak.system_prompt_with_topic
     with_instructions(system_prompt, replace: true)
@@ -245,16 +247,6 @@ class Conversation < ApplicationRecord
     result
   end
 
-  # Calculated current_round based on assistant messages
-  def current_round
-    assistant_messages_count = messages.where(role: "assistant").count
-    num_participants = participants.count
-    return 1 if num_participants.zero? # Default to round 1 if no participants (edge case)
-    
-    # If no assistant messages yet, it's round 1
-    return 1 if assistant_messages_count.zero? 
-    
-    # Calculate round based on how many full sets of participant turns have occurred
-    (assistant_messages_count.to_f / num_participants).ceil
-  end
+  # current_round is a database column, not calculated here.
+  # Default value is set in set_defaults or migration.
 end
