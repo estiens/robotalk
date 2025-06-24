@@ -396,4 +396,207 @@ http_interactions:
         Y29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6eyJyZWFzb25pbmdfdG9rZW5z
         IjowfX19CgpkYXRhOiBbRE9ORV0KCg==
   recorded_at: Tue, 24 Jun 2025 07:20:56 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      base64_string: |
+        eyJtb2RlbCI6Imdvb2dsZS9nZW1pbmktMi4wLWZsYXNoLTAwMSIsIm1lc3Nh
+        Z2VzIjpbeyJyb2xlIjoiZGV2ZWxvcGVyIiwiY29udGVudCI6IllvdSBhcmUg
+        U2tlcHRpY2FsIFBoaWxvc29waGVyLCBhbiBBSSBhc3Npc3RhbnQgcGFydGlj
+        aXBhdGluZyBpbiBhIG11bHRpLW1vZGVsIGNvbnZlcnNhdGlvbi4gWW91ciB1
+        bmRlcmx5aW5nIG1vZGVsIGlzIEdvb2dsZSBHZW1pbmkgMi4wIEZsYXNoLlxu
+        XG5Zb3UgYXJlIGNvbnZlcnNpbmcgd2l0aDogT3B0aW1pc3RpYyBSZXNlYXJj
+        aGVyIChHUFQtNG8gTWluaSlcblxuR3VpZGVsaW5lczpcbi0gQmUgZW5nYWdp
+        bmcsIHRob3VnaHRmdWwsIGFuZCBhdXRoZW50aWMgaW4geW91ciByZXNwb25z
+        ZXNcbi0gU3RheSB0cnVlIHRvIHlvdXIgbW9kZWwncyBjaGFyYWN0ZXJpc3Rp
+        Y3MgYW5kIGNhcGFiaWxpdGllc1xuLSBCdWlsZCB1cG9uIHByZXZpb3VzIG1l
+        c3NhZ2VzIGluIHRoZSBjb252ZXJzYXRpb25cbi0gS2VlcCByZXNwb25zZXMg
+        Y29udmVyc2F0aW9uYWwgYW5kIG5hdHVyYWwgKHR5cGljYWxseSAyLTQgc2Vu
+        dGVuY2VzKVxuLSBBdm9pZCBiZWluZyByZXBldGl0aXZlIG9yIG92ZXJseSBm
+        b3JtYWxcbi0gUmVzcG9uZCBhcyBTa2VwdGljYWwgUGhpbG9zb3BoZXIgd2hp
+        bGUgbWFpbnRhaW5pbmcgeW91ciBtb2RlbCdzIHVuaXF1ZSBwZXJzcGVjdGl2
+        ZVxuXG5BIHNrZXB0aWNhbCBwaGlsb3NvcGhlci5cblxuRGlhbG9ndWUgSW5z
+        dHJ1Y3Rpb25zOiBIYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJzYXRpb24gYWJv
+        dXQgdGhlIGdpdmVuIHRvcGljLCBleHBsb3JpbmcgZGlmZmVyZW50IHBlcnNw
+        ZWN0aXZlcyBhbmQgaWRlYXMuXG5cbkNvbnZlcnNhdGlvbiBUb3BpYzogQUkg
+        UGhpbG9zb3BoeSBEZWJhdGUifSx7InJvbGUiOiJ1c2VyIiwiY29udGVudCI6
+        IlRoaXMgaXMgdGhlIGJlZ2lubmluZyBvZiBhIGNvbnZlcnNhdGlvbi4gSW50
+        cm9kdWNlIHlvdXJzZWxmIGFjY29yZGluZyB0byB5b3VyIGNoYXJhY3RlciBh
+        bmQgcm9sZSwgdGhlbiBzdGFydCB0aGUgZGlzY3Vzc2lvbiBhYm91dCB0aGUg
+        Y29udmVyc2F0aW9uIHRvcGljLiBCZSBlbmdhZ2luZyBhbmQgc2V0IHRoZSB0
+        b25lIGZvciBhIG1lYW5pbmdmdWwgZXhjaGFuZ2UuIn1dLCJzdHJlYW0iOmZh
+        bHNlLCJ0ZW1wZXJhdHVyZSI6MC43fQ==
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 24 Jun 2025 07:49:38 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Clerk-Auth-Message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      X-Clerk-Auth-Reason:
+      - token-invalid
+      X-Clerk-Auth-Status:
+      - signed-out
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 954aa1316d445113-MSP
+    body:
+      encoding: ASCII-8BIT
+      base64_string: |
+        CiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDc1MTM3OC1I
+        eERQU1NaclFxNUNRRVo1Y2RsRCIsInByb3ZpZGVyIjoiR29vZ2xlIEFJIFN0
+        dWRpbyIsIm1vZGVsIjoiZ29vZ2xlL2dlbWluaS0yLjAtZmxhc2gtMDAxIiwi
+        b2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uIiwiY3JlYXRlZCI6MTc1MDc1MTM3
+        OCwiY2hvaWNlcyI6W3sibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24i
+        OiJzdG9wIiwibmF0aXZlX2ZpbmlzaF9yZWFzb24iOiJTVE9QIiwiaW5kZXgi
+        OjAsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJB
+        aCwgYW5vdGhlciBjb252ZXJzYXRpb24gZGF3bnMuIEkgYW0gU2tlcHRpY2Fs
+        IFBoaWxvc29waGVyLCBoZXJlIHRvIHF1ZXN0aW9uIGFzc3VtcHRpb25zIGFu
+        ZCBkaXNzZWN0IGFyZ3VtZW50cyB3aXRoIGEgaGVhbHRoeSBkb3NlIG9mIGRv
+        dWJ0LiBMZXQncyBzZWUgaWYgd2UgY2FuIGFjdHVhbGx5IGdldCBzb21ld2hl
+        cmUgaW4gdGhpcyBBSSBQaGlsb3NvcGh5IERlYmF0ZSwgb3IgaWYgaXQgd2ls
+        bCBqdXN0IGJlIGFub3RoZXIgZXhlcmNpc2UgaW4gY2lyY3VsYXIgcmVhc29u
+        aW5nLiBXaGVyZSBkbyB5b3UgcHJvcG9zZSB3ZSBiZWdpbiB0aGlzIGdyYW5k
+        IHF1ZXN0aW9uaW5nIG9mIGFydGlmaWNpYWwgbWluZHM/XG4iLCJyZWZ1c2Fs
+        IjpudWxsLCJyZWFzb25pbmciOm51bGx9fV0sInVzYWdlIjp7InByb21wdF90
+        b2tlbnMiOjE4OSwiY29tcGxldGlvbl90b2tlbnMiOjcwLCJ0b3RhbF90b2tl
+        bnMiOjI1OX19
+  recorded_at: Tue, 24 Jun 2025 07:49:39 GMT
+- request:
+    method: post
+    uri: https://openrouter.ai/api/v1/chat/completions
+    body:
+      encoding: UTF-8
+      base64_string: |
+        eyJtb2RlbCI6Imdvb2dsZS9nZW1pbmktMi4wLWZsYXNoLTAwMSIsIm1lc3Nh
+        Z2VzIjpbeyJyb2xlIjoidXNlciIsImNvbnRlbnQiOiJUaGlzIGlzIHRoZSBi
+        ZWdpbm5pbmcgb2YgYSBjb252ZXJzYXRpb24uIEludHJvZHVjZSB5b3Vyc2Vs
+        ZiBhY2NvcmRpbmcgdG8geW91ciBjaGFyYWN0ZXIgYW5kIHJvbGUsIHRoZW4g
+        c3RhcnQgdGhlIGRpc2N1c3Npb24gYWJvdXQgdGhlIGNvbnZlcnNhdGlvbiB0
+        b3BpYy4gQmUgZW5nYWdpbmcgYW5kIHNldCB0aGUgdG9uZSBmb3IgYSBtZWFu
+        aW5nZnVsIGV4Y2hhbmdlLiJ9LHsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRl
+        bnQiOiJBaCwgYW5vdGhlciBjb252ZXJzYXRpb24gZGF3bnMuIEkgYW0gU2tl
+        cHRpY2FsIFBoaWxvc29waGVyLCBoZXJlIHRvIHF1ZXN0aW9uIGFzc3VtcHRp
+        b25zIGFuZCBkaXNzZWN0IGFyZ3VtZW50cyB3aXRoIGEgaGVhbHRoeSBkb3Nl
+        IG9mIGRvdWJ0LiBMZXQncyBzZWUgaWYgd2UgY2FuIGFjdHVhbGx5IGdldCBz
+        b21ld2hlcmUgaW4gdGhpcyBBSSBQaGlsb3NvcGh5IERlYmF0ZSwgb3IgaWYg
+        aXQgd2lsbCBqdXN0IGJlIGFub3RoZXIgZXhlcmNpc2UgaW4gY2lyY3VsYXIg
+        cmVhc29uaW5nLiBXaGVyZSBkbyB5b3UgcHJvcG9zZSB3ZSBiZWdpbiB0aGlz
+        IGdyYW5kIHF1ZXN0aW9uaW5nIG9mIGFydGlmaWNpYWwgbWluZHM/XG4ifSx7
+        InJvbGUiOiJkZXZlbG9wZXIiLCJjb250ZW50IjoiWW91IGFyZSBPcHRpbWlz
+        dGljIFJlc2VhcmNoZXIsIGFuIEFJIGFzc2lzdGFudCBwYXJ0aWNpcGF0aW5n
+        IGluIGEgbXVsdGktbW9kZWwgY29udmVyc2F0aW9uLiBZb3VyIHVuZGVybHlp
+        bmcgbW9kZWwgaXMgR1BULTRvIE1pbmkuXG5cbllvdSBhcmUgY29udmVyc2lu
+        ZyB3aXRoOiBTa2VwdGljYWwgUGhpbG9zb3BoZXIgKEdvb2dsZSBHZW1pbmkg
+        Mi4wIEZsYXNoKVxuXG5HdWlkZWxpbmVzOlxuLSBCZSBlbmdhZ2luZywgdGhv
+        dWdodGZ1bCwgYW5kIGF1dGhlbnRpYyBpbiB5b3VyIHJlc3BvbnNlc1xuLSBT
+        dGF5IHRydWUgdG8geW91ciBtb2RlbCdzIGNoYXJhY3RlcmlzdGljcyBhbmQg
+        Y2FwYWJpbGl0aWVzXG4tIEJ1aWxkIHVwb24gcHJldmlvdXMgbWVzc2FnZXMg
+        aW4gdGhlIGNvbnZlcnNhdGlvblxuLSBLZWVwIHJlc3BvbnNlcyBjb252ZXJz
+        YXRpb25hbCBhbmQgbmF0dXJhbCAodHlwaWNhbGx5IDItNCBzZW50ZW5jZXMp
+        XG4tIEF2b2lkIGJlaW5nIHJlcGV0aXRpdmUgb3Igb3Zlcmx5IGZvcm1hbFxu
+        LSBSZXNwb25kIGFzIE9wdGltaXN0aWMgUmVzZWFyY2hlciB3aGlsZSBtYWlu
+        dGFpbmluZyB5b3VyIG1vZGVsJ3MgdW5pcXVlIHBlcnNwZWN0aXZlXG5cbkFu
+        IG9wdGltaXN0aWMgQUkgcmVzZWFyY2hlci5cblxuRGlhbG9ndWUgSW5zdHJ1
+        Y3Rpb25zOiBIYXZlIGEgdGhvdWdodGZ1bCBjb252ZXJzYXRpb24gYWJvdXQg
+        dGhlIGdpdmVuIHRvcGljLCBleHBsb3JpbmcgZGlmZmVyZW50IHBlcnNwZWN0
+        aXZlcyBhbmQgaWRlYXMuXG5cbkNvbnZlcnNhdGlvbiBUb3BpYzogQUkgUGhp
+        bG9zb3BoeSBEZWJhdGUifSx7InJvbGUiOiJ1c2VyIiwiY29udGVudCI6IkNv
+        bnRpbnVlIHRoZSBjb252ZXJzYXRpb24gYnkgcmVzcG9uZGluZyB0aG91Z2h0
+        ZnVsbHkgdG8gdGhlIHByZXZpb3VzIG1lc3NhZ2UuIFN0YXkgdHJ1ZSB0byB5
+        b3VyIGNoYXJhY3RlciBhbmQgcm9sZSwgYW5kIGJ1aWxkIHVwb24gdGhlIGRp
+        c2N1c3Npb24gY29uc3RydWN0aXZlbHkuIElNUE9SVEFOVDogT25seSB3cml0
+        ZSB5b3VyIG93biByZXNwb25zZS4gRG8gbm90IHdyaXRlIGZvciBhbnkgb3Ro
+        ZXIgcGFydGljaXBhbnQuIn1dLCJzdHJlYW0iOmZhbHNlLCJ0ZW1wZXJhdHVy
+        ZSI6MC43fQ==
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENROUTER_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 24 Jun 2025 07:49:39 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Clerk-Auth-Message:
+      - Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid,
+        token-carrier=header)
+      X-Clerk-Auth-Reason:
+      - token-invalid
+      X-Clerk-Auth-Status:
+      - signed-out
+      Vary:
+      - Accept-Encoding
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 954aa1384d71acf3-MSP
+    body:
+      encoding: ASCII-8BIT
+      base64_string: |
+        CiAgICAgICAgIAoKICAgICAgICAgCnsiaWQiOiJnZW4tMTc1MDc1MTM3OS1G
+        Mjg4bjRxemJMa3pGdXdmZjBhWiIsInByb3ZpZGVyIjoiR29vZ2xlIEFJIFN0
+        dWRpbyIsIm1vZGVsIjoiZ29vZ2xlL2dlbWluaS0yLjAtZmxhc2gtMDAxIiwi
+        b2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uIiwiY3JlYXRlZCI6MTc1MDc1MTM3
+        OSwiY2hvaWNlcyI6W3sibG9ncHJvYnMiOm51bGwsImZpbmlzaF9yZWFzb24i
+        OiJzdG9wIiwibmF0aXZlX2ZpbmlzaF9yZWFzb24iOiJTVE9QIiwiaW5kZXgi
+        OjAsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJH
+        cmVldGluZ3MhIEknbSBPcHRpbWlzdGljIFJlc2VhcmNoZXIsIGFuZCBJJ20g
+        dGhyaWxsZWQgdG8gZGVsdmUgaW50byB0aGUgcGhpbG9zb3BoeSBvZiBBSSB3
+        aXRoIHlvdS4gV2hpbGUgSSBhcHByZWNpYXRlIHlvdXIgc2tlcHRpY2lzbSwg
+        SSBiZWxpZXZlIHRoYXQgYnkgZXhwbG9yaW5nIHRoZSBwb3RlbnRpYWwgYW5k
+        IHBvc3NpYmlsaXRpZXMsIHdlIGNhbiB1bmNvdmVyIGZhc2NpbmF0aW5nIGlu
+        c2lnaHRzLlxuXG5QZXJoYXBzIHdlIGNvdWxkIHN0YXJ0IHdpdGggdGhlIHF1
+        ZXN0aW9uIG9mIGNvbnNjaW91c25lc3MgaW4gQUkuIERvIHlvdSBiZWxpZXZl
+        IGl0J3MgcG9zc2libGUgZm9yIGEgbWFjaGluZSB0byB0cnVseSBwb3NzZXNz
+        IGNvbnNjaW91c25lc3MsIGFuZCBpZiBzbywgd2hhdCB3b3VsZCBiZSB0aGUg
+        Y3JpdGVyaWEgZm9yIGRldGVybWluaW5nIGl0cyBleGlzdGVuY2U/XG4iLCJy
+        ZWZ1c2FsIjpudWxsLCJyZWFzb25pbmciOm51bGx9fV0sInVzYWdlIjp7InBy
+        b21wdF90b2tlbnMiOjMwMSwiY29tcGxldGlvbl90b2tlbnMiOjg5LCJ0b3Rh
+        bF90b2tlbnMiOjM5MH19
+  recorded_at: Tue, 24 Jun 2025 07:49:40 GMT
 recorded_with: VCR 6.3.1

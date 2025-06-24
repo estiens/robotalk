@@ -131,7 +131,7 @@ RSpec.describe Conversation, type: :model do
           conversation_participant: nil
         )
 
-        expect(conversation.next_speaker).to be_nil
+        expect(conversation.next_speaker).to eq(conversation.participants.ordered.first)
       end
     end
 

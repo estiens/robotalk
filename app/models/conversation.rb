@@ -141,7 +141,7 @@ class Conversation < ApplicationRecord
     end
   end
 
-  def generate_one_round!
+  def generate_one_round!(stream: true)
     return unless can_continue? && participants.any?
 
     current_round_value = self.current_round
@@ -166,7 +166,7 @@ class Conversation < ApplicationRecord
       Rails.logger.info "[Conversation##generate_one_round!] Participant #{participant.id} (#{participant.name}) speaking for round #{round_to_generate}, conversation ID: #{id}"
       Rails.logger.info "[Conversation##generate_one_round!] Messages count before generate_one_speaker_turn!: #{messages.count}"
       
-      generate_one_speaker_turn!(participant, stream: false)
+      generate_one_speaker_turn!(participant, stream: stream)
       
       reload
       Rails.logger.info "[Conversation##generate_one_round!] Messages count after generate_one_speaker_turn!: #{messages.count}"
@@ -180,7 +180,7 @@ class Conversation < ApplicationRecord
     
     max_rounds.times do |i|
       Rails.logger.info "Generating round #{i + 1}/#{max_rounds} for conversation #{id}"
-      generate_one_round!
+      generate_one_round!(stream: false)
       reload
     end
 
@@ -255,6 +255,21 @@ class Conversation < ApplicationRecord
         Rails.logger.warn "Message conversation_participant not set correctly. Updating..."
         message.update!(conversation_participant: participant)
       end
+      
+      # Broadcast round indicator update for assistant messages
+      self.reload # Ensure we have the latest state
+      broadcast_replace_to(
+        self,
+        target: "round-indicator",
+        html: %{
+          <div class="badge badge-lg #{can_continue? ? 'badge-success' : 'badge-neutral'} gap-2" data-test="round-indicator">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Round #{[current_round, 1].max}/#{max_rounds}
+          </div>
+        }.strip
+      )
     end
     
     result

@@ -106,16 +106,7 @@ class ConversationsController < ApplicationController
       return
     end
 
-    # Only add system messages if they don't already exist
-    if @conversation.messages.where(role: "system").empty?
-      @conversation.participants.each do |participant|
-        @conversation.messages.create!(
-          role: "system",
-          content: participant.system_prompt_with_topic,
-          model_id: participant.model_id
-        )
-      end
-    end
+    # System messages will be created by ruby_llm via with_instructions
 
     begin
       # Always use streaming

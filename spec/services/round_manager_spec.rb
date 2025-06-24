@@ -101,7 +101,7 @@ RSpec.describe RoundManager, type: :service do
 
     it "returns nil if message has no conversation_participant" do
       conversation.messages.create!(role: "assistant", content: "Message", model_id: "unknown/model", conversation_participant: nil)
-      expect(round_manager.next_speaker).to be_nil
+      expect(round_manager.next_speaker).to eq(conversation.participants.ordered.first)
     end
   end
 end

@@ -31,7 +31,7 @@ RSpec.describe 'Simple Conversation Flow', type: :system do
 
     # Should be redirected to the conversation show page
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'Test Conversation')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 0/2')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/2')
 
     # Verify the conversation was created
     conversation = Conversation.last
