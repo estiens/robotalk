@@ -46,7 +46,7 @@ class Conversation < ApplicationRecord
     interactive? && participants.size >= 2
   end
 
-  def generate_one_speaker_turn!(participant_to_speak, stream: true)
+  def generate_one_speaker_turn!(participant_to_speak) # Removed stream parameter
     unless participant_to_speak
       Rails.logger.error "[Conversation##generate_one_speaker_turn!] Called with nil participant_to_speak."
       return
@@ -60,6 +60,8 @@ class Conversation < ApplicationRecord
     self.model_id = participant_to_speak.model_id # acts_as_chat uses this to set on the message
 
     system_prompt = participant_to_speak.system_prompt_with_topic
+    # with_instructions is part of ruby_llm, it sets system prompts for the next 'ask' call.
+    # It's correct to call it here to set the context for the specific participant.
     with_instructions(system_prompt, replace: true)
 
     prompt = if messages.where(role: "assistant").empty?
@@ -90,55 +92,50 @@ class Conversation < ApplicationRecord
       # Potentially raise an error or handle this case, as subsequent logic will fail.
     end
 
-    Rails.logger.info "About to call ask() method (streaming: #{stream})"
+    Rails.logger.info "About to call ask() method (streaming is always on)"
     begin
-      if stream
-        result = ask(prompt) do |chunk| # 'ask' calls 'complete', which calls on_new_message, then persist_message_completion
-          # The assistant_message is created by acts_as_chat's on_new_message hook (empty at first)
-          # and then updated by our persist_message_completion (which is like on_end_message)
-          # For streaming, we need the latest assistant message.
-          assistant_message = messages.where(role: "assistant").order(:created_at).last
-          
-          if assistant_message.nil?
-            Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: assistant_message is nil inside ask block. This should not happen."
-            next # or break, or raise
-          end
+      result = ask(prompt) do |chunk| # 'ask' calls 'complete', which calls on_new_message, then persist_message_completion
+        # The assistant_message is created by acts_as_chat's on_new_message hook (empty at first)
+        # and then updated by our persist_message_completion (which is like on_end_message)
+        # For streaming, we need the latest assistant message.
+        assistant_message = messages.where(role: "assistant").order(:created_at).last
+        
+        if assistant_message.nil?
+          Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: assistant_message is nil inside ask block. This should not happen."
+          next # or break, or raise
+        end
 
-          # Ensure participant is assigned to the message object before first broadcast
-          if current_participant_for_broadcast && assistant_message.conversation_participant.nil?
-            assistant_message.conversation_participant = current_participant_for_broadcast
-            # Note: This in-memory assignment won't be saved to DB until persist_message_completion runs fully,
-            # but it's crucial for the initial broadcast_new_message to have the participant info.
-            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{assistant_message.id}) for broadcast."
-          end
+        # Ensure participant is assigned to the message object before first broadcast
+        if current_participant_for_broadcast && assistant_message.conversation_participant.nil?
+          assistant_message.conversation_participant = current_participant_for_broadcast
+          # Note: This in-memory assignment won't be saved to DB until persist_message_completion runs fully,
+          # but it's crucial for the initial broadcast_new_message to have the participant info.
+          Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{assistant_message.id}) for broadcast."
+        end
 
-          if chunk.content # Only process if there's actual content in the chunk
-            unless message_frame_broadcast
-              if current_participant_for_broadcast
-                # Pass the potentially updated assistant_message (with participant assigned in memory)
-                broadcast_new_message(assistant_message, current_participant_for_broadcast)
-                message_frame_broadcast = true
-                Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{assistant_message.id} with participant: #{current_participant_for_broadcast.name}"
-              else
-                Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message."
-              end
-              sleep 0.1 # Only sleep during streaming for UX
-            end
-
-            if is_first_chunk
-              assistant_message.broadcast_update_chunk(chunk.content)
-              is_first_chunk = false
+        if chunk.content # Only process if there's actual content in the chunk
+          unless message_frame_broadcast
+            if current_participant_for_broadcast
+              # Pass the potentially updated assistant_message (with participant assigned in memory)
+              broadcast_new_message(assistant_message, current_participant_for_broadcast)
+              message_frame_broadcast = true
+              Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{assistant_message.id} with participant: #{current_participant_for_broadcast.name}"
             else
-              assistant_message.broadcast_append_chunk(chunk.content)
+              Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message."
             end
+            sleep 0.1 # Only sleep during streaming for UX
+          end
+
+          if is_first_chunk
+            assistant_message.broadcast_update_chunk(chunk.content)
+            is_first_chunk = false
+          else
+            assistant_message.broadcast_append_chunk(chunk.content)
           end
         end
-      else
-        # Non-streaming version for background jobs
-        result = ask(prompt)
-      end
+      end # End of ask block
       
-      Rails.logger.info "ask() method completed, result: #{result.inspect}"
+      Rails.logger.info "ask() method completed, result: #{result.inspect}" # result here is from the ask method itself, not the stream.
       Rails.logger.info "Messages count after ask: #{messages.count}"
       Rails.logger.info "Assistant messages count after ask: #{messages.where(role: 'assistant').count}"
     rescue => e
@@ -147,15 +144,13 @@ class Conversation < ApplicationRecord
       raise e
     end
 
-    if stream
-      broadcast_controls
-    end
+    broadcast_controls # Always broadcast controls as streaming is always on
   end
 
-  def generate_one_round!(stream: true)
+  def generate_one_round! # Removed stream parameter
     return unless can_continue? && participants.any?
 
-    round_to_generate = self.current_round
+    round_to_generate = self.current_round # Keep this as it's used for has_spoken_in_round?
 
     Rails.logger.info "[Conversation##generate_one_round!] Attempting to generate/complete round: #{round_to_generate} for conversation ID: #{id}"
     Rails.logger.info "[Conversation##generate_one_round!] current_round: #{self.current_round}, round_to_generate: #{round_to_generate}"
@@ -176,7 +171,7 @@ class Conversation < ApplicationRecord
       Rails.logger.info "[Conversation##generate_one_round!] Participant #{participant.id} (#{participant.name}) speaking for round #{round_to_generate}, conversation ID: #{id}"
       Rails.logger.info "[Conversation##generate_one_round!] Messages count before generate_one_speaker_turn!: #{messages.count}"
       
-      generate_one_speaker_turn!(participant, stream: stream)
+      generate_one_speaker_turn!(participant) # Removed stream argument
       
       reload
       Rails.logger.info "[Conversation##generate_one_round!] Messages count after generate_one_speaker_turn!: #{messages.count}"
@@ -190,7 +185,7 @@ class Conversation < ApplicationRecord
     
     max_rounds.times do |i|
       Rails.logger.info "Generating round #{i + 1}/#{max_rounds} for conversation #{id}"
-      generate_one_round!(stream: false)
+      generate_one_round! # Removed stream argument; assumes background generation is also effectively streaming to DB
       reload
     end
 
