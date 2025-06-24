@@ -8,9 +8,7 @@
         <%= link_to conversations_path, class: "hover:text-primary transition-colors" do %>
           Conversations
         <% end %>
-        <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-        </svg>
+        <span class="material-symbols-outlined text-lg mx-1">chevron_right</span>
         <span class="font-medium text-base-content">Current Chat</span>
       </div>
 
@@ -28,9 +26,7 @@
               </div>
               <% if i < conversation.participants.count - 1 %>
                 <div class="hidden sm:flex items-center">
-                  <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                  </svg>
+                  <span class="material-symbols-outlined text-base-content/40">bolt</span>
                 </div>
               <% end %>
             <% end %>
@@ -48,27 +44,21 @@
         <div class="flex items-center space-x-2">
           <%= link_to edit_conversation_path(conversation), 
               class: "btn btn-ghost btn-sm gap-2" do %>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
+            <span class="material-symbols-outlined text-lg">edit</span>
             Edit
           <% end %>
           
           <div class="dropdown dropdown-end">
             <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-              </svg>
+              <span class="material-symbols-outlined">more_vert</span>
             </label>
             <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-100 rounded-box w-48 border border-base-200/50">
               <li>
                 <%= button_to restart_conversation_path(conversation),
                     method: :post,
-                    class: "text-warning w-full text-left",
+                    class: "text-warning w-full text-left flex items-center gap-2",
                     data: { confirm: "Restart conversation? All messages will be deleted." } do %>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
+                  <span class="material-symbols-outlined">replay</span>
                   Restart Chat
                 <% end %>
               </li>
@@ -167,9 +157,7 @@
                     action: "click->conversation-controls#showLoading",
                     test: "start-conversation-button"
                   } do %>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                </svg>
+                <span class="material-symbols-outlined">play_arrow</span>
                 Start
               <% end %>
             <% else %>
@@ -184,18 +172,14 @@
                     action: "click->conversation-controls#showLoading",
                     test: "continue-conversation-button"
                   } do %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-                </svg>
+                <span class="material-symbols-outlined">fast_forward</span>
                 <span class="auto-continue-button-text">Next Round</span>
               <% end %>
             <% end %>
           <% else %>
             <!-- Completed Status -->
             <div class="badge badge-success gap-2 p-4">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
+              <span class="material-symbols-outlined">check_circle</span>
               <span class="font-medium">Completed</span>
             </div>
           <% end %>
@@ -208,9 +192,7 @@
   <% if conversation_has_content_issues?(conversation) %>
     <div class="pt-4">
       <div class="alert alert-warning">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current w-6 h-6 shrink-0">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-        </svg>
+        <span class="material-symbols-outlined text-2xl">warning</span>
         <div>
           <div class="font-bold">Content Issues Detected</div>
           <div class="text-sm">
