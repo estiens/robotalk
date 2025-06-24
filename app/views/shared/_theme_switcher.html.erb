@@ -15,15 +15,25 @@
     </label>
   </div>
   
-  <ul tabindex="0" class="z-[101] bg-base-100 shadow-2xl mt-4 p-2 border border-base-300/50 rounded-box w-56 max-h-[70vh] overflow-y-auto dropdown-content menu">
-    <li class="menu-title">
-      <span class="px-2 font-semibold text-base-content/80">Select Theme</span>
+  <ul tabindex="0" class="z-[101] bg-base-100 shadow-2xl mt-4 p-2 border border-base-300/50 rounded-box w-80 max-h-[80vh] overflow-y-auto dropdown-content grid grid-cols-1 gap-2">
+    <li class="menu-title col-span-full px-2 py-1">
+      <span class="font-semibold text-base-content/80">Select Theme</span>
     </li>
     <% available_themes.each do |theme| %>
       <li>
-        <button class="hover:bg-base-200 p-2 rounded-lg w-full text-left capitalize transition-colors theme-item" data-action="click->theme#setSpecificTheme" data-theme="<%= theme %>">
-          <%= theme.tr('-', ' ') %>
-        </button>
+        <div data-theme="<%= theme %>" 
+             data-action="click->theme#setSpecificTheme" 
+             class="bg-base-100 text-base-content rounded-lg w-full p-3 cursor-pointer hover:bg-base-200/60 transition-colors theme-item">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold capitalize"><%= theme.tr('-', ' ') %></span>
+            <div class="flex items-center gap-2 -space-x-1">
+              <div class="w-5 h-5 rounded-full bg-primary ring-1 ring-base-content/20"></div>
+              <div class="w-5 h-5 rounded-full bg-secondary ring-1 ring-base-content/20"></div>
+              <div class="w-5 h-5 rounded-full bg-accent ring-1 ring-base-content/20"></div>
+              <div class="w-5 h-5 rounded-full bg-neutral ring-1 ring-base-content/20"></div>
+            </div>
+          </div>
+        </div>
       </li>
     <% end %>
   </ul>
