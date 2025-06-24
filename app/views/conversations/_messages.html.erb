@@ -1,10 +1,12 @@
-<%# messages_to_display is passed from _conversation_frame and excludes "user" role messages %>
-<% if messages_to_display.any? %>
+<%# Default to filtering conversation.messages if messages_to_display is not explicitly passed %>
+<% messages_for_view = local_assigns.fetch(:messages_to_display, conversation.messages.where.not(role: "user").order(:created_at)) %>
+
+<% if messages_for_view.any? %>
   <div class="bg-base-100 shadow-xl card">
     <!-- Unified Conversation Timeline -->
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <% assistant_messages = messages_to_display.filter { |m| m.role == 'assistant' } %>
-      <% system_messages = messages_to_display.filter { |m| m.role == 'system' } %>
+      <% assistant_messages = messages_for_view.filter { |m| m.role == 'assistant' } %>
+      <% system_messages = messages_for_view.filter { |m| m.role == 'system' } %>
       
       <!-- System Messages (Collapsible) -->
       <% if system_messages.any? %>
