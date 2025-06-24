@@ -2,7 +2,7 @@
   <!-- Gradient Border Effect -->
   <div class="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl blur opacity-20 group-hover:opacity-40 transition-all duration-300"></div>
   
-  <div class="relative bg-base-100 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-300/50 overflow-hidden">
+  <div class="relative bg-base-200 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-300/50 overflow-hidden">
     <!-- Status Indicator Bar -->
     <div class="h-1 w-full <%= conversation.generating? ? 'bg-gradient-to-r from-info via-warning to-info animate-pulse' : conversation.can_continue? ? 'bg-gradient-to-r from-success to-primary' : conversation.failed? ? 'bg-error' : 'bg-neutral' %>"></div>
     
@@ -111,7 +111,7 @@
           <% if conversation.messages.empty? %>
             <%= button_to start_conversation_path(conversation),
                 method: :post,
-                class: "btn btn-success btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
+                class: "btn btn-primary btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
                 data: { test: "start-conversation-button" } do %>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
