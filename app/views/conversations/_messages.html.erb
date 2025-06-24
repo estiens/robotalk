@@ -1,9 +1,10 @@
-<% if conversation.messages.any? %>
+<%# messages_to_display is passed from _conversation_frame and excludes "user" role messages %>
+<% if messages_to_display.any? %>
   <div class="bg-base-100 shadow-xl card">
     <!-- Unified Conversation Timeline -->
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <% assistant_messages = conversation.messages.where(role: 'assistant') %>
-      <% system_messages = conversation.messages.where(role: 'system') %>
+      <% assistant_messages = messages_to_display.filter { |m| m.role == 'assistant' } %>
+      <% system_messages = messages_to_display.filter { |m| m.role == 'system' } %>
       
       <!-- System Messages (Collapsible) -->
       <% if system_messages.any? %>
