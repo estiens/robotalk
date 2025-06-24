@@ -83,21 +83,44 @@ class Conversation < ApplicationRecord
 
     message_frame_broadcast = false
     is_first_chunk = true
+    # Ensure current_participant is fetched once before the loop for efficiency and consistency
+    current_participant_for_broadcast = participants.find_by(id: current_turn_participant_id)
+    unless current_participant_for_broadcast
+      Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: Could not find current_participant_for_broadcast with ID: #{current_turn_participant_id} before ask block."
+      # Potentially raise an error or handle this case, as subsequent logic will fail.
+    end
 
     Rails.logger.info "About to call ask() method (streaming: #{stream})"
     begin
       if stream
-        result = ask(prompt) do |chunk|
-          assistant_message = messages.where(role: "assistant").last
+        result = ask(prompt) do |chunk| # 'ask' calls 'complete', which calls on_new_message, then persist_message_completion
+          # The assistant_message is created by acts_as_chat's on_new_message hook (empty at first)
+          # and then updated by our persist_message_completion (which is like on_end_message)
+          # For streaming, we need the latest assistant message.
+          assistant_message = messages.where(role: "assistant").order(:created_at).last
+          
+          if assistant_message.nil?
+            Rails.logger.error "[Conversation##generate_one_speaker_turn!] CRITICAL: assistant_message is nil inside ask block. This should not happen."
+            next # or break, or raise
+          end
 
-          if chunk.content && assistant_message
+          # Ensure participant is assigned to the message object before first broadcast
+          if current_participant_for_broadcast && assistant_message.conversation_participant.nil?
+            assistant_message.conversation_participant = current_participant_for_broadcast
+            # Note: This in-memory assignment won't be saved to DB until persist_message_completion runs fully,
+            # but it's crucial for the initial broadcast_new_message to have the participant info.
+            Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Assigned participant #{current_participant_for_broadcast.name} to in-memory assistant_message (ID: #{assistant_message.id}) for broadcast."
+          end
+
+          if chunk.content # Only process if there's actual content in the chunk
             unless message_frame_broadcast
-              current_participant = participants.find(current_turn_participant_id)
-              if current_participant
-                broadcast_new_message(assistant_message, current_participant)
+              if current_participant_for_broadcast
+                # Pass the potentially updated assistant_message (with participant assigned in memory)
+                broadcast_new_message(assistant_message, current_participant_for_broadcast)
                 message_frame_broadcast = true
+                Rails.logger.info "[Conversation##generate_one_speaker_turn! StreamBlock] Broadcasted new message shell for assistant_message ID: #{assistant_message.id} with participant: #{current_participant_for_broadcast.name}"
               else
-                Rails.logger.error "[Conversation##generate_one_speaker_turn!] Could not find current participant."
+                Rails.logger.error "[Conversation##generate_one_speaker_turn! StreamBlock] Could not find current_participant_for_broadcast to broadcast new message."
               end
               sleep 0.1 # Only sleep during streaming for UX
             end

@@ -1,15 +1,14 @@
-<%# Default to filtering conversation.messages if messages_to_display is not explicitly passed %>
+<%# messages_for_view filters out "user" role messages and orders by creation time %>
 <% messages_for_view = local_assigns.fetch(:messages_to_display, conversation.messages.where.not(role: "user").order(:created_at)) %>
 
-<% if messages_for_view.any? %>
+<% if messages_for_view.any? || conversation.generating? %> <%# Show card even if generating first message %>
   <div class="bg-base-100 shadow-xl card">
-    <!-- Unified Conversation Timeline -->
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <% assistant_messages = messages_for_view.filter { |m| m.role == 'assistant' } %>
-      <% system_messages = messages_for_view.filter { |m| m.role == 'system' } %>
+      <% assistant_messages = messages_for_view.filter { |m| m.role == 'assistant' }.sort_by(&:created_at) %>
+      <% system_messages = messages_for_view.filter { |m| m.role == 'system' }.sort_by(&:created_at) %>
       
-      <!-- System Messages (Collapsible) -->
-      <% if system_messages.any? %>
+      <!-- System Messages (Collapsible, only if not empty and not generating initial message) -->
+      <% if system_messages.any? && !(conversation.generating? && assistant_messages.empty?) %>
         <div class="mb-6 collapse collapse-arrow bg-base-200 border border-base-300">
           <input type="checkbox" /> 
           <div class="collapse-title font-medium text-sm">
