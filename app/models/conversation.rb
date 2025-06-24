@@ -1,4 +1,6 @@
 class Conversation < ApplicationRecord
+  include TurboStreamable
+  
   acts_as_chat
   belongs_to :user
   has_many :messages, dependent: :destroy
@@ -25,7 +27,7 @@ class Conversation < ApplicationRecord
   before_validation :set_defaults
   before_validation :ensure_user_exists
 
-  delegate :current_round, :next_speaker, to: :round_manager
+  delegate :next_speaker, to: :round_manager
 
   def can_continue?
     (interactive? || generating?) && current_round < max_rounds
@@ -87,24 +89,12 @@ class Conversation < ApplicationRecord
 
           if chunk.content && assistant_message
             unless message_frame_broadcast
-              next_speaking_participant = next_speaker # Store in a local variable
-              if next_speaking_participant
-                assistant_message.broadcast_append_to(
-                  [ self, "messages" ],
-                  target: "conversation-messages",
-                  partial: "conversations/message",
-                  locals: {
-                    message: assistant_message,
-                    message_model_id: next_speaking_participant.model_id,
-                    conversation_participant: next_speaking_participant,
-                    conversation: self,
-                    index: messages.where(role: "assistant").count - 1,
-                    view_mode: "live"
-                  }
-                )
+              current_participant = participants.find(current_turn_participant_id)
+              if current_participant
+                broadcast_new_message(assistant_message, current_participant)
                 message_frame_broadcast = true
               else
-                Rails.logger.error "[Conversation##generate_one_speaker_turn!] next_speaker returned nil, cannot broadcast message frame."
+                Rails.logger.error "[Conversation##generate_one_speaker_turn!] Could not find current participant."
               end
               sleep 0.1 # Only sleep during streaming for UX
             end
@@ -132,23 +122,17 @@ class Conversation < ApplicationRecord
     end
 
     if stream
-      broadcast_replace_to(
-        self,
-        target: "conversation-controls-container",
-        partial: "conversations/controls",
-        locals: { conversation: self.reload }
-      )
+      broadcast_controls
     end
   end
 
   def generate_one_round!(stream: true)
     return unless can_continue? && participants.any?
 
-    current_round_value = self.current_round
-    round_to_generate = (current_round_value == 0) ? 1 : current_round_value
+    round_to_generate = self.current_round
 
     Rails.logger.info "[Conversation##generate_one_round!] Attempting to generate/complete round: #{round_to_generate} for conversation ID: #{id}"
-    Rails.logger.info "[Conversation##generate_one_round!] current_round: #{current_round_value}, round_to_generate: #{round_to_generate}"
+    Rails.logger.info "[Conversation##generate_one_round!] current_round: #{self.current_round}, round_to_generate: #{round_to_generate}"
     Rails.logger.info "[Conversation##generate_one_round!] Current assistant messages count: #{messages.where(role: 'assistant').count}"
     Rails.logger.info "[Conversation##generate_one_round!] Participants count: #{participants.count}"
 
@@ -256,20 +240,7 @@ class Conversation < ApplicationRecord
         message.update!(conversation_participant: participant)
       end
       
-      # Broadcast round indicator update for assistant messages
-      self.reload # Ensure we have the latest state
-      broadcast_replace_to(
-        self,
-        target: "round-indicator",
-        html: %{
-          <div class="badge badge-lg #{can_continue? ? 'badge-success' : 'badge-neutral'} gap-2" data-test="round-indicator">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Round #{[current_round, 1].max}/#{max_rounds}
-          </div>
-        }.strip
-      )
+      # Round indicator will be updated by the message callback
     end
     
     result

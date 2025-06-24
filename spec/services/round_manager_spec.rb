@@ -11,12 +11,12 @@ RSpec.describe RoundManager, type: :service do
     conversation.participants.create!(model_id: "deepseek/deepseek-r1", name: "Assistant 3", turn_order: 3)
   end
 
-  describe "#current_round" do
-    it "returns 0 when no assistant messages exist" do
-      expect(round_manager.current_round).to eq(0)
+  describe "conversation#current_round" do
+    it "starts at 1 when no assistant messages exist" do
+      expect(conversation.current_round).to eq(1)
     end
 
-    it "returns 1 for rounds 1-3 assistant messages" do
+    it "stays at 1 for rounds 1-3 assistant messages" do
       participants = conversation.participants.ordered
       
       conversation.messages.create!(
@@ -25,7 +25,7 @@ RSpec.describe RoundManager, type: :service do
         model_id: participants[0].model_id,
         conversation_participant: participants[0]
       )
-      expect(round_manager.current_round).to eq(1)
+      expect(conversation.current_round).to eq(1)
 
       conversation.messages.create!(
         role: "assistant", 
@@ -33,7 +33,7 @@ RSpec.describe RoundManager, type: :service do
         model_id: participants[1].model_id,
         conversation_participant: participants[1]
       )
-      expect(round_manager.current_round).to eq(1)
+      expect(conversation.current_round).to eq(1)
 
       conversation.messages.create!(
         role: "assistant", 
@@ -41,10 +41,10 @@ RSpec.describe RoundManager, type: :service do
         model_id: participants[2].model_id,
         conversation_participant: participants[2]
       )
-      expect(round_manager.current_round).to eq(1)
+      expect(conversation.current_round).to eq(2)
     end
 
-    it "returns 2 for rounds 4-6 assistant messages" do
+    it "advances to 2 when all participants have spoken in round 1" do
       participants = conversation.participants.ordered
       4.times { |i|
         participant = participants[i % 3]
@@ -55,12 +55,12 @@ RSpec.describe RoundManager, type: :service do
           conversation_participant: participant
         )
       }
-      expect(round_manager.current_round).to eq(2)
+      expect(conversation.current_round).to eq(2)
     end
 
     it "handles zero participants gracefully" do
       conversation.participants.destroy_all
-      expect(round_manager.current_round).to eq(0)
+      expect(conversation.current_round).to eq(1)
     end
   end
 

@@ -5,21 +5,11 @@ class RoundManager
     @conversation = conversation
   end
 
-  def current_round
-    assistant_message_count = conversation.messages.where(role: "assistant").count
-    num_participants = conversation.participants.count
-    return 0 if num_participants.zero?
-    
-    result = (assistant_message_count.to_f / num_participants).ceil
-    Rails.logger.debug "RoundManager#current_round: #{assistant_message_count} assistant messages / #{num_participants} participants = round #{result}"
-    result
-  end
-
   def next_speaker
     ordered_participants = conversation.participants.ordered
     return ordered_participants.first if ordered_participants.empty?
 
-    current_round_num = [current_round, 1].max
+    current_round_num = conversation.current_round
     
     # Find the participant with the lowest turn_order who hasn't spoken in this round
     next_speaker = ordered_participants.find do |participant|

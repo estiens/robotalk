@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_065226) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_083212) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_065226) do
     t.string "model_id"
     t.integer "user_id", null: false
     t.string "status"
+    t.integer "current_round", default: 1, null: false
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 

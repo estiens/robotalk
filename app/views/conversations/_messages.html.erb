@@ -1,13 +1,13 @@
 <% if conversation.messages.any? %>
   <div class="bg-base-100 shadow-xl card">
-    <!-- History View (Accordion) -->
-    <div class="hidden space-y-4 p-4" data-view-mode-target="historyView" data-test="history-view">
-      <% system_messages = conversation.messages.where(role: 'system') %>
+    <!-- Unified Conversation Timeline -->
+    <div class="pt-0 card-body" data-test="conversation-timeline">
       <% assistant_messages = conversation.messages.where(role: 'assistant') %>
+      <% system_messages = conversation.messages.where(role: 'system') %>
       
-      <!-- System Messages -->
+      <!-- System Messages (Collapsible) -->
       <% if system_messages.any? %>
-        <div class="collapse collapse-arrow bg-base-200 border border-base-300">
+        <div class="mb-6 collapse collapse-arrow bg-base-200 border border-base-300">
           <input type="checkbox" /> 
           <div class="collapse-title font-medium text-sm">
             🔧 System Setup (<%= system_messages.count %> messages)
@@ -32,20 +32,11 @@
         </div>
       <% end %>
 
-      <!-- Assistant Messages (Alternating Colors) -->
-      <% assistant_messages.each_with_index do |message, index| %>
-        <%= render "conversations/message", message: message, conversation: conversation, index: index, view_mode: "history" %>
-      <% end %>
-    </div>
-
-    <!-- Live View (Compact Recent Exchange) -->
-    <div class="pt-0 card-body hidden" data-view-mode-target="liveView" data-test="live-view">
-      <% assistant_messages = conversation.messages.where(role: 'assistant') %>
+      <!-- Assistant Messages Timeline -->
       <% if assistant_messages.any? %>
-        <% last_messages = assistant_messages.last(3) %>
         <div class="space-y-4">
-          <% last_messages.each_with_index do |message, index| %>
-            <%= render "conversations/message", message: message, conversation: conversation, index: index, view_mode: "live" %>
+          <% assistant_messages.each_with_index do |message, index| %>
+            <%= render "conversations/message", message: message, conversation: conversation, index: index %>
           <% end %>
         </div>
       <% else %>

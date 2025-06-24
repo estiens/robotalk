@@ -70,4 +70,16 @@ module ConversationsHelper
 
     color_set[provider_key]
   end
+
+  def participant_class(participant)
+    "participant-#{participant.turn_order}"
+  end
+
+  def conversation_has_content_issues?(conversation)
+    conversation.messages.where(role: 'assistant').any? { |m| m.content.blank? }
+  end
+
+  def content_missing_count(conversation)
+    conversation.messages.where(role: 'assistant').count { |m| m.content.blank? }
+  end
 end

@@ -1,136 +1,184 @@
 <%= turbo_stream_from @conversation, "messages" %>
 <%= turbo_frame_tag "conversation" do %>
-<div class="space-y-6" data-controller="view-mode conversation-updater" data-view-mode-default-value="live" data-action="turbo:frame-load->view-mode#setInitialMode">
-  <!-- Compact Header -->
-  <div class="relative bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 shadow-lg p-6 border border-base-300 rounded-2xl overflow-hidden neural-pattern">
-    <div class="z-10 relative flex lg:flex-row flex-col justify-between items-start gap-4">
-      <!-- Left side: Navigation and Title -->
-      <div class="flex-1">
-        <%= link_to conversations_path, class: "btn btn-ghost btn-sm mb-4" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
-          Back
-        <% end %>
-        
-        <h1 class="mb-2 font-bold text-2xl lg:text-3xl">
-          <% @conversation.participants.ordered.each_with_index do |p, i| %>
-            <span class="inline-flex items-center gap-2">
-              <span class="text-2xl"><%= model_avatar_emoji(p.model_id) %></span>
-              <span><%= friendly_model_name(p.model_id) %></span>
-            </span>
-            <% if i < @conversation.participants.count - 1 %>
-              <span class="mx-2 text-base-content/40">↔</span>
-            <% end %>
+<div data-controller="conversation-updater">
+  
+  <!-- Header -->
+  <div class="bg-base-100 border-b border-base-200">
+    <div class="container mx-auto px-4">
+      <div class="navbar min-h-16">
+        <div class="navbar-start">
+          <%= link_to conversations_path, class: "btn btn-ghost" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Back
           <% end %>
-        </h1>
+        </div>
         
-        <% if @conversation.conversation_topic.present? %>
-          <p class="text-base-content/70" data-test="conversation-topic">
-            <span class="font-semibold">Topic:</span> <%= @conversation.conversation_topic %>
-          </p>
-        <% end %>
-      </div>
-      
-      <!-- Right side: Actions and Status -->
-      <div class="flex flex-wrap items-center gap-2">
-        <%= link_to edit_conversation_path(@conversation), class: "btn btn-outline btn-sm" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-          </svg>
-          Edit
-        <% end %>
-        <%= button_to restart_conversation_path(@conversation),
-            method: :post,
-            class: "btn btn-outline btn-sm btn-warning",
-            data: { confirm: "Are you sure you want to restart this conversation? All messages will be deleted." } do %>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-          </svg>
-          Restart
-        <% end %>
-        <div id="round-indicator" class="badge badge-lg <%= @conversation.can_continue? ? 'badge-success' : 'badge-neutral' %> gap-2" data-test="round-indicator">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Round <%= [@conversation.current_round, 1].max %>/<%= @conversation.max_rounds %>
+        <div class="navbar-center">
+          <div class="flex items-center gap-3">
+            <% @conversation.participants.ordered.each_with_index do |p, i| %>
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-<%= i == 0 ? 'primary' : 'secondary' %>">
+                  <div class="flex items-center justify-center w-full h-full text-primary-content text-sm">
+                    <%= model_avatar_emoji(p.model_id) %>
+                  </div>
+                </div>
+              </div>
+              <% if i < @conversation.participants.count - 1 %>
+                <span class="text-base-content/40 mx-1">vs</span>
+              <% end %>
+            <% end %>
+            <div class="ml-3">
+              <div class="font-semibold">
+                <% @conversation.participants.ordered.each_with_index do |p, i| %>
+                  <%= p.name || "Participant #{i + 1}" %><%= " vs " if i < @conversation.participants.count - 1 %>
+                <% end %>
+              </div>
+              <% if @conversation.conversation_topic.present? %>
+                <div class="text-xs text-base-content/60" data-test="conversation-topic">
+                  <%= truncate(@conversation.conversation_topic, length: 50) %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        
+        <div class="navbar-end">
+          <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+              </svg>
+            </div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48">
+              <li>
+                <%= link_to edit_conversation_path(@conversation) do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                  Edit
+                <% end %>
+              </li>
+              <li>
+                <%= button_to restart_conversation_path(@conversation),
+                    method: :post,
+                    class: "text-warning",
+                    data: { confirm: "Restart conversation? All messages will be deleted." } do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Restart
+                <% end %>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    
-    <% if conversation_has_content_issues?(@conversation) %>
-      <div class="mt-4 alert alert-error">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current w-6 h-6 shrink-0">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-        </svg>
-        <div>
-          <h3 class="font-bold">Content Issues Detected</h3>
-          <div class="text-xs">
-            <%= content_missing_count(@conversation) %> message(s) have missing content. 
-            <%= link_to "View debug info", debug_conversation_path(@conversation), class: "link link-hover", target: "_blank" %>
-          </div>
-        </div>
-      </div>
-    <% end %>
   </div>
 
-  <!-- Participants Cards -->
-  <div class="gap-4 grid grid-cols-1 lg:grid-cols-2">
-    <% @conversation.participants.ordered.each_with_index do |participant, index| %>
-      <div class="bg-base-100 shadow-lg hover:shadow-xl border border-base-200 transition-shadow duration-200 card">
-        <div class="p-4 card-body">
-          <div class="flex items-center gap-4">
-            <div class="avatar placeholder">
-              <div class="bg-<%= index == 0 ? 'primary' : 'secondary' %> text-primary-content rounded-full w-14 h-14">
-                <span class="text-2xl"><%= model_avatar_emoji(participant.model_id) %></span>
-              </div>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-bold text-lg"><%= participant.name || "Participant #{index + 1}" %></h3>
-              <p class="text-sm text-base-content/70"><%= friendly_model_name(participant.model_id) %></p>
-            </div>
-            <div class="badge-outline badge">Turn <%= participant.turn_order %></div>
-          </div>
-        </div>
-      </div>
-    <% end %>
-  </div>
-
-  <div id="conversation-controls-container">
-    <%= render "conversations/controls", conversation: @conversation %>
-  </div>
-
-  <!-- View Mode Toggle -->
+  <!-- Controls Section -->
   <% if @conversation.messages.any? %>
-    <div class="flex justify-center">
-      <div class="bg-base-200 tabs tabs-boxed tabs-lg">
-        <button class="tab" <%# Remove tab-active, controller will set it %>
-                data-action="click->view-mode#switchMode"
-                data-view-mode-target="toggle"
-                data-mode="history"
-                data-test="history-view-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Full History
-        </button>
-        <button class="tab" <%# Remove tab-active, controller will set it. Default is live. %>
-                data-action="click->view-mode#switchMode"
-                data-view-mode-target="toggle"
-                data-mode="live"
-                data-test="live-view-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-          </svg>
-          Live View
-        </button>
+    <!-- Progress & Controls Bar -->
+    <div class="bg-base-50 border-b border-base-200">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-4">
+            <div id="round-indicator">
+              <%= render "conversations/round_indicator", conversation: @conversation %>
+            </div>
+            <% if @conversation.next_speaker %>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-base-content/60">Next:</span>
+                <div class="avatar">
+                  <div class="w-6 h-6 rounded-full bg-<%= @conversation.next_speaker.turn_order == 1 ? 'primary' : 'secondary' %>">
+                    <div class="flex items-center justify-center w-full h-full text-primary-content text-xs">
+                      <%= model_avatar_emoji(@conversation.next_speaker.model_id) %>
+                    </div>
+                  </div>
+                </div>
+                <span class="font-medium"><%= @conversation.next_speaker.name %></span>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <% if @conversation.can_continue? %>
+              <div class="form-control">
+                <label class="label cursor-pointer gap-2 py-2">
+                  <span class="label-text text-sm">Auto</span>
+                  <input type="checkbox"
+                         class="toggle toggle-primary toggle-sm"
+                         data-controller="auto-continue"
+                         data-action="change->auto-continue#toggle"
+                         data-auto-continue-conversation-id-value="<%= @conversation.id %>"
+                         data-auto-continue-max-rounds-value="<%= @conversation.max_rounds %>"
+                         data-auto-continue-active-value="false"
+                         data-test="auto-continue-toggle" />
+                </label>
+              </div>
+              
+              <%= button_to continue_conversation_path(@conversation), 
+                  method: :post,
+                  class: "btn btn-primary gap-2",
+                  data: { 
+                    turbo_frame: "conversation",
+                    streaming_conversation_target: "continueButton",
+                    controller: "conversation-controls",
+                    action: "click->conversation-controls#showLoading",
+                    test: "continue-conversation-button"
+                  } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                </svg>
+                Continue
+              <% end %>
+            <% else %>
+              <div class="badge badge-success gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Complete
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <!-- Start Controls for new conversations -->
+    <div class="container mx-auto px-4 py-6">
+      <div id="conversation-controls-container">
+        <%= render "conversations/controls", conversation: @conversation %>
       </div>
     </div>
   <% end %>
 
-  <!-- Messages Display -->
-  <div id="conversation-messages" data-streaming-conversation-target="messagesContainer">
-    <%= render partial: "conversations/messages", locals: { conversation: @conversation } %>
+  <!-- Error Alert -->
+  <% if conversation_has_content_issues?(@conversation) %>
+    <div class="container mx-auto px-4 pt-4">
+      <div class="alert alert-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current w-6 h-6 shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+        <div>
+          <div class="font-bold">Content Issues Detected</div>
+          <div class="text-sm">
+            <%= content_missing_count(@conversation) %> message(s) have missing content. 
+            <%= link_to "Debug", debug_conversation_path(@conversation), class: "link link-hover", target: "_blank" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Messages -->
+  <div class="container mx-auto px-4 py-6">
+    <div id="conversation-messages" data-streaming-conversation-target="messagesContainer">
+      <%= render partial: "conversations/messages", locals: { conversation: @conversation } %>
+    </div>
   </div>
+  
 </div>
 <% end %>
