@@ -138,12 +138,10 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex justify-end gap-3">
-        <%= link_to conversations_path, class: "btn btn-ghost" do %>
-          Cancel
-        <% end %>
-        <%= form.submit "Create & View", class: "btn btn-primary", data: { "turbo-submits-with": "Creating...", test: "create-conversation" } %>
+      <div class="card-actions justify-end gap-3">
+        <%= link_to "Cancel", conversations_path, class: "btn btn-ghost" %>
         <%= form.submit "Generate in Background", name: "generate_in_background", class: "btn btn-secondary", data: { "turbo-submits-with": "Enqueuing..." } %>
+        <%= form.submit "Create & View", class: "btn btn-primary", data: { "turbo-submits-with": "Creating...", test: "create-conversation" } %>
       </div>
     <% end %>
 </div>

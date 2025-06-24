@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div class="stat-title">Total Conversations</div>
-        <div class="stat-value text-primary"><%= @conversations.count %></div>
+        <div class="stat-value"><%= @conversations.count %></div>
         <div class="stat-desc">All time</div>
       </div>
       
@@ -20,7 +20,7 @@
           </svg>
         </div>
         <div class="stat-title">Currently Active</div>
-        <div class="stat-value text-secondary"><%= @conversations.generating.count + @conversations.interactive.count %></div>
+        <div class="stat-value"><%= @conversations.generating.count + @conversations.interactive.count %></div>
         <div class="stat-desc">In progress</div>
       </div>
       
@@ -31,7 +31,7 @@
           </svg>
         </div>
         <div class="stat-title">Completed</div>
-        <div class="stat-value text-accent"><%= @conversations.complete.count %></div>
+        <div class="stat-value"><%= @conversations.complete.count %></div>
         <div class="stat-desc">Finished</div>
       </div>
     </div>
@@ -39,7 +39,8 @@
 
 <!-- Content Area -->
 <%= turbo_stream_from "conversations" %> <%# Add stream subscription for the index page %>
-<% if @conversations.any? %>
+<div class="bg-base-100 p-8 rounded-2xl shadow-lg">
+  <% if @conversations.any? %>
     <!-- Section Header -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
       <div>
@@ -101,3 +102,4 @@
       </div>
     </div>
   <% end %>
+</div>
