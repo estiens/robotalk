@@ -1,4 +1,4 @@
-<div class="group bg-base-200/50 hover:bg-base-200/70 border border-base-300 transition-colors duration-200 rounded-lg participant-item" data-test="participant-<%= participant_form.index %>">
+<div class="group bg-base-200/50 hover:bg-base-200/70 border border-base-300 rounded-lg transition-colors duration-200 participant-item" data-test="participant-<%= participant_form.index %>">
   <div class="p-3">
     <!-- Header with participant info and remove button -->
     <div class="flex justify-between items-center mb-3">
@@ -16,25 +16,25 @@
     </div>
     
     <!-- Compact participant details -->
-    <div class="grid grid-cols-2 gap-3">
+    <div class="gap-3 grid grid-cols-2">
       <div class="form-control">
         <%= participant_form.label :name, class: "label py-1" do %>
-          <span class="text-sm font-medium text-base-content label-text">Name</span>
+          <span class="font-medium text-sm text-base-content label-text">Name</span>
         <% end %>
         <%= participant_form.text_field :name, 
             placeholder: "e.g. Dr. Smith", 
             required: true,
-            class: "input input-sm input-bordered w-full bg-base-100 text-base-content participant-name focus:border-primary transition-colors" %>
+            class: "input input-sm input-bordered w-full bg-base-300 text-base-content participant-name focus:border-primary transition-colors" %>
       </div>
       
       <div class="form-control">
         <%= participant_form.label :model_id, "Model", class: "label py-1" do %>
-          <span class="text-sm font-medium text-base-content label-text">AI Model</span>
+          <span class="font-medium text-sm text-base-content label-text">AI Model</span>
         <% end %>
         <%= participant_form.select :model_id, 
             options_for_select(available_models.map { |m| [m[:text], m[:value]] }, participant_form.object.model_id),
             { prompt: "Select model..." },
-            { required: true, class: "select select-sm select-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors" } %>
+            { required: true, class: "select select-sm select-bordered w-full bg-base-300 text-base-content focus:border-primary transition-colors" } %>
       </div>
     </div>
     
@@ -43,7 +43,7 @@
     
     <!-- Compact character selection -->
     <div class="mt-3 form-control">
-      <select class="select select-sm select-bordered w-full bg-base-100 text-base-content character-select" 
+      <select class="bg-base-300 w-full text-base-content select-bordered select-sm select character-select" 
               data-participant-index="<%= participant_form.index %>">
         <option value="">Choose personality (optional)...</option>
         <% ConversationTemplates::CHARACTER_ARCHETYPES.each do |key, character| %>
@@ -57,7 +57,7 @@
     
     <!-- Inline character preview -->
     <div class="hidden mt-1 character-preview" style="display: none;">
-      <div class="text-xs text-success flex items-center gap-1">
+      <div class="flex items-center gap-1 text-success text-xs">
         <span>✨</span>
         <span class="character-preview-text"></span>
       </div>
@@ -67,17 +67,17 @@
     <div class="mt-2 form-control">
       <%= participant_form.text_area :character_prompt, 
           rows: 2,
-          class: "textarea textarea-sm textarea-bordered w-full bg-base-100 text-base-content character-prompt focus:border-primary transition-colors resize-none",
+          class: "textarea textarea-sm textarea-bordered w-full bg-base-300 text-base-content character-prompt focus:border-primary transition-colors resize-none",
           placeholder: "Custom character description (optional)..." %>
     </div>
     
     <!-- Advanced system prompt - hidden by default -->
     <details class="mt-2">
-      <summary class="text-xs text-base-content/60 cursor-pointer hover:text-base-content">Advanced system prompt</summary>
+      <summary class="text-xs text-base-content/60 hover:text-base-content cursor-pointer">Advanced system prompt</summary>
       <div class="mt-2">
         <%= participant_form.text_area :system_prompt, 
             rows: 1,
-            class: "textarea textarea-sm textarea-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors resize-none",
+            class: "textarea textarea-sm textarea-bordered w-full bg-base-300 text-base-content focus:border-primary transition-colors resize-none",
             placeholder: "Technical instructions for the model..." %>
       </div>
     </details>

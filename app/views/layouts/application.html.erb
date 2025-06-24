@@ -24,11 +24,11 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-base-200">
+  <body class="bg-base-200 min-h-screen">
     <!-- Modern Navigation Header -->
-    <header class="sticky top-0 z-50 bg-base-100/95 backdrop-blur-sm border-b border-base-200/50">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+    <header class="top-0 z-[100] sticky bg-base-100/95 shadow-lg backdrop-blur-sm border-b border-base-300/50">
+      <div class="mx-auto px-4 sm:px-6 lg:px-8 container">
+        <div class="flex justify-between items-center h-20">
           
           <!-- Logo/Brand -->
           <div class="flex items-center">
@@ -44,7 +44,7 @@
               Conversations
             <% end %>
             
-            <span class="text-base-content/30 mx-2">•</span>
+            <span class="mx-2 text-base-content/30">•</span>
             
             <%= link_to new_conversation_path, class: "px-3 py-1.5 text-sm font-medium text-base-content hover:text-primary transition-colors" do %>
               New Chat
@@ -63,13 +63,13 @@
             <% if logged_in? %>
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-content font-semibold text-sm">
+                  <div class="flex justify-center items-center bg-gradient-to-br from-primary to-secondary rounded-full w-10 h-10 font-semibold text-primary-content">
                     <%= current_user.email[0].upcase %>
                   </div>
                 </label>
-                <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-200/50">
+                <ul tabindex="0" class="z-[101] bg-base-100 shadow-lg mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
                   <li class="menu-title">
-                    <span class="text-xs opacity-60"><%= current_user.email %></span>
+                    <span class="opacity-60 text-xs"><%= current_user.email %></span>
                   </li>
                   <li><%= link_to models_path do %>Models<% end %></li>
                   <li><hr class="my-1"></li>
@@ -80,8 +80,8 @@
               </div>
             <% else %>
               <div class="hidden sm:flex items-center space-x-2">
-                <%= link_to "Sign In", login_path, class: "btn btn-ghost btn-sm" %>
-                <%= link_to "Sign Up", signup_path, class: "btn btn-primary btn-sm" %>
+                <%= link_to "Sign In", login_path, class: "btn btn-ghost" %>
+                <%= link_to "Sign Up", signup_path, class: "btn btn-primary" %>
               </div>
             <% end %>
 
@@ -93,7 +93,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                   </svg>
                 </label>
-                <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-200/50">
+                <ul tabindex="0" class="z-[101] bg-base-100 shadow-lg mt-4 p-2 border border-base-300/50 rounded-box w-52 dropdown-content menu">
                   <li><%= link_to "Conversations", conversations_path %></li>
                   <li><%= link_to "New Chat", new_conversation_path %></li>
                   <li><hr class="my-1"></li>
@@ -120,20 +120,20 @@
 
     <!-- Main Content Area -->
     <main class="flex-1">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 container">
         <%= yield %>
       </div>
     </main>
 
     <!-- Clean Footer -->
-    <footer class="bg-base-100 border-t border-base-200/50 mt-auto">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <footer class="bg-base-100 mt-auto border-t border-base-200/50">
+      <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 container">
         <div class="text-center">
-          <div class="flex items-center justify-center space-x-2 text-sm text-base-content/60 mb-4">
+          <div class="flex justify-center items-center space-x-2 mb-4 text-sm text-base-content/60">
             <span>Powered by</span>
-            <div class="badge badge-outline badge-sm">OpenRouter</div>
+            <div class="badge-outline badge badge-sm">OpenRouter</div>
             <span>•</span>
-            <div class="badge badge-outline badge-sm">Rails 8</div>
+            <div class="badge-outline badge badge-sm">Rails 8</div>
           </div>
           <p class="text-xs text-base-content/40">
             © <%= Date.current.year %> RoboConvo - AI Conversation Platform

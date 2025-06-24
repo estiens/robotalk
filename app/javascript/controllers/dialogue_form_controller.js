@@ -20,9 +20,7 @@ export default class extends Controller {
       this.dialogueInstructionsTextareaTarget.placeholder = 'Enter custom dialogue instructions (e.g., "Have a thoughtful debate about the topic" or "Brainstorm creative solutions together")...';
       this.maxRoundsInputTarget.value = 10;
     } else {
-      // Assuming the template object has a field like 'dialogue_instructions' or 'instructions'
-      // Adjust 'template.dialogue_instructions' if the key name is different in your DIALOGUE_TYPES
-      this.dialogueInstructionsTextareaTarget.value = template.dialogue_instructions || template.instructions || template.text || '';
+      this.dialogueInstructionsTextareaTarget.value = template.conversation_topic || '';
       this.dialogueInstructionsTextareaTarget.placeholder = 'Edit these template instructions as needed...';
       this.maxRoundsInputTarget.value = template.suggested_rounds || 10;
       this.flashBackground(this.dialogueInstructionsTextareaTarget);
