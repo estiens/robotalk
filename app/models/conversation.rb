@@ -30,7 +30,8 @@ class Conversation < ApplicationRecord
   delegate :next_speaker, to: :round_manager
 
   def can_continue?
-    (interactive? || generating?) && current_round < max_rounds
+    # current_round is now a calculated method
+    (interactive? || generating?) && current_round <= max_rounds && participants.size > 0
   end
 
   def participant_for_model(model_id)
@@ -211,38 +212,49 @@ class Conversation < ApplicationRecord
       Rails.logger.info "Model ID: #{message.model_id}"
       Rails.logger.info "Tokens: Input=#{message.input_tokens || 'N/A'}, Output=#{message.output_tokens || 'N/A'}"
       Rails.logger.info "Content: #{message.content&.truncate(200)}"
-      
+
       # Set the conversation_participant based on current_turn_participant_id
-      if current_turn_participant_id && message.role == "assistant"
-        participant = participants.find(current_turn_participant_id)
+      # Ensure this is done *before* super for assistant messages.
+      if message.role == "assistant" && current_turn_participant_id.present?
+        participant = participants.find_by(id: current_turn_participant_id)
         if participant
           message.conversation_participant = participant
-          Rails.logger.info "Set conversation_participant: #{participant.name} (ID: #{participant.id})"
+          Rails.logger.info "Assigned conversation_participant: #{participant.name} (ID: #{participant.id}) to message ID: #{message.id || 'new'}"
         else
-          Rails.logger.warn "Could not find participant with ID: #{current_turn_participant_id}"
+          Rails.logger.warn "[Conversation##persist_message_completion] Could not find participant with ID: #{current_turn_participant_id} to assign to message."
         end
-      else
-        Rails.logger.info "Not setting conversation_participant (role: #{message.role}, current_turn_participant_id: #{current_turn_participant_id})"
+      elsif message.role == "assistant"
+        Rails.logger.warn "[Conversation##persist_message_completion] current_turn_participant_id is blank for assistant message. Participant not set."
       end
     else
       Rails.logger.warn "Status: Failure (message object is nil)"
     end
     Rails.logger.info "-------------------------"
-    
-    # Call the parent method
-    result = super(message)
-    
-    # After the message is saved, double-check the participant relationship
-    if message&.role == "assistant" && current_turn_participant_id
-      participant = participants.find(current_turn_participant_id) 
-      if participant && message.conversation_participant != participant
-        Rails.logger.warn "Message conversation_participant not set correctly. Updating..."
-        message.update!(conversation_participant: participant)
+
+    result = super(message) # Call the original acts_as_chat persistence logic
+
+    # Verify and log after persistence
+    if message&.persisted? && message.role == "assistant"
+      if message.conversation_participant.nil?
+        Rails.logger.warn "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) still has no conversation_participant after super. This is unexpected."
+      else
+        Rails.logger.info "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) successfully persisted with participant: #{message.conversation_participant.name}"
       end
-      
-      # Round indicator will be updated by the message callback
     end
     
     result
+  end
+
+  # Calculated current_round based on assistant messages
+  def current_round
+    assistant_messages_count = messages.where(role: "assistant").count
+    num_participants = participants.count
+    return 1 if num_participants.zero? # Default to round 1 if no participants (edge case)
+    
+    # If no assistant messages yet, it's round 1
+    return 1 if assistant_messages_count.zero? 
+    
+    # Calculate round based on how many full sets of participant turns have occurred
+    (assistant_messages_count.to_f / num_participants).ceil
   end
 end
