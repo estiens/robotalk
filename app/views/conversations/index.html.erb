@@ -39,8 +39,7 @@
 
 <!-- Content Area -->
 <%= turbo_stream_from "conversations" %> <%# Add stream subscription for the index page %>
-<div class="bg-base-100 p-8 rounded-2xl shadow-2xl">
-  <% if @conversations.any? %>
+<% if @conversations.any? %>
     <!-- Section Header -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
       <div>
@@ -73,8 +72,8 @@
 
     <!-- Conversations Grid -->
     <div id="conversations" class="grid gap-8 md:grid-cols-2 xl:grid-cols-3"> <%# Add id for broadcast target %>
-      <% @conversations.each do |conversation| %>
-        <%= render 'conversation_card', conversation: conversation %>
+      <% @conversations.each_with_index do |conversation, index| %>
+        <%= render 'conversation_card', conversation: conversation, index: index %>
       <% end %>
     </div>
   <% else %>
@@ -102,4 +101,3 @@
       </div>
     </div>
   <% end %>
-</div>

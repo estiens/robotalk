@@ -1,8 +1,15 @@
+<%
+  # Alternate card colors for better visual separation
+  is_even = local_assigns.fetch(:index, 0).even?
+  color_class = is_even ? 'primary' : 'secondary'
+  content_class = "#{color_class}-content"
+  focus_class = "#{color_class}-focus"
+%>
 <div class="group relative">
   <!-- Gradient Border Effect -->
   <div class="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl blur opacity-20 group-hover:opacity-40 transition-all duration-300"></div>
   
-  <div class="relative bg-accent text-accent-content rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-300/50 overflow-hidden">
+  <div class="relative bg-<%= color_class %> text-<%= content_class %> rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-300/50 overflow-hidden">
     <!-- Status Indicator Bar -->
     <div class="h-1 w-full <%= conversation.generating? ? 'bg-gradient-to-r from-info via-warning to-info animate-pulse' : conversation.can_continue? ? 'bg-gradient-to-r from-success to-primary' : conversation.failed? ? 'bg-error' : 'bg-neutral' %>"></div>
     
@@ -36,7 +43,7 @@
             <% end %>
           </div>
         <% end %>
-        <div class="text-xs text-accent-content/70 bg-accent-focus px-2 py-1 rounded-full">
+        <div class="text-xs text-<%= content_class %>/70 bg-<%= focus_class %> px-2 py-1 rounded-full">
           <%= conversation.created_at.strftime("%b %d") %>
         </div>
       </div>
@@ -67,11 +74,11 @@
         <!-- Model Names -->
         <div class="text-center">
           <% conversation.participants.ordered.each_with_index do |p, i| %>
-            <span class="text-sm font-medium text-accent-content/80">
+            <span class="text-sm font-medium text-<%= content_class %>/80">
               <%= p.name || friendly_model_name(p.model_id) %>
             </span>
             <% if i < conversation.participants.count - 1 %>
-              <span class="text-accent-content/60 mx-2">vs</span>
+              <span class="text-<%= content_class %>/60 mx-2">vs</span>
             <% end %>
           <% end %>
         </div>
@@ -79,9 +86,9 @@
       
       <!-- Topic Preview -->
       <% if conversation.conversation_topic.present? %>
-        <div class="bg-accent-focus rounded-lg p-3 mb-4">
-          <div class="text-xs font-semibold text-accent-content uppercase tracking-wider mb-1">Topic</div>
-          <p class="text-sm text-accent-content/80 line-clamp-2 leading-relaxed"><%= conversation.conversation_topic %></p>
+        <div class="bg-<%= focus_class %> rounded-lg p-3 mb-4">
+          <div class="text-xs font-semibold text-<%= content_class %> uppercase tracking-wider mb-1">Topic</div>
+          <p class="text-sm text-<%= content_class %>/80 line-clamp-2 leading-relaxed"><%= conversation.conversation_topic %></p>
         </div>
       <% end %>
       
@@ -89,16 +96,16 @@
       <% if conversation.messages.where(role: 'assistant').any? %>
         <% last_message = conversation.messages.where(role: 'assistant').last %>
         <% participant = conversation.participant_for_model(last_message.model_id) %>
-        <div class="bg-accent-focus rounded-lg p-3 mb-4 border-l-4 border-accent-content/30">
-          <div class="text-xs text-accent-content mb-1">Latest from <%= participant&.name || 'AI' %>:</div>
-          <p class="text-sm text-accent-content/70 line-clamp-2">
+        <div class="bg-<%= focus_class %> rounded-lg p-3 mb-4 border-l-4 border-<%= content_class %>/30">
+          <div class="text-xs text-<%= content_class %> mb-1">Latest from <%= participant&.name || 'AI' %>:</div>
+          <p class="text-sm text-<%= content_class %>/70 line-clamp-2">
             <%= truncate(last_message.content, length: 100) %>
           </p>
         </div>
       <% end %>
       
       <!-- Actions -->
-      <div class="flex justify-between items-center mt-4 pt-4 border-t border-base-200">
+      <div class="flex justify-between items-center mt-4 pt-4 border-t border-<%= content_class %>/20">
         <%= link_to conversation_path(conversation), class: "btn btn-ghost btn-sm group/view" do %>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 group-hover/view:scale-110 transition-transform">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
