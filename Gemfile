@@ -70,5 +70,5 @@ group :test do
   gem "webdrivers", require: false
   gem "vcr", "~> 6.3", require: false
   gem "webmock", "~> 3.25", require: false
-  gem "shoulda-matchers", "~> 5.3"
+  gem "shoulda-matchers", "~> 6.5"
 end
