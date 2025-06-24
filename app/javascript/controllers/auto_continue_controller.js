@@ -78,6 +78,12 @@ export default class extends Controller {
 
   async continueConversation() {
     if (!this.isActive) return
+    
+    // Prevent multiple simultaneous clicks
+    if (this.isProcessing) {
+      console.log('Auto-continue: Already processing, skipping')
+      return
+    }
 
     console.log('Auto-continue: Starting conversation continuation')
     
@@ -89,55 +95,92 @@ export default class extends Controller {
     if (continueButton && !continueButton.disabled) {
       console.log('Auto-continue: Found continue button, clicking it')
       
-      // Show loading indicator if it exists
-      const loadingIndicator = document.querySelector('#message-loading[data-controller="loading-indicator"]')
-      if (loadingIndicator) {
-        const nextSpeakerInfo = this.getNextSpeakerInfo()
-        const loadingController = this.application.getControllerForElementAndIdentifier(loadingIndicator, 'loading-indicator')
-        if (loadingController) {
-          loadingController.show(nextSpeakerInfo.name)
-        }
-      }
+      // Mark as processing
+      this.isProcessing = true
       
-      // Listen for new messages being added via Turbo Streams (streaming job)
-      const handleNewMessage = (event) => {
-        console.log('Auto-continue: New message detected via Turbo Stream')
+      // Set up a promise to wait for the streaming to complete
+      const streamingComplete = new Promise((resolve) => {
+        let messageFrameAdded = false
+        let streamingStarted = false
+        let timeoutId = null
         
-        // Remove the event listener
-        document.removeEventListener('turbo:before-stream-render', handleNewMessage)
-        
-        // Hide loading indicator
-        if (loadingIndicator) {
-          const loadingController = this.application.getControllerForElementAndIdentifier(loadingIndicator, 'loading-indicator')
-          if (loadingController) {
-            loadingController.hide()
+        // Listen for the message frame being added (indicates streaming started)
+        const handleMessageFrame = (event) => {
+          const target = event.detail?.newStream?.target
+          if (target && target.includes('message_')) {
+            console.log('Auto-continue: Message frame added, streaming started')
+            messageFrameAdded = true
+            streamingStarted = true
+            
+            // Reset timeout now that streaming has started
+            if (timeoutId) clearTimeout(timeoutId)
+            timeoutId = setTimeout(() => {
+              console.log('Auto-continue: Streaming timeout after message frame')
+              cleanup()
+              resolve()
+            }, 30000) // 30 second timeout after streaming starts
           }
         }
         
-        // Check if we should continue after a short delay to allow streaming to complete
-        setTimeout(() => {
-          this.checkAndContinue()
-        }, 3000) // Longer delay to allow streaming to finish
-      }
-      
-      // Listen for Turbo Stream updates (from streaming job)
-      document.addEventListener('turbo:before-stream-render', handleNewMessage)
-      
-      // Set a timeout fallback in case streaming doesn't complete
-      setTimeout(() => {
-        console.log('Auto-continue: Timeout reached, cleaning up')
-        document.removeEventListener('turbo:before-stream-render', handleNewMessage) 
-        if (loadingIndicator) {
-          const loadingController = this.application.getControllerForElementAndIdentifier(loadingIndicator, 'loading-indicator')
-          if (loadingController) {
-            loadingController.hide()
+        // Listen for the conversation frame being replaced (indicates round complete)
+        const handleConversationUpdate = (event) => {
+          const target = event.detail?.newStream?.target
+          if (target === 'conversation' && streamingStarted) {
+            console.log('Auto-continue: Conversation frame updated, round complete')
+            cleanup()
+            resolve()
           }
         }
-        this.checkAndContinue()
-      }, 45000) // Longer timeout for streaming
+        
+        // Listen for streaming indicator being shown/hidden
+        const handleStreamingIndicator = (event) => {
+          const target = event.detail?.newStream?.target
+          if (target === 'message-loading') {
+            console.log('Auto-continue: Streaming indicator updated')
+            if (!streamingStarted) {
+              streamingStarted = true
+              // Reset timeout when streaming starts
+              if (timeoutId) clearTimeout(timeoutId)
+              timeoutId = setTimeout(() => {
+                console.log('Auto-continue: Streaming timeout')
+                cleanup()
+                resolve()
+              }, 30000)
+            }
+          }
+        }
+        
+        const cleanup = () => {
+          document.removeEventListener('turbo:before-stream-render', handleMessageFrame)
+          document.removeEventListener('turbo:before-stream-render', handleConversationUpdate)
+          document.removeEventListener('turbo:before-stream-render', handleStreamingIndicator)
+          if (timeoutId) clearTimeout(timeoutId)
+          this.isProcessing = false
+        }
+        
+        // Set up listeners
+        document.addEventListener('turbo:before-stream-render', handleMessageFrame)
+        document.addEventListener('turbo:before-stream-render', handleConversationUpdate)
+        document.addEventListener('turbo:before-stream-render', handleStreamingIndicator)
+        
+        // Set initial timeout
+        timeoutId = setTimeout(() => {
+          console.log('Auto-continue: Initial timeout reached')
+          cleanup()
+          resolve()
+        }, 10000) // 10 second initial timeout
+      })
       
       // Click the button
       continueButton.click()
+      
+      // Wait for streaming to complete
+      await streamingComplete
+      
+      // Add a small delay before checking if we should continue
+      setTimeout(() => {
+        this.checkAndContinue()
+      }, 1000)
     } else {
       console.log('Auto-continue: No continue button found, stopping')
       this.stop()

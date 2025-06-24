@@ -65,6 +65,7 @@
 </div>
 
 <!-- Content Area -->
+<%= turbo_stream_from "conversations" %> <%# Add stream subscription for the index page %>
 <div class="container mx-auto px-4 py-12 max-w-7xl">
   <% if @conversations.any? %>
     <!-- Section Header -->
@@ -98,7 +99,7 @@
     </div>
 
     <!-- Conversations Grid -->
-    <div class="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+    <div id="conversations" class="grid gap-8 md:grid-cols-2 xl:grid-cols-3"> <%# Add id for broadcast target %>
       <% @conversations.each do |conversation| %>
         <%= render 'conversation_card', conversation: conversation %>
       <% end %>

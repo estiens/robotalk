@@ -35,7 +35,7 @@
           <span class="font-medium text-base-content label-text">AI Model</span>
         <% end %>
         <%= participant_form.select :model_id, 
-            options_for_select(available_models.map { |m| [m[:text], m[:value]] }),
+            options_for_select(available_models.map { |m| [m[:text], m[:value]] }, participant_form.object.model_id),
             { prompt: "Select model..." },
             { required: true, class: "select select-bordered w-full bg-base-100 text-base-content focus:border-primary transition-colors" } %>
       </div>

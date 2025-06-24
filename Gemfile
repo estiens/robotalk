@@ -72,3 +72,5 @@ group :test do
   gem "webmock", "~> 3.25", require: false
   gem "shoulda-matchers", "~> 5.3"
 end
+
+gem "faker", "~> 3.5", groups: [:development, :test]

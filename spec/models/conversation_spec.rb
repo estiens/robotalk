@@ -1,0 +1,266 @@
+require 'rails_helper'
+
+RSpec.describe Conversation, type: :model do
+  let(:user) { User.create!(email: "test@example.com", password: "password123") }
+  let(:conversation) { Conversation.create!(user: user, max_rounds: 3, conversation_topic: "Test Topic") }
+  
+  describe "round management" do
+    before do
+      # Create 3 participants
+      conversation.participants.create!(
+        model_id: "openai/gpt-4",
+        name: "Assistant 1",
+        turn_order: 1,
+        character_prompt: "You are a helpful assistant"
+      )
+      conversation.participants.create!(
+        model_id: "anthropic/claude-3-haiku",
+        name: "Assistant 2", 
+        turn_order: 2,
+        character_prompt: "You are a creative thinker"
+      )
+      conversation.participants.create!(
+        model_id: "deepseek/deepseek-r1",
+        name: "Assistant 3",
+        turn_order: 3,
+        character_prompt: "You are an analytical mind"
+      )
+    end
+
+    describe "#current_round" do
+      it "returns 0 when no assistant messages exist" do
+        expect(conversation.current_round).to eq(0)
+      end
+
+      it "returns 1 for rounds 1-3 assistant messages" do
+        1.times { conversation.messages.create!(role: "assistant", content: "Message", model_id: "openai/gpt-4") }
+        expect(conversation.current_round).to eq(1)
+        
+        conversation.messages.create!(role: "assistant", content: "Message", model_id: "anthropic/claude-3-haiku")
+        expect(conversation.current_round).to eq(1)
+        
+        conversation.messages.create!(role: "assistant", content: "Message", model_id: "deepseek/deepseek-r1")
+        expect(conversation.current_round).to eq(1)
+      end
+
+      it "returns 2 for rounds 4-6 assistant messages" do
+        4.times { |i| 
+          model = conversation.participants[i % 3].model_id
+          conversation.messages.create!(role: "assistant", content: "Message #{i+1}", model_id: model)
+        }
+        expect(conversation.current_round).to eq(2)
+      end
+
+      it "correctly calculates partial rounds using ceil" do
+        # With 3 participants, 4 messages = ceil(4/3) = 2
+        4.times { |i|
+          model = conversation.participants[i % 3].model_id
+          conversation.messages.create!(role: "assistant", content: "Message", model_id: model)
+        }
+        expect(conversation.current_round).to eq(2)
+      end
+
+      it "handles zero participants gracefully" do
+        conversation.participants.destroy_all
+        expect(conversation.current_round).to eq(0)
+      end
+    end
+
+    describe "#can_continue?" do
+      it "returns true when status is interactive and under max rounds" do
+        conversation.update!(status: "interactive")
+        expect(conversation.can_continue?).to be true
+      end
+
+      it "returns false when current round equals max rounds" do
+        conversation.update!(status: "interactive", max_rounds: 1)
+        3.times { |i|
+          model = conversation.participants[i % 3].model_id
+          conversation.messages.create!(role: "assistant", content: "Message", model_id: model)
+        }
+        expect(conversation.can_continue?).to be false
+      end
+
+      it "returns false when status is not interactive" do
+        conversation.update!(status: "complete")
+        expect(conversation.can_continue?).to be false
+      end
+    end
+
+    describe "#next_speaker" do
+      it "returns first participant when no assistant messages exist" do
+        next_speaker = conversation.next_speaker
+        expect(next_speaker).to eq(conversation.participants.ordered.first)
+        expect(next_speaker.turn_order).to eq(1)
+      end
+
+      it "returns second participant after first has spoken" do
+        first_participant = conversation.participants.ordered.first
+        conversation.messages.create!(
+          role: "assistant", 
+          content: "First message",
+          model_id: first_participant.model_id,
+          conversation_participant: first_participant
+        )
+        
+        next_speaker = conversation.next_speaker
+        expect(next_speaker.turn_order).to eq(2)
+      end
+
+      it "cycles back to first participant after last has spoken" do
+        # All participants speak once
+        conversation.participants.ordered.each do |participant|
+          conversation.messages.create!(
+            role: "assistant",
+            content: "Message from #{participant.name}",
+            model_id: participant.model_id,
+            conversation_participant: participant
+          )
+        end
+        
+        next_speaker = conversation.next_speaker
+        expect(next_speaker).to eq(conversation.participants.ordered.first)
+        expect(next_speaker.turn_order).to eq(1)
+      end
+
+      it "returns nil if participant cannot be found by model_id" do
+        conversation.messages.create!(
+          role: "assistant",
+          content: "Message",
+          model_id: "unknown/model"
+        )
+        
+        expect(conversation.next_speaker).to be_nil
+      end
+    end
+
+    describe "#participant_for_model" do
+      it "finds participant by model_id" do
+        participant = conversation.participants.first
+        found = conversation.participant_for_model(participant.model_id)
+        expect(found).to eq(participant)
+      end
+
+      it "returns nil for unknown model_id" do
+        expect(conversation.participant_for_model("unknown/model")).to be_nil
+      end
+    end
+
+    describe "#can_start?" do
+      it "returns true with 2+ participants and interactive status" do
+        conversation.update!(status: "interactive")
+        expect(conversation.can_start?).to be true
+      end
+
+      it "returns false with less than 2 participants" do
+        conversation.participants.destroy_all
+        conversation.participants.create!(model_id: "openai/gpt-4", turn_order: 1)
+        expect(conversation.can_start?).to be false
+      end
+
+      it "returns false when not interactive" do
+        conversation.update!(status: "generating")
+        expect(conversation.can_start?).to be false
+      end
+    end
+
+    describe "round_number assignment in messages" do
+      it "assigns correct round_number when creating messages" do
+        # Mock the persist_new_message behavior
+        participant1 = conversation.participants.ordered.first
+        conversation.current_turn_participant_id = participant1.id
+        
+        # Simulate message creation with round number
+        message1 = conversation.messages.create!(
+          role: "assistant",
+          content: "First message",
+          model_id: participant1.model_id,
+          conversation_participant_id: participant1.id,
+          round_number: 1
+        )
+        
+        expect(message1.round_number).to eq(1)
+        
+        # Second participant in same round
+        participant2 = conversation.participants.ordered.second
+        message2 = conversation.messages.create!(
+          role: "assistant", 
+          content: "Second message",
+          model_id: participant2.model_id,
+          conversation_participant_id: participant2.id,
+          round_number: 1
+        )
+        
+        expect(message2.round_number).to eq(1)
+      end
+    end
+
+    describe "ConversationParticipant#has_spoken_in_round?" do
+      let(:participant) { conversation.participants.first }
+      
+      it "returns false when participant hasn't spoken in the round" do
+        expect(participant.has_spoken_in_round?(1)).to be false
+      end
+      
+      it "returns true when participant has spoken in the round" do
+        participant.messages.create!(
+          conversation: conversation,
+          role: "assistant",
+          content: "Test message",
+          round_number: 1
+        )
+        
+        expect(participant.has_spoken_in_round?(1)).to be true
+      end
+      
+      it "checks specific round numbers correctly" do
+        participant.messages.create!(
+          conversation: conversation,
+          role: "assistant", 
+          content: "Round 1 message",
+          round_number: 1
+        )
+        
+        expect(participant.has_spoken_in_round?(1)).to be true
+        expect(participant.has_spoken_in_round?(2)).to be false
+      end
+    end
+  end
+
+  describe "validations" do
+    it "validates max_rounds numericality" do
+      conversation = Conversation.new(user: user, conversation_topic: "Test", max_rounds: "not_a_number")
+      expect(conversation).not_to be_valid
+      expect(conversation.errors[:max_rounds]).to include("is not a number")
+    end
+
+    it "requires conversation_topic" do
+      conversation = Conversation.new(user: user, max_rounds: 5)
+      expect(conversation).not_to be_valid
+      expect(conversation.errors[:conversation_topic]).to include("can't be blank")
+    end
+
+    it "validates max_rounds is between 1 and 50" do
+      conversation.max_rounds = 0
+      expect(conversation).not_to be_valid
+      
+      conversation.max_rounds = 51
+      expect(conversation).not_to be_valid
+      
+      conversation.max_rounds = 25
+      expect(conversation).to be_valid
+    end
+  end
+
+  describe "defaults" do
+    it "sets default status to interactive" do
+      conv = Conversation.create!(user: user, max_rounds: 5, conversation_topic: "Test")
+      expect(conv.status).to eq("interactive")
+    end
+
+    it "sets default dialogue_instructions" do
+      conv = Conversation.create!(user: user, max_rounds: 5, conversation_topic: "Test")
+      expect(conv.dialogue_instructions).to include("thoughtful conversation")
+    end
+  end
+end

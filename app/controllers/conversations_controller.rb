@@ -64,7 +64,12 @@ class ConversationsController < ApplicationController
   def new
     @conversation = current_user.conversations.build
     # Build two default participants
-    2.times { @conversation.participants.build }
+    # Build two default participants with a default model
+    2.times do |i|
+      participant = @conversation.participants.build
+      # Set default model for the participant
+      participant.model_id = "deepseek/deepseek-r1-0528"
+    end
     @available_models = get_available_models
   end
 
@@ -113,11 +118,20 @@ class ConversationsController < ApplicationController
     end
 
     begin
-      @conversation.generate_one_round!
+      # Always use streaming
+      next_speaker_model = @conversation.next_speaker
+      ChatStreamJob.perform_later(@conversation.id)
 
       respond_to do |format|
-        format.html { redirect_to @conversation, notice: "Conversation started!" }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("conversation", template: "conversations/show", locals: { conversation: @conversation }) }
+        format.html { redirect_to @conversation, notice: "Conversation started with streaming!" }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update("message-loading",
+              html: render_to_string(partial: "shared/streaming_indicator", locals: { model_name: next_speaker_model }),
+              attributes: { class: "mt-8 loading-indicator-chat animate-fade-in" }),
+            turbo_stream.replace("start-conversation-controls", "")
+          ]
+        end
       end
     rescue => e
       Rails.logger.error "Failed to start conversation: #{e.message}"
@@ -134,13 +148,36 @@ class ConversationsController < ApplicationController
     @conversation = current_user.conversations.find(params[:id])
 
     if @conversation.can_continue?
-      @conversation.generate_one_round!
+      # Always use streaming
+      ChatStreamJob.perform_later(@conversation.id)
+
+      respond_to do |format|
+        format.html { redirect_to @conversation, notice: "Conversation continued with streaming!" }
+        format.turbo_stream { head :ok } # The broadcasts from the model will handle UI updates.
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to @conversation, alert: "Conversation cannot continue." }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("conversation", template: "conversations/show", locals: { conversation: @conversation }) }
+      end
+    end
+  end
+
+  def restart
+    @conversation = current_user.conversations.find(params[:id])
+
+    # Delete all messages
+    @conversation.messages.destroy_all
+
+    # Reset status if it was complete or failed, otherwise keep as is (e.g. interactive)
+    if @conversation.complete? || @conversation.failed?
+      @conversation.update(status: :interactive)
     end
 
-    respond_to do |format|
-      format.html { redirect_to @conversation, notice: "Conversation continued!" }
-      format.turbo_stream { render turbo_stream: turbo_stream.replace("conversation", template: "conversations/show", locals: { conversation: @conversation }) }
-    end
+    # Optionally, reset other specific attributes if needed, e.g., current_round if stored explicitly
+    # For now, deleting messages effectively resets the round count as it's calculated.
+
+    redirect_to @conversation, notice: "Conversation has been restarted."
   end
 
   private
@@ -174,12 +211,13 @@ class ConversationsController < ApplicationController
     end
   rescue => e
     Rails.logger.error "Failed to load models: #{e.message}"
-    # Fallback to hardcoded models if everything fails
+    # Fallback to hardcoded models if everything fails (original list)
     [
       { value: "openai/gpt-4o", text: "OpenAI: GPT-4o" },
       { value: "openai/gpt-4o-mini", text: "OpenAI: GPT-4o Mini" },
       { value: "anthropic/claude-3-5-sonnet", text: "Anthropic: Claude 3.5 Sonnet" },
-      { value: "anthropic/claude-3-haiku", text: "Anthropic: Claude 3 Haiku" }
+      { value: "anthropic/claude-3-haiku", text: "Anthropic: Claude 3 Haiku" },
+      { value: "deepseek/deepseek-r1-0528", text: "DeepSeek: R1 0528 (OpenRouter)" } # Ensure DeepSeek is an option
     ]
   end
 end

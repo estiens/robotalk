@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       post :start
       post :continue
       get :debug
+      post :restart # Add restart route
     end
   end
 

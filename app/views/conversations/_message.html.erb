@@ -1,15 +1,25 @@
 <%= turbo_frame_tag message do %>
-  <% participant = conversation.participant_for_model(message.model_id) %>
+  <%# Prioritize message_model_id if passed explicitly (during initial stream frame), otherwise use message.model_id %>
+  <%# current_model_id = local_assigns.fetch(:message_model_id, message.model_id) # Old way %>
+  <% participant = message.conversation_participant || message.conversation.participant_for_model(local_assigns.fetch(:message_model_id, message.model_id)) %>
   <% is_first_participant = participant&.turn_order == 1 %>
   
-  <% if view_mode == "history" %>
-    <% round_number = index + 1 %>
+  <%# Use participant.model_id for avatar if participant exists, else fallback %>
+  <% avatar_model_id = participant&.model_id || local_assigns.fetch(:message_model_id, message.model_id) %>
+
+  <%# Default view_mode to "live" if not explicitly passed %>
+  <% current_view_mode = local_assigns.fetch(:view_mode, "live") %>
+
+  <% if current_view_mode == "history" %>
+    <% num_participants = message.conversation.participants.count.to_f %>
+    <%# index is 0-based index of this assistant message among all assistant messages %>
+    <% display_round_number = num_participants > 0 ? (index / num_participants).floor + 1 : index + 1 %>
     <div class="collapse collapse-arrow <%= is_first_participant ? 'bg-primary/5 border-primary/20' : 'bg-secondary/5 border-secondary/20' %> border">
-      <input type="checkbox" <% if index >= conversation.messages.where(role: 'assistant').count - 2 %>checked<% end %> /> 
+      <input type="checkbox" <% if local_assigns.key?(:index) && index >= message.conversation.messages.where(role: 'assistant').count - 2 %>checked<% end %> />
       <div class="collapse-title font-medium text-sm">
-        <%= model_avatar_emoji(message.model_id) %> 
-        <%= participant&.name || "Unknown" %> (<%= friendly_model_name(message.model_id) %>) 
-        • Round <%= round_number %> 
+        <%= model_avatar_emoji(avatar_model_id) %>
+        <%= participant&.name || "Unknown" %> (<%= friendly_model_name(avatar_model_id) %>)
+        • Round <%= display_round_number %>
         • <%= message.created_at.strftime("%I:%M %p") %>
         <% if message.metadata&.dig('response_time_ms') %>
           • <%= message.metadata['response_time_ms'].to_i %>ms
@@ -51,15 +61,48 @@
       </div>
     </div>
   <% else %>
-    <% assistant_messages = conversation.messages.where(role: 'assistant') %>
-    <% round_number = assistant_messages.count - assistant_messages.last(3).count + index + 1 %>
+    <%# When rendered via Message.broadcasts_to, `index` might not be available.
+       We need to calculate round number based on the message itself if index is not present.
+       This part is tricky for "live view" if it's not part of a collection render.
+       For now, let's assume index is available or adjust if it causes issues.
+       If index is not available, this round_number calculation will fail for live view.
+       A robust way would be to count messages older than the current one.
+    %>
+    <% assistant_messages = message.conversation.messages.where(role: 'assistant') %>
+    <% if local_assigns.key?(:index) %>
+      <% round_number = assistant_messages.count - assistant_messages.last(3).count + index + 1 %>
+    <% else %>
+      <%# Approximate round number for a single message broadcast if index isn't passed.
+         This assumes the message is the latest one.
+      %>
+      <% round_number = assistant_messages.where("created_at <= ?", message.created_at).count %>
+    <% end %>
+    <%# For live view, round number display is more complex if we only show last few messages.
+        The 'Round X' badge on the "Next Speaker's Turn" button uses conversation.current_round + 1.
+        Individual messages in live view often don't show a round number, but if they did,
+        it would need similar logic based on their absolute position in all assistant messages.
+        The existing round calculation for live view (lines 71-77 of original file) was complex
+        and might be better simplified or removed from individual live messages if the button shows current round.
+        Let's assume the `chat-header` in live view also wants a round number.
+        We need a reliable way to get the absolute index of an assistant message.
+    %>
+    <%
+      all_assistant_messages = message.conversation.messages.where(role: 'assistant').order(:created_at, :id)
+      current_message_index_in_all_assistants = all_assistant_messages.to_a.index(message)
+      num_participants_for_live = message.conversation.participants.count.to_f
+      live_display_round_number = if current_message_index_in_all_assistants && num_participants_for_live > 0
+                                    (current_message_index_in_all_assistants / num_participants_for_live).floor + 1
+                                  else
+                                    "?" # Fallback if index can't be determined
+                                  end
+    %>
     
-    <div class="chat <%= is_first_participant ? 'chat-start' : 'chat-end' %> group/message animate-fade-in-up" style="animation-delay: <%= index * 0.1 %>s;">
+    <div class="chat <%= is_first_participant ? 'chat-start' : 'chat-end' %> group/message animate-fade-in-up" style="animation-delay: <%= local_assigns.fetch(:index, 0) * 0.1 %>s;">
       <!-- Enhanced Avatar with Glow Effect -->
       <div class="chat-image avatar">
         <div class="relative">
           <div class="w-12 h-12 rounded-full bg-gradient-to-br <%= is_first_participant ? 'from-primary via-primary/80 to-primary/60' : 'from-secondary via-secondary/80 to-secondary/60' %> flex items-center justify-center text-lg text-white shadow-lg transform group-hover/message:scale-110 transition-all duration-300">
-            <%= model_avatar_emoji(message.model_id) %>
+            <%= model_avatar_emoji(avatar_model_id) %>
           </div>
           <!-- Thinking pulse ring -->
           <% unless message.content.present? %>
@@ -85,7 +128,7 @@
             <%= participant&.name || "Unknown" %>
           </span>
           <div class="flex items-center gap-1 text-xs text-base-content/60">
-            <span class="bg-base-200 px-2 py-0.5 rounded-full">Round <%= round_number %></span>
+            <span class="bg-base-200 px-2 py-0.5 rounded-full">Round <%= live_display_round_number %></span>
             <span class="opacity-50">•</span>
             <time><%= message.created_at.strftime("%I:%M %p") %></time>
           </div>

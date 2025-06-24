@@ -1,5 +1,6 @@
 class ConversationParticipant < ApplicationRecord
   belongs_to :conversation
+  has_many :messages, dependent: :nullify # Or :destroy, nullify is safer for history
 
 
   validates :model_id, presence: true
@@ -9,6 +10,11 @@ class ConversationParticipant < ApplicationRecord
   scope :ordered, -> { order(:turn_order) }
 
   before_validation :set_defaults
+
+  # Checks if this participant has an assistant message in the given round_number
+  def has_spoken_in_round?(round_number_to_check)
+    messages.where(role: "assistant", round_number: round_number_to_check).exists?
+  end
 
   def system_prompt_with_topic
     # Build the complete system prompt with base + character + dialogue + topic

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_031826) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_065226) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -47,7 +47,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_031826) do
     t.json "metadata"
     t.integer "input_tokens"
     t.integer "output_tokens"
+    t.integer "conversation_participant_id"
+    t.integer "round_number"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["conversation_participant_id"], name: "index_messages_on_conversation_participant_id"
   end
 
   create_table "tool_calls", force: :cascade do |t|
@@ -75,6 +78,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_031826) do
 
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversations", "users"
+  add_foreign_key "messages", "conversation_participants"
   add_foreign_key "messages", "conversations"
   add_foreign_key "tool_calls", "conversations"
   add_foreign_key "tool_calls", "messages"

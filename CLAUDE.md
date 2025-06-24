@@ -190,3 +190,7 @@ Pre-configured pairings like "Classic Debate" (Analytical + Philosophical) or "C
 - `lib/conversation_templates.rb` - Dialogue types, character archetypes, and suggested combinations
 - `config/initializers/ruby_llm.rb` - Multi-provider LLM configuration
 - `app/javascript/controllers/` - Stimulus controllers for interactive behavior
+
+## Documentation References
+- `TODO.md` - Comprehensive improvement plan for conversation flow, round management, and UX enhancements
+- `docs/ruby_llm.txt` - Detailed documentation for the RubyLLM gem integration patterns and usage

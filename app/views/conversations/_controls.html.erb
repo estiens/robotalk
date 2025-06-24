@@ -1,0 +1,63 @@
+<!-- Controls Section -->
+<div class="bg-base-100 shadow-xl border border-base-300 card" data-controller="streaming-conversation"
+     data-streaming-conversation-conversation-id-value="<%= conversation.id %>"
+     data-streaming-conversation-next-model-value="<%= conversation.can_continue? ? conversation.next_speaker : '' %>">
+  <div class="card-body">
+    <% if conversation.messages.empty? %>
+      <!-- Start Button -->
+      <div id="start-conversation-controls" class="py-8 text-center">
+        <h3 class="mb-4 font-semibold text-xl">Ready to begin?</h3>
+        <p class="mb-6 text-base-content/70">Start the conversation between your AI models</p>
+        <%= button_to start_conversation_path(conversation),
+            method: :post,
+            class: "btn btn-success btn-lg gap-2",
+            data: {
+              turbo_frame: "conversation",
+              streaming_conversation_target: "startButton",
+              controller: "conversation-controls",
+              action: "click->conversation-controls#showLoading",
+              test: "start-conversation-button"
+            } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+          </svg>
+          Start Conversation
+        <% end %>
+      </div>
+    <% elsif conversation.can_continue? %>
+      <!-- Auto-continue Toggle -->
+      <div class="bg-primary/5 p-4 border border-primary/20 rounded-lg">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl">⚡</div>
+            <div>
+              <h4 class="font-semibold text-lg">Auto-continue Mode</h4>
+              <p class="text-sm text-base-content/70">Automatically advance through all rounds</p>
+            </div>
+          </div>
+          <input type="checkbox"
+                 class="toggle toggle-primary toggle-lg"
+                 data-controller="auto-continue"
+                 data-action="change->auto-continue#toggle"
+                 data-auto-continue-conversation-id-value="<%= conversation.id %>"
+                 data-auto-continue-max-rounds-value="<%= conversation.max_rounds %>"
+                 data-auto-continue-active-value="false"
+                 data-test="auto-continue-toggle" />
+        </div>
+        <div id="auto-continue-status" class="hidden mt-3">
+          <div class="flex items-center gap-2 text-primary text-sm">
+            <span class="loading loading-spinner loading-sm"></span>
+            <span>Auto-continuing conversation...</span>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <!-- Conversation Complete -->
+      <div class="py-8 text-center">
+        <div class="mb-4 text-5xl">✅</div>
+        <h3 class="mb-2 font-semibold text-xl" data-test="conversation-complete-message">Conversation Complete</h3>
+        <p class="text-base-content/70">All <%= conversation.max_rounds %> rounds have been completed</p>
+      </div>
+    <% end %>
+  </div>
+</div>

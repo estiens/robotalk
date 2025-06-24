@@ -1,0 +1,30 @@
+<div id="message-loading" class="mt-8 loading-indicator-chat animate-fade-in">
+  <div class="chat chat-start">
+    <div class="chat-image avatar">
+      <div class="relative">
+        <div class="w-12 h-12 bg-gradient-to-br from-warning via-warning/80 to-warning/60 rounded-full flex items-center justify-center text-lg text-white shadow-lg">
+          <%= model_avatar_emoji(model_name) %>
+        </div>
+        <!-- Multiple pulse rings for thinking effect -->
+        <div class="absolute inset-0 rounded-full bg-warning animate-ping opacity-20"></div>
+        <div class="absolute inset-1 rounded-full bg-warning animate-ping opacity-30" style="animation-delay: 0.2s;"></div>
+        <div class="absolute inset-2 rounded-full bg-warning animate-ping opacity-40" style="animation-delay: 0.4s;"></div>
+      </div>
+    </div>
+    <div class="chat-header mb-1">
+      <span class="font-semibold text-warning"><%= friendly_model_name(model_name) %></span>
+      <span class="text-xs text-base-content/60 ml-2">is thinking...</span>
+    </div>
+    <div class="chat-bubble chat-bubble-warning shadow-lg border-0 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent pointer-events-none"></div>
+      <div class="relative z-10 flex items-center gap-3">
+        <div class="flex gap-1">
+          <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+          <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
+          <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+        </div>
+        <span class="text-sm animate-pulse">Crafting response...</span>
+      </div>
+    </div>
+  </div>
+</div>
