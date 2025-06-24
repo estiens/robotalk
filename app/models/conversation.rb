@@ -216,12 +216,17 @@ class Conversation < ApplicationRecord
       Rails.logger.info "Content: #{message.content&.truncate(200)}"
 
       # Set the conversation_participant based on current_turn_participant_id
-      # Ensure this is done *before* super for assistant messages.
       if message.role == "assistant" && current_turn_participant_id.present?
         participant = participants.find_by(id: current_turn_participant_id)
         if participant
-          message.conversation_participant = participant
-          Rails.logger.info "Assigned conversation_participant: #{participant.name} (ID: #{participant.id}) to message ID: #{message.id || 'new'}"
+          if message.conversation_participant != participant
+            message.conversation_participant = participant
+            # Explicitly save if we've just set the participant and the message is persistable
+            message.save if message.persisted? && message.changed? 
+            Rails.logger.info "Assigned conversation_participant: #{participant.name} (ID: #{participant.id}) to message ID: #{message.id || 'new'}"
+          elsif message.conversation_participant == participant
+            Rails.logger.info "Conversation_participant already correctly set for message ID: #{message.id || 'new'}"
+          end
         else
           Rails.logger.warn "[Conversation##persist_message_completion] Could not find participant with ID: #{current_turn_participant_id} to assign to message."
         end
@@ -233,9 +238,11 @@ class Conversation < ApplicationRecord
     end
     Rails.logger.info "-------------------------"
 
-    result = super(message) # Call the original acts_as_chat persistence logic
+    # Now call super, which might update tokens, content, etc.
+    # The message object should already have the participant associated if found.
+    result = super(message) 
 
-    # Verify and log after persistence
+    # Verify and log after persistence by super
     if message&.persisted? && message.role == "assistant"
       if message.conversation_participant.nil?
         Rails.logger.warn "[Conversation##persist_message_completion] Message ID #{message.id} (assistant) still has no conversation_participant after super. This is unexpected."
