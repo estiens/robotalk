@@ -175,27 +175,28 @@ class Conversation < ApplicationRecord
     Rails.logger.info "[Conversation##generate_one_round!] Current assistant messages count: #{messages.where(role: 'assistant').count}"
     Rails.logger.info "[Conversation##generate_one_round!] Participants count: #{participants.count}"
 
-    participants.ordered.each do |participant|
-      break unless can_continue?
+    loop do
+      break unless can_continue? # Check if conversation can overall continue (max_rounds, status)
 
-      has_spoken = participant.has_spoken_in_round?(round_to_generate)
-      Rails.logger.info "[Conversation##generate_one_round!] Participant #{participant.id} (#{participant.name}) has_spoken_in_round?(#{round_to_generate}): #{has_spoken}"
+      # Determine the speaker for the current conversation.current_round
+      # The RoundManager#next_speaker correctly finds who hasn't spoken in the current round.
+      speaker_for_this_turn = round_manager.next_speaker 
 
-      if has_spoken
-        Rails.logger.info "[Conversation##generate_one_round!] Participant #{participant.id} (#{participant.name}) already spoke in round #{round_to_generate}. Skipping."
-        next
+      unless speaker_for_this_turn
+        Rails.logger.info "[Conversation##generate_one_round!] No next speaker found for round #{self.current_round}. Round is complete."
+        break # Exit loop if no one is left to speak in the current round
       end
 
-      Rails.logger.info "[Conversation##generate_one_round!] Participant #{participant.id} (#{participant.name}) speaking for round #{round_to_generate}, conversation ID: #{id}"
-      Rails.logger.info "[Conversation##generate_one_round!] Messages count before generate_one_speaker_turn!: #{messages.count}"
+      Rails.logger.info "[Conversation##generate_one_round!] Participant #{speaker_for_this_turn.id} (#{speaker_for_this_turn.name}) selected to speak for round #{self.current_round}, conversation ID: #{id}"
       
-      generate_one_speaker_turn!(participant) # Removed stream argument
+      generate_one_speaker_turn!(speaker_for_this_turn)
       
-      reload
-      Rails.logger.info "[Conversation##generate_one_round!] Messages count after generate_one_speaker_turn!: #{messages.count}"
-      Rails.logger.info "[Conversation##generate_one_round!] Assistant messages count after generate_one_speaker_turn!: #{messages.where(role: 'assistant').count}"
+      reload # Reload conversation state (e.g., messages, current_round if it was advanced by a callback)
+      
+      # Small delay to prevent tight loops in case of rapid state changes or issues
+      sleep 0.1 
     end
-    Rails.logger.info "[Conversation##generate_one_round!] Finished attempting to generate/complete round: #{round_to_generate} for conversation ID: #{id}"
+    Rails.logger.info "[Conversation##generate_one_round!] Finished generating turns for round (or until can_continue? is false) for conversation ID: #{id}. Current round is now #{self.current_round}."
   end
 
   def generate_full_conversation!
