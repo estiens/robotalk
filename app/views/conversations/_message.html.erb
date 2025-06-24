@@ -27,7 +27,7 @@
       
       <!-- Chat Bubble -->
       <div class="relative">
-        <div class="chat-bubble <%= is_first_participant ? 'chat-bubble-primary' : 'chat-bubble-secondary' %> text-base max-w-3xl shadow-lg border-0 relative overflow-hidden group-hover/message:shadow-xl transition-shadow duration-300">
+        <div class="chat-bubble <%= is_first_participant ? 'chat-bubble-primary text-primary-content' : 'chat-bubble-secondary text-secondary-content' %> text-base max-w-3xl shadow-lg border-0 relative overflow-hidden group-hover/message:shadow-xl transition-shadow duration-300">
           
           <div class="relative z-10" id="<%= dom_id(message, "content") %>">
             <% if message.content.present? %>
