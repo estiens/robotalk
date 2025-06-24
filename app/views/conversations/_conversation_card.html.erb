@@ -7,51 +7,66 @@
 %>
 <div class="group relative">
   <!-- Gradient Border Effect -->
-  <div class="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-accent rounded-2xl blur opacity-20 group-hover:opacity-40 transition-all duration-300"></div>
+  <div class="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-accent opacity-20 group-hover:opacity-40 rounded-2xl transition-all duration-300 blur"></div>
   
-  <div class="relative bg-<%= color_class %> text-<%= content_class %> rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-base-300/50 overflow-hidden">
+  <!-- Delete Button -->
+  <div class="top-2 right-2 z-10 absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+    <%= button_to conversation_path(conversation), 
+        method: :delete,
+        class: "btn btn-circle btn-sm btn-error hover:btn-error shadow-lg",
+        data: { 
+          confirm: "Are you sure you want to delete this conversation? This action cannot be undone.",
+          test: "delete-conversation-button"
+        } do %>
+      <span class="material-symbols-outlined text-lg">close</span>
+    <% end %>
+  </div>
+  
+  <div class="relative bg-base-100 shadow-lg hover:shadow-2xl border border-base-300 rounded-xl overflow-hidden transition-all duration-300">
     <!-- Status Indicator Bar -->
-    <div class="h-1 w-full <%= conversation.generating? ? 'bg-gradient-to-r from-info via-warning to-info animate-pulse' : conversation.can_continue? ? 'bg-gradient-to-r from-success to-primary' : conversation.failed? ? 'bg-error' : 'bg-neutral' %>"></div>
+    <div class="h-2 w-full <%= conversation.generating? ? 'bg-gradient-to-r from-info via-warning to-info animate-pulse' : conversation.can_continue? ? 'bg-gradient-to-r from-success to-primary' : conversation.failed? ? 'bg-error' : 'bg-neutral' %>"></div>
     
-    <div class="p-6">
-      <!-- Header with Status -->
-      <div class="flex justify-between items-start mb-4">
+    <!-- Header Section -->
+    <div class="bg-<%= color_class %> text-<%= content_class %> p-4">
+      <div class="flex justify-between items-start pr-8">
         <% case conversation.status.to_sym %>
         <% when :generating %>
-          <div class="flex items-center gap-2 text-info">
-            <div class="w-2 h-2 bg-info rounded-full animate-ping"></div>
-            <span class="text-sm font-medium">Generating...</span>
+          <div class="flex items-center gap-2 text-warning">
+            <div class="bg-warning rounded-full w-2 h-2 animate-ping"></div>
+            <span class="font-semibold text-sm">Generating...</span>
           </div>
         <% when :failed %>
           <div class="flex items-center gap-2 text-error">
-            <span class="material-symbols-outlined">error</span>
-            <span class="text-sm font-medium">Failed</span>
+            <span class="material-symbols-outlined text-lg">error</span>
+            <span class="font-semibold text-sm">Failed</span>
           </div>
         <% else %>
-          <div class="flex items-center gap-2 <%= conversation.can_continue? ? 'text-success' : 'text-neutral' %>">
+          <div class="flex items-center gap-2">
             <% if conversation.messages.empty? && conversation.interactive? %>
-              <div class="w-2 h-2 bg-warning rounded-full animate-pulse"></div>
-              <span class="text-sm font-medium">Ready to Start</span>
+              <div class="bg-warning rounded-full w-2 h-2 animate-pulse"></div>
+              <span class="font-semibold text-sm">Ready to Start</span>
             <% elsif conversation.can_continue? %>
-              <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-              <span class="text-sm font-medium">Round <%= conversation.current_round %>/<%= conversation.max_rounds %></span>
+              <div class="bg-success rounded-full w-2 h-2 animate-pulse"></div>
+              <span class="font-semibold text-sm">Round <%= conversation.current_round %>/<%= conversation.max_rounds %></span>
             <% else %>
-              <div class="w-2 h-2 bg-neutral rounded-full"></div>
-              <span class="text-sm font-medium">Complete</span>
+              <div class="bg-neutral rounded-full w-2 h-2"></div>
+              <span class="font-semibold text-sm">Complete</span>
             <% end %>
           </div>
         <% end %>
-        <div class="text-xs text-<%= content_class %>/70 bg-<%= focus_class %> px-2 py-1 rounded-full">
-          <%= conversation.created_at.strftime("%b %d") %>
+        <div class="text-xs text-<%= content_class %>/80 bg-<%= content_class %>/10 px-3 py-1 rounded-full border border-<%= content_class %>/20">
+          <%= conversation.created_at.strftime("%b %d, %Y") %>
         </div>
       </div>
+    </div>
 
-      <!-- AI Participants with Animation -->
-      <div class="mb-4">
-        <div class="flex items-center justify-center gap-3 mb-3">
+    <div class="space-y-4 p-5">
+      <!-- AI Participants Section -->
+      <div class="bg-base-200/50 p-4 border border-base-300/50 rounded-lg">
+        <div class="flex justify-center items-center gap-3 mb-3">
           <% conversation.participants.ordered.each_with_index do |p, i| %>
-            <div class="relative group/avatar">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br <%= i == 0 ? 'from-primary to-primary/70' : 'from-secondary to-secondary/70' %> flex items-center justify-center text-white text-lg shadow-lg transform group-hover:scale-110 transition-all duration-200">
+            <div class="group/avatar relative">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br <%= i == 0 ? 'from-primary to-primary/70' : 'from-secondary to-secondary/70' %> flex items-center justify-center text-white text-sm shadow-md transform group-hover:scale-110 transition-all duration-200">
                 <%= model_avatar_emoji(p.model_id) %>
               </div>
               <!-- Pulse ring for active conversations -->
@@ -61,51 +76,78 @@
             </div>
             <% if i < conversation.participants.count - 1 %>
               <div class="flex items-center">
-                <span class="material-symbols-outlined text-base-content/40">swap_horiz</span>
+                <span class="material-symbols-outlined text-base-content/40 text-lg">swap_horiz</span>
               </div>
             <% end %>
           <% end %>
         </div>
         
-        <!-- Model Names -->
-        <div class="text-center">
-          <% conversation.participants.ordered.each_with_index do |p, i| %>
-            <span class="text-sm font-medium text-<%= content_class %>/80">
-              <%= p.name || friendly_model_name(p.model_id) %>
-            </span>
-            <% if i < conversation.participants.count - 1 %>
-              <span class="text-<%= content_class %>/60 mx-2">vs</span>
+        <!-- Model Names and Participant Names -->
+        <div class="space-y-1 text-center">
+          <div>
+            <% conversation.participants.ordered.each_with_index do |p, i| %>
+              <span class="font-medium text-sm text-base-content">
+                <%= p.name || friendly_model_name(p.model_id) %>
+              </span>
+              <% if i < conversation.participants.count - 1 %>
+                <span class="mx-2 font-semibold text-base-content/60">vs</span>
+              <% end %>
             <% end %>
-          <% end %>
+          </div>
+          <div class="text-xs text-base-content/60">
+            <% conversation.participants.ordered.each_with_index do |p, i| %>
+              <span class="bg-base-300 px-2 py-1 rounded font-mono">
+                <%= p.model_id %>
+              </span>
+              <% if i < conversation.participants.count - 1 %>
+                <span class="mx-2">•</span>
+              <% end %>
+            <% end %>
+          </div>
         </div>
       </div>
       
-      <!-- Topic Preview -->
+      <!-- Topic Section -->
       <% if conversation.conversation_topic.present? %>
-        <div class="bg-<%= focus_class %> rounded-lg p-3 mb-4">
-          <div class="text-xs font-semibold text-<%= content_class %> uppercase tracking-wider mb-1">Topic</div>
-          <p class="text-sm text-<%= content_class %>/80 line-clamp-2 leading-relaxed"><%= conversation.conversation_topic %></p>
+        <div class="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-accent border-l-4 rounded-lg">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-accent text-lg">topic</span>
+            <div class="font-bold text-accent text-xs uppercase tracking-wider">Topic</div>
+          </div>
+          <p class="text-sm text-base-content/80 leading-relaxed"><%= conversation.conversation_topic %></p>
         </div>
       <% end %>
       
-      <!-- Message Preview (if conversation has started) -->
+      <!-- Latest Message Section -->
       <% if conversation.messages.where(role: 'assistant').any? %>
         <% last_message = conversation.messages.where(role: 'assistant').last %>
         <% participant = conversation.participant_for_model(last_message.model_id) %>
-        <div class="bg-<%= focus_class %> rounded-lg p-3 mb-4 border-l-4 border-<%= content_class %>/30">
-          <div class="text-xs text-<%= content_class %> mb-1">Latest from <%= participant&.name || 'AI' %>:</div>
-          <p class="text-sm text-<%= content_class %>/70 line-clamp-2">
-            <%= truncate(last_message.content, length: 100) %>
+        <div class="bg-gradient-to-r from-info/10 to-info/5 p-4 border-info border-l-4 rounded-lg">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-info text-lg">chat</span>
+            <div class="font-bold text-info text-xs uppercase tracking-wider">Latest from <%= participant&.name || 'AI' %></div>
+          </div>
+          <p class="text-sm text-base-content/70 line-clamp-2 leading-relaxed">
+            <%= truncate(last_message.content, length: 120) %>
           </p>
         </div>
       <% end %>
+    </div>
       
-      <!-- Actions -->
-      <div class="flex justify-between items-center mt-4 pt-4 border-t border-<%= content_class %>/20">
-        <%= link_to conversation_path(conversation), class: "btn btn-ghost btn-sm group/view gap-2" do %>
-          <span class="material-symbols-outlined text-lg group-hover/view:scale-110 transition-transform">visibility</span>
-          View
-        <% end %>
+    <!-- Actions Section -->
+    <div class="bg-base-50 p-4 border-t border-base-300/50">
+      <div class="flex justify-between items-center gap-3">
+        <div class="flex gap-2">
+          <%= link_to conversation_path(conversation), class: "btn btn-ghost btn-sm gap-2 group/view" do %>
+            <span class="material-symbols-outlined text-lg group-hover/view:scale-110 transition-transform">visibility</span>
+            View
+          <% end %>
+          
+          <%= link_to edit_conversation_path(conversation), class: "btn btn-outline btn-sm gap-2 group/edit" do %>
+            <span class="material-symbols-outlined text-lg group-hover/edit:scale-110 transition-transform">edit</span>
+            Edit
+          <% end %>
+        </div>
 
         <% if conversation.interactive? && !conversation.generating? %>
           <% if conversation.messages.empty? %>
@@ -119,11 +161,9 @@
           <% elsif conversation.can_continue? %>
             <%= button_to continue_conversation_path(conversation),
                 method: :post,
-                class: "btn btn-primary btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
+                class: "btn btn-success btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
                 data: { test: "continue-conversation-button" } do %>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z" />
-              </svg>
+              <span class="material-symbols-outlined">fast_forward</span>
               Continue
             <% end %>
           <% end %>

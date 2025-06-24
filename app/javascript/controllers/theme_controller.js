@@ -39,7 +39,10 @@ export default class extends Controller {
     const button = this.toggleTarget
     
     // Update button appearance
-    button.querySelector('.theme-controller').checked = isDark
+    const checkbox = button.querySelector('input[type="checkbox"]')
+    if (checkbox) {
+      checkbox.checked = isDark
+    }
     
     // Update icon/text if needed
     const icon = button.querySelector('.swap-on, .swap-off')
@@ -105,7 +108,7 @@ export default class extends Controller {
   
   // Allow setting specific themes from dropdown
   setSpecificTheme(event) {
-    const theme = event.target.dataset.theme || event.target.value
+    const theme = event.currentTarget.dataset.theme || event.currentTarget.value
     if (theme) {
       this.setTheme(theme)
       

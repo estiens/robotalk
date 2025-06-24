@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_083212) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_24_104247) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_083212) do
     t.integer "output_tokens"
     t.integer "conversation_participant_id"
     t.integer "round_number"
+    t.string "type"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["conversation_participant_id"], name: "index_messages_on_conversation_participant_id"
   end
