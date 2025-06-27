@@ -1,34 +1,23 @@
 class Message < ApplicationRecord
-  # Define roles as constants for clarity and to avoid magic strings
-  ROLE_USER = "user".freeze
+  # We're consolidating to only store assistant messages (actual conversation content)
+  # No more user/system messages stored - those are generated on-the-fly for LLM context
   ROLE_ASSISTANT = "assistant".freeze
-  ROLE_SYSTEM = "system".freeze
-  ROLE_TOOL = "tool".freeze # If you use tool result messages
 
-  # Define roles as constants for clarity and to avoid magic strings
-  ROLE_USER = "user".freeze
-  ROLE_ASSISTANT = "assistant".freeze
-  ROLE_SYSTEM = "system".freeze
-  ROLE_TOOL = "tool".freeze # If you use tool result messages
-  # Add other roles as needed, e.g. ROLE_TOOL_RESULT = "tool_result".freeze
-
-  acts_as_message chat_class: "Conversation" # From ruby_llm gem
   belongs_to :conversation
-  belongs_to :conversation_participant, optional: true # Links to the AI participant that "spoke" this
+  belongs_to :conversation_participant # Always required now - every message has a speaker
   has_many :tool_calls, dependent: :destroy
 
-  # STI discriminator column is 'type' by default.
-  # self.inheritance_column = :type
+  # All messages are assistant messages now, with STI for future extensibility
+  validates :role, inclusion: { in: [ ROLE_ASSISTANT ] }
+  validates :content, presence: true
+  validates :conversation_participant, presence: true
+  validates :round_number, presence: true
 
-  # This callback sets the round_number when an assistant message shell is first created by acts_as_chat.
-  before_create :set_initial_round_number_for_shell
+  # Set round_number for assistant messages based on conversation state
+  before_create :set_round_number_for_assistant_messages
 
-  # Broadcasting for the message shell during streaming.
-  # Finalized AssistantMessage instances can have their own broadcasts if needed,
-  # typically triggered by their after_create_commit callbacks.
-  broadcasts_to ->(message) { [message.conversation, "messages"] },
-                  partial: "conversations/message", # Renders the individual message partial
-                  target: "conversation-messages"   # Appends/prepends to the div with this ID
+  # Broadcasting will be handled manually through LlmService to avoid route issues
+  # broadcasts_to removed to prevent automatic broadcast errors
 
   # Helper to broadcast chunks during streaming
   def broadcast_append_chunk(chunk_content)
@@ -55,12 +44,10 @@ class Message < ApplicationRecord
 
   private
 
-  def set_initial_round_number_for_shell
-    # This callback runs when acts_as_chat creates the initial message shell (before content).
-    # For assistant messages, set their round_number to the conversation's current_round.
-    if self.role == ROLE_ASSISTANT && self.conversation.present? && self.round_number.nil?
+  def set_round_number_for_assistant_messages
+    if self.conversation.present? && self.round_number.nil?
       self.round_number = self.conversation.current_round
-      Rails.logger.info "[Message##set_initial_round_number_for_shell] Set round_number to #{self.round_number} for new assistant message shell (ID: #{self.id || 'new'}) in conversation #{conversation.id} (current_round: #{self.conversation.current_round})."
+      Rails.logger.info "[Message##set_round_number_for_assistant_messages] Set round_number to #{self.round_number} for message (ID: #{self.id || 'new'}) in conversation #{conversation.id}"
     end
   end
 end

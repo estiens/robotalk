@@ -22,15 +22,14 @@
     <%# DaisyUI CDN for components %>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
 
-    <%# Google Fonts & Icons %>
+    <%# Google Fonts & Phosphor Icons %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     
     <style>
-      .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      .ph {
         vertical-align: middle;
       }
       html {
@@ -53,7 +52,7 @@
           <!-- Logo/Brand -->
           <div class="flex items-center">
             <%= link_to root_path, class: "flex items-center space-x-3 text-xl font-bold text-neutral-content hover:text-primary transition-colors" do %>
-              <span class="text-2xl">🤖</span>
+              <i class="ph ph-robot text-3xl"></i>
               <span class="hidden sm:block font-lexend">RoboConvo</span>
             <% end %>
           </div>
@@ -80,7 +79,7 @@
             <% if logged_in? %>
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                  <div class="flex justify-center items-center bg-gradient-to-br from-primary to-secondary rounded-full w-10 h-10 font-semibold text-primary-content">
+                  <div class="flex justify-center items-center bg-primary rounded-full w-10 h-10 font-semibold text-primary-content">
                     <%= current_user.email[0].upcase %>
                   </div>
                 </label>
@@ -106,7 +105,7 @@
             <div class="md:hidden">
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle">
-                  <span class="material-symbols-outlined">menu</span>
+                  <i class="ph ph-list text-xl"></i>
                 </label>
                 <ul tabindex="0" class="z-[101] bg-base-100 shadow-xl mt-4 p-2 border border-base-300/50 rounded-box w-52 text-base-content dropdown-content menu">
                   <li><%= link_to "Conversations", conversations_path %></li>

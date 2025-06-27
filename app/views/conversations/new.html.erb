@@ -29,7 +29,7 @@
            data-dialogue-form-types-value="<%= ConversationTemplates::DIALOGUE_TYPES.to_json %>">
         <div class="card-body">
             <h2 class="flex items-center gap-3 mb-4 font-bold text-neutral-content text-xl card-title">
-              <span class="material-symbols-outlined">notes</span>
+              <i class="ph ph-note"></i>
               Dialogue Instructions
             </h2>
             <div class="form-control">
@@ -107,7 +107,7 @@
             <div class="flex justify-between items-center mb-6">
               <div>
                 <h2 class="flex items-center gap-3 font-bold text-primary text-xl card-title">
-                  <span class="material-symbols-outlined">groups</span>
+                  <i class="ph ph-users"></i>
                   AI Participants
                 </h2>
                 <p class="mt-1 text-sm text-base-content/60">Configure the AI models that will participate in your conversation</p>
@@ -116,7 +116,7 @@
                       class="gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all btn btn-success transform"
                       data-action="click->participant-form#addParticipant"
                       data-participant-form-target="addButton">
-                <span class="material-symbols-outlined">add</span>
+                <i class="ph ph-plus"></i>
                 Add Participant
               </button>
             </div>

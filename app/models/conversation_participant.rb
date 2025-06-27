@@ -11,9 +11,11 @@ class ConversationParticipant < ApplicationRecord
 
   before_validation :set_defaults
 
-  # Checks if this participant has an assistant message in the given round_number
+  # Checks if this participant has a successful (non-error) message in the given round_number
   def has_spoken_in_round?(round_number_to_check)
-    messages.where(role: "assistant", round_number: round_number_to_check).exists?
+    messages.where(round_number: round_number_to_check)
+           .where.not("metadata->>'is_error' = ?", "true")
+           .exists?
   end
 
   def system_prompt_with_topic
@@ -59,9 +61,9 @@ class ConversationParticipant < ApplicationRecord
   private
 
   def set_defaults
-    # Set default name if not provided
+    # Set default name if not provided - use model_id
     if name.blank?
-      self.name = "Participant #{turn_order || (conversation&.participants&.count || 0) + 1}"
+      self.name = model_id.present? ? model_id : "Participant #{turn_order || (conversation&.participants&.count || 0) + 1}"
     end
 
     # Set default turn_order if not provided

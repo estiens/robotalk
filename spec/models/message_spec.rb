@@ -8,15 +8,15 @@ RSpec.describe Message, type: :model do
   end
 
   describe 'callbacks' do
-    it 'triggers set_round_number before creation' do
+    it 'triggers set_initial_round_number_for_shell before creation' do
       conversation = create(:conversation)
-      message = build(:message, conversation: conversation)
-      expect(message).to receive(:set_round_number)
+      message = build(:message, conversation: conversation, role: 'assistant')
+      expect(message).to receive(:set_initial_round_number_for_shell)
       message.save!
     end
   end
 
-  describe '#set_round_number' do
+  describe '#set_initial_round_number_for_shell' do
     let(:conversation) { create(:conversation, max_rounds: 5) }
     let!(:participant1) { create(:conversation_participant, conversation: conversation, turn_order: 1) }
     let!(:participant2) { create(:conversation_participant, conversation: conversation, turn_order: 2) }
@@ -32,11 +32,12 @@ RSpec.describe Message, type: :model do
       expect(message2.round_number).to eq(1)
     end
 
-    it 'assigns round 2 after all participants have spoken in round 1' do
-      create(:message, conversation: conversation, role: 'assistant', conversation_participant: participant1)
-      create(:message, conversation: conversation, role: 'assistant', conversation_participant: participant2)
-      message3 = create(:message, conversation: conversation, role: 'assistant', conversation_participant: participant1)
-      expect(message3.round_number).to eq(2)
+    it 'assigns round number from conversation current_round' do
+      # Advance conversation to round 2
+      conversation.update!(current_round: 2)
+
+      message = create(:message, conversation: conversation, role: 'assistant', conversation_participant: participant1)
+      expect(message.round_number).to eq(2)
     end
 
     it 'does not assign a round number to user messages' do

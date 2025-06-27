@@ -1,9 +1,9 @@
 <div id="message-loading" class="mt-8 loading-indicator-chat animate-fade-in">
   <div class="chat chat-start">
     <div class="chat-image avatar">
-      <div class="relative">
-        <div class="w-12 h-12 bg-gradient-to-br from-warning via-warning/80 to-warning/60 rounded-full flex items-center justify-center text-lg text-white shadow-lg">
-          <%= model_avatar_emoji(model_name) %>
+      <div class="avatar placeholder relative">
+        <div class="w-12 rounded-full bg-warning text-warning-content">
+          <span class="text-lg"><%= model_avatar_emoji(model_name) %></span>
         </div>
         <!-- Multiple pulse rings for thinking effect -->
         <div class="absolute inset-0 rounded-full bg-warning animate-ping opacity-20"></div>

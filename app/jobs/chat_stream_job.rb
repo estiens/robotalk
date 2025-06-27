@@ -4,8 +4,7 @@ class ChatStreamJob < ApplicationJob
   def perform(conversation_id)
     conversation = Conversation.find(conversation_id)
 
-    # Generate one round with streaming
-    # This job now generates a full round (all participants speak)
-    conversation.generate_one_round!
+    # Generate response from current speaker with streaming
+    conversation.have_current_speaker_respond!
   end
 end

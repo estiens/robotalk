@@ -1,7 +1,7 @@
 module TurboStreamable
   extend ActiveSupport::Concern
 
-  # Broadcast conversation frame update to handle layout transitions  
+  # Broadcast conversation frame update to handle layout transitions
   def broadcast_conversation_update
     broadcast_replace_to(
       self,
@@ -16,7 +16,7 @@ module TurboStreamable
     # message_shell is the base Message instance created by acts_as_chat
     # participant_for_shell is the ConversationParticipant it will belong to (assigned in-memory for this broadcast)
     message_shell.broadcast_append_to(
-      [self, "messages"], # Stream to the conversation's "messages" channel
+      [ self, "messages" ], # Stream to the conversation's "messages" channel
       target: "conversation-messages", # DOM ID of the container for all messages
       partial: "conversations/message",  # The partial to render for this new message shell
       locals: {
@@ -26,7 +26,7 @@ module TurboStreamable
         conversation: self,
         # Index can be based on existing assistant messages for animation delay,
         # or simply 0 if this is the only way new messages appear.
-        index: self.assistant_messages.count 
+        index: self.assistant_messages.count
       }
     )
     Rails.logger.info "[TurboStreamable##broadcast_new_message] Broadcasted new message shell for Message ID #{message_shell.id}, Participant: #{participant_for_shell&.name}"

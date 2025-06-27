@@ -42,7 +42,7 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
-gem "ruby_llm", "~> 1.3"
+gem "open_router"
 gem "dotenv-rails", "~> 3.1"
 
 group :development, :test do
@@ -54,6 +54,8 @@ group :development, :test do
   gem "pry-rails"
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
+  # Detect N+1 queries and unused eager loading
+  gem "bullet"
 end
 
 group :development do
@@ -68,9 +70,10 @@ group :test do
   gem "capybara", ">= 3.39", require: false
   gem "selenium-webdriver", require: false
   gem "webdrivers", require: false
+  gem "cuprite", require: false  # Chrome DevTools Protocol driver for faster JS testing
   gem "vcr", "~> 6.3", require: false
   gem "webmock", "~> 3.25", require: false
   gem "shoulda-matchers", "~> 5.3"
 end
 
-gem "faker", "~> 3.5", groups: [:development, :test]
+gem "faker", "~> 3.5", groups: [ :development, :test ]

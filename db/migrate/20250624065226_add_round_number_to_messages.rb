@@ -1,8 +1,8 @@
 class AddRoundNumberToMessages < ActiveRecord::Migration[8.0]
   def change
     add_column :messages, :round_number, :integer
-    add_index :messages, [:conversation_id, :round_number]
-    
+    add_index :messages, [ :conversation_id, :round_number ]
+
     # Populate round_number for existing messages
     reversible do |dir|
       dir.up do

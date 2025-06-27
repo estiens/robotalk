@@ -1,42 +1,15 @@
-<%# We only want to display finalized assistant messages in the main timeline %>
-<% finalized_assistant_messages = conversation.assistant_messages.order(:created_at) %>
+<%# We only display conversation messages (assistant messages) - no internal system/user messages %>
+<% conversation_messages = conversation.messages.order(:created_at) %>
 
-<% if finalized_assistant_messages.any? || conversation.generating? %> <%# Show card even if generating first message %>
+<% if conversation_messages.any? || conversation.in_progress? %> <%# Show card even if generating first message %>
   <div class="bg-base-100 shadow-xl card">
     <div class="pt-0 card-body" data-test="conversation-timeline">
-      <%# System messages (base Message class) can be shown in a separate, optional debug/info area if needed %>
-      <% system_messages = conversation.messages.where(role: Message::ROLE_SYSTEM).order(:created_at) %>
-      <% if system_messages.any? && !(conversation.generating? && finalized_assistant_messages.empty?) %>
-        <div class="mb-6 collapse collapse-arrow bg-base-200 border border-base-300">
-          <input type="checkbox" /> 
-          <div class="collapse-title font-medium text-sm">
-            🔧 System Setup (<%= system_messages.count %> messages)
-          </div>
-          <div class="collapse-content">
-            <div class="space-y-3">
-              <% system_messages.each do |message| %>
-                <div class="bg-base-100 p-3 border-accent border-l-4 rounded text-sm">
-                  <% participant = conversation.participant_for_model(message.model_id) %>
-                  <div class="mb-1 font-medium">
-                    <%= participant&.name || "Unknown" %> (<%= friendly_model_name(message.model_id) %>) System Prompt
-                  </div>
-                  <% if message.content.present? %>
-                    <%= simple_format(message.content, class: "text-base-content/80") %>
-                  <% else %>
-                    <div class="text-error">⚠️ Content missing for system message</div>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      <% end %>
+      <%# No system messages displayed - conversation shows only actual assistant responses %>
 
-      <!-- Assistant Messages Timeline -->
-      <% if finalized_assistant_messages.any? %>
+      <!-- Conversation Messages Timeline -->
+      <% if conversation_messages.any? %>
         <div class="space-y-4">
-          <% finalized_assistant_messages.each_with_index do |message, index| %>
-            <%# Ensure we pass an AssistantMessage instance to the partial %>
+          <% conversation_messages.each_with_index do |message, index| %>
             <%= render "conversations/message", message: message, conversation: conversation, index: index %>
           <% end %>
         </div>
@@ -48,33 +21,44 @@
         </div>
       <% end %>
       
-      <!-- Enhanced Loading Indicator -->
-      <div id="message-loading" class="hidden mt-8 loading-indicator-chat animate-fade-in" data-controller="loading-indicator">
-        <div class="chat chat-start">
+      <!-- Ultra Modern Loading Indicator -->
+      <div id="message-loading" class="hidden mt-8 animate-fade-in-up loading-indicator-chat" data-controller="loading-indicator">
+        <div class="group/loading mb-8 chat chat-start">
           <div class="chat-image avatar">
             <div class="relative">
-              <div class="w-12 h-12 bg-gradient-to-br from-warning via-warning/80 to-warning/60 rounded-full flex items-center justify-center text-lg text-white shadow-lg">
+              <!-- Enhanced Avatar with Multi-Ring Animation -->
+              <div class="flex justify-center items-center bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 shadow-2xl border-2 border-white/20 rounded-2xl w-16 h-16 text-2xl">
                 🤔
               </div>
-              <!-- Multiple pulse rings for thinking effect -->
-              <div class="absolute inset-0 rounded-full bg-warning animate-ping opacity-20"></div>
-              <div class="absolute inset-1 rounded-full bg-warning animate-ping opacity-30" style="animation-delay: 0.2s;"></div>
-              <div class="absolute inset-2 rounded-full bg-warning animate-ping opacity-40" style="animation-delay: 0.4s;"></div>
+              <!-- Multiple Animated Rings -->
+              <div class="absolute inset-0 bg-orange-400 opacity-20 rounded-2xl animate-ping"></div>
+              <div class="absolute inset-1 bg-orange-500 opacity-30 rounded-2xl animate-ping" style="animation-delay: 0.2s;"></div>
+              <div class="absolute inset-2 bg-amber-500 opacity-40 rounded-2xl animate-ping" style="animation-delay: 0.4s;"></div>
             </div>
           </div>
-          <div class="chat-header mb-1">
-            <span class="font-semibold text-warning" data-loading-indicator-target="modelName">AI Model</span>
-            <span class="text-xs text-base-content/60 ml-2">is thinking...</span>
-          </div>
-          <div class="chat-bubble chat-bubble-warning shadow-lg border-0 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent pointer-events-none"></div>
-            <div class="relative z-10 flex items-center gap-3">
-              <div class="flex gap-1">
-                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0s;"></div>
-                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
-                <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+          <div class="mb-3 chat-header">
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-orange-600 text-lg" data-loading-indicator-target="modelName">AI Assistant</span>
+              <div class="bg-gradient-to-r from-orange-100 to-amber-200 shadow-sm px-2.5 py-1 rounded-full font-bold text-orange-800">
+                Thinking
               </div>
-              <span class="text-sm animate-pulse">Crafting response...</span>
+            </div>
+            <div class="mt-1 font-medium text-gray-500 text-xs">Generating intelligent response...</div>
+          </div>
+          
+          <!-- Enhanced Loading Bubble -->
+          <div class="relative bg-white bg-gradient-to-br from-orange-50/50 to-amber-100/30 shadow-xl group-hover/loading:shadow-2xl px-6 py-4 border-2 border-orange-200 rounded-2xl max-w-md transition-all duration-300">
+            <!-- Gradient Accent -->
+            <div class="top-0 left-0 absolute bg-gradient-to-r from-orange-400 to-amber-500 rounded-t-2xl w-full h-1"></div>
+            
+            <div class="z-10 relative flex items-center gap-4 py-2">
+              <!-- Enhanced Typing Dots -->
+              <div class="flex gap-2">
+                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0s;"></div>
+                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0.1s;"></div>
+                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0.2s;"></div>
+              </div>
+              <span class="font-semibold text-gray-700 text-lg animate-pulse">Crafting thoughtful response...</span>
             </div>
           </div>
         </div>

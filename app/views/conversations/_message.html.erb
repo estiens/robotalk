@@ -1,35 +1,46 @@
 <%= turbo_frame_tag message do %>
-  <% participant = message.conversation_participant || message.conversation.participant_for_model(local_assigns.fetch(:message_model_id, message.model_id)) %>
+  <% participant = message.conversation_participant %>
   <% is_first_participant = participant&.turn_order == 1 %>
   <% avatar_model_id = participant&.model_id || local_assigns.fetch(:message_model_id, message.model_id) %>
   <% display_round_number = message.round_number || "?" %>
     
-  <div class="chat <%= is_first_participant ? 'chat-start' : 'chat-end' %> group/message animate-fade-in-up <%= participant_class(participant) if participant %>" style="animation-delay: <%= local_assigns.fetch(:index, 0) * 0.1 %>s;">
-      <!-- Avatar -->
+  <div class="chat <%= is_first_participant ? 'chat-start' : 'chat-end' %> group/message animate-fade-in-up <%= participant_class(participant) if participant %> mb-8" style="animation-delay: <%= local_assigns.fetch(:index, 0) * 0.1 %>s;">
+      <!-- Enhanced Avatar with DaisyUI -->
       <div class="chat-image avatar">
-        <div class="w-12 h-12 rounded-full bg-<%= is_first_participant ? 'primary' : 'secondary' %> flex items-center justify-center text-lg text-primary-content shadow-md transform group-hover/message:scale-110 transition-transform duration-300">
-          <%= model_avatar_emoji(avatar_model_id) %>
-        </div>
-      </div>
-      
-      <!-- Chat Header -->
-      <div class="chat-header mb-1.5">
-        <div class="flex items-center gap-2.5 <%= is_first_participant ? 'justify-start' : 'justify-end' %>">
-          <span class="font-semibold text-base-content">
-            <%= participant&.name || "Unknown" %>
-          </span>
-          <div class="flex items-center gap-1.5 text-xs text-base-content/60">
-            <span class="badge badge-xs badge-outline">R<%= display_round_number %></span>
-            <time><%= message.created_at.strftime("%I:%M %p") %></time>
+        <div class="avatar placeholder">
+          <div class="w-16 rounded-xl <%= is_first_participant ? 'bg-primary text-primary-content' : 'bg-secondary text-secondary-content' %> transform group-hover/message:scale-110 transition-all duration-300">
+            <span class="text-2xl"><%= model_avatar_emoji(avatar_model_id) %></span>
           </div>
         </div>
       </div>
       
-      <!-- Chat Bubble -->
+      <!-- Enhanced Chat Header -->
+      <div class="chat-header mb-3">
+        <div class="flex items-center gap-3 <%= is_first_participant ? 'justify-start' : 'justify-end' %>">
+          <div class="<%= is_first_participant ? '' : 'order-2' %>">
+            <span class="font-bold text-lg text-base-content tracking-wide">
+              <%= participant&.name || "Unknown" %>
+            </span>
+            <div class="text-xs text-base-content/50 font-medium">
+              <%= friendly_model_name(avatar_model_id) %>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs <%= is_first_participant ? '' : 'order-1' %>">
+            <div class="px-2.5 py-1 rounded-full <%= is_first_participant ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary' %> font-bold shadow-sm">
+              Round <%= display_round_number %>
+            </div>
+            <time class="text-base-content/40 font-medium"><%= message.created_at.strftime("%I:%M %p") %></time>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Enhanced Chat Bubble -->
       <div class="relative">
-        <div class="chat-bubble <%= is_first_participant ? 'chat-bubble-primary text-primary-content' : 'chat-bubble-secondary text-secondary-content' %> text-base max-w-3xl shadow-lg border-0 relative overflow-hidden group-hover/message:shadow-xl transition-shadow duration-300">
+        <div class="relative bg-base-100 border-2 <%= is_first_participant ? 'border-primary/30' : 'border-secondary/30' %> rounded-2xl px-6 py-4 shadow-xl max-w-4xl transform group-hover/message:shadow-2xl group-hover/message:-translate-y-1 transition-all duration-300 <%= is_first_participant ? 'bg-primary/5' : 'bg-secondary/5' %>">
+          <!-- Accent Bar -->
+          <div class="absolute top-0 left-0 w-full h-1 <%= is_first_participant ? 'bg-primary' : 'bg-secondary' %> rounded-t-2xl"></div>
           
-          <div class="relative z-10" id="<%= dom_id(message, "content") %>">
+          <div class="relative z-10 text-base-content" id="<%= dom_id(message, "content") %>">
             <% if message.content.present? %>
               <% content_lines = message.content.lines.count %>
               <% should_truncate = content_lines > 10 || message.content.length > 800 %>
@@ -37,50 +48,56 @@
               <% if should_truncate %>
                 <div data-controller="expandable-message">
                   <div data-expandable-message-target="preview">
-                    <%= simple_format(truncate(message.content, length: 800, separator: '. '), class: "leading-relaxed") %>
+                    <%= simple_format(truncate(message.content, length: 800, separator: '. '), class: "leading-loose text-lg font-medium") %>
                   </div>
                   <div data-expandable-message-target="full" class="hidden">
-                    <%= simple_format(message.content, class: "leading-relaxed") %>
+                    <%= simple_format(message.content, class: "leading-loose text-lg font-medium") %>
                   </div>
-                  <div class="mt-3 text-center">
-                    <button class="btn btn-xs btn-ghost gap-1" 
+                  <div class="mt-4 text-center">
+                    <button class="btn btn-sm <%= is_first_participant ? 'btn-primary' : 'btn-secondary' %> btn-outline gap-2" 
                             data-action="click->expandable-message#toggle"
                             data-expandable-message-target="toggleButton">
-                      <span class="material-symbols-outlined">expand_more</span>
-                      Show more
+                      <i class="ph ph-caret-down"></i>
+                      Show Full Message
                     </button>
                   </div>
                 </div>
               <% else %>
-                <%= simple_format(message.content, class: "leading-relaxed") %>
+                <%= simple_format(message.content, class: "leading-loose text-lg font-medium") %>
               <% end %>
             <% else %>
-              <div class="flex items-center gap-3 py-2">
-                <div class="flex gap-1">
-                  <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0s;"></div>
-                  <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
-                  <div class="w-2 h-2 bg-current rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+              <div class="flex items-center gap-4 py-3">
+                <div class="flex gap-1.5">
+                  <div class="w-3 h-3 <%= is_first_participant ? 'bg-primary' : 'bg-secondary' %> rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+                  <div class="w-3 h-3 <%= is_first_participant ? 'bg-primary' : 'bg-secondary' %> rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
+                  <div class="w-3 h-3 <%= is_first_participant ? 'bg-primary' : 'bg-secondary' %> rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
                 </div>
-                <span class="text-sm opacity-70 animate-pulse">Thinking...</span>
+                <span class="text-lg font-semibold text-base-content/70 animate-pulse">Crafting response...</span>
               </div>
             <% end %>
           </div>
         </div>
       </div>
       
-      <!-- Enhanced Footer with More Details -->
-      <div class="chat-footer opacity-60 group-hover/message:opacity-80 transition-opacity">
-        <div class="flex items-center gap-2 text-xs mt-1 <%= is_first_participant ? '' : 'justify-end' %>">
-          <% if message.metadata&.dig('response_time_ms') %>
-            <div class="badge badge-xs badge-outline gap-1">
-              <span class="material-symbols-outlined text-xs">timer</span>
-              <span><%= message.metadata['response_time_ms'].to_i %>ms</span>
+      <!-- Enhanced Footer with Stats -->
+      <div class="chat-footer mt-3 opacity-60 group-hover/message:opacity-100 transition-all duration-300">
+        <div class="flex items-center gap-3 text-xs <%= is_first_participant ? '' : 'justify-end' %>">
+          <% if message.input_tokens.present? || message.output_tokens.present? %>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-base-200 rounded-full">
+              <i class="ph ph-brain text-sm text-base-content/70"></i>
+              <span class="font-semibold text-base-content/70">
+                <% if message.input_tokens.present? && message.output_tokens.present? %>
+                  <%= message.input_tokens + message.output_tokens %> tokens
+                <% elsif message.output_tokens.present? %>
+                  <%= message.output_tokens %> tokens
+                <% end %>
+              </span>
             </div>
           <% end %>
-          <% if message.metadata&.dig('total_tokens') %>
-            <div class="badge badge-xs badge-outline gap-1">
-              <span class="material-symbols-outlined text-xs">token</span>
-              <span><%= message.metadata['total_tokens'] %></span>
+          <% if message.metadata&.dig('response_time_ms') %>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-base-200 rounded-full">
+              <i class="ph ph-clock text-sm text-base-content/70"></i>
+              <span class="font-semibold text-base-content/70"><%= (message.metadata['response_time_ms'].to_f / 1000).round(1) %>s</span>
             </div>
           <% end %>
         </div>

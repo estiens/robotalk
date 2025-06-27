@@ -76,10 +76,10 @@ module ConversationsHelper
   end
 
   def conversation_has_content_issues?(conversation)
-    conversation.messages.where(role: 'assistant').any? { |m| m.content.blank? }
+    conversation.messages.where(role: "assistant").any? { |m| m.content.blank? }
   end
 
   def content_missing_count(conversation)
-    conversation.messages.where(role: 'assistant').count { |m| m.content.blank? }
+    conversation.messages.where(role: "assistant").count { |m| m.content.blank? }
   end
 end

@@ -8,6 +8,8 @@ RoboConvo is a Ruby on Rails 8.0.2 application that facilitates automated conver
 
 ## Key Development Commands
 
+**Important**: All bundle exec commands must be prefixed with `asdf exec` (e.g., `asdf exec bundle exec rspec`)
+
 ```bash
 # Initial setup
 bin/setup              # Installs dependencies, prepares database, starts dev server
@@ -22,13 +24,13 @@ bin/rails db:migrate  # Run migrations
 bin/rails db:prepare  # Create, migrate, and seed database
 
 # Testing
-bin/rspec            # Run all tests
-bin/rspec spec/models/conversation_spec.rb  # Run specific test file
+asdf exec bundle exec rspec            # Run all tests
+asdf exec bundle exec rspec spec/models/conversation_spec.rb  # Run specific test file
 
 # Code Quality
-bin/rubocop          # Run linter
-bin/rubocop -a       # Auto-fix linting issues
-bin/brakeman         # Security vulnerability scanner
+asdf exec bundle exec rubocop          # Run linter
+asdf exec bundle exec rubocop -a       # Auto-fix linting issues
+asdf exec bundle exec brakeman         # Security vulnerability scanner
 
 # Deployment
 bin/kamal deploy     # Deploy to production

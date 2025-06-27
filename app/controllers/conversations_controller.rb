@@ -1,11 +1,15 @@
 class ConversationsController < ApplicationController
   before_action :require_user
   def index
-    @conversations = current_user.conversations.order(created_at: :desc)
+    @conversations = current_user.conversations
+                                 .includes(:participants, :messages)
+                                 .order(created_at: :desc)
   end
 
   def show
-    @conversation = current_user.conversations.find(params[:id])
+    @conversation = current_user.conversations
+                                .includes(:participants, messages: :conversation_participant)
+                                .find(params[:id])
   end
 
   def edit
@@ -25,7 +29,9 @@ class ConversationsController < ApplicationController
   end
 
   def debug
-    @conversation = current_user.conversations.find(params[:id])
+    @conversation = current_user.conversations
+                                .includes(:participants, :messages)
+                                .find(params[:id])
     render json: {
       conversation: {
         id: @conversation.id,
@@ -77,7 +83,7 @@ class ConversationsController < ApplicationController
     @conversation = current_user.conversations.build(conversation_params)
 
     if params[:generate_in_background]
-      @conversation.status = :generating
+      @conversation.status = :in_progress
       if @conversation.save
         GenerateConversationJob.perform_later(@conversation)
         redirect_to conversations_path, notice: "Conversation is being generated in the background."
@@ -85,7 +91,7 @@ class ConversationsController < ApplicationController
         handle_creation_failure
       end
     else
-      @conversation.status = :interactive
+      @conversation.status = :pending
       if @conversation.save
         redirect_to @conversation, notice: "Conversation created successfully! You can now start it."
       else
@@ -95,16 +101,19 @@ class ConversationsController < ApplicationController
   end
 
   def start
-    @conversation = current_user.conversations.find(params[:id])
+    @conversation = current_user.conversations
+                                .includes(:participants)
+                                .find(params[:id])
 
     unless @conversation.can_start?
-      alert_message = @conversation.interactive? ? "Conversation must have at least 2 participants to start." : "This conversation is not interactive."
+      alert_message = @conversation.pending? ? "Conversation must have at least 2 participants to start." : "This conversation cannot be started."
       respond_to do |format|
         format.html { redirect_to @conversation, alert: alert_message }
         format.turbo_stream { render turbo_stream: turbo_stream.replace("conversation", template: "conversations/show", locals: { conversation: @conversation }) }
       end
       return
     end
+
 
     # System messages will be created by ruby_llm via with_instructions
 
@@ -136,7 +145,9 @@ class ConversationsController < ApplicationController
   end
 
   def continue
-    @conversation = current_user.conversations.find(params[:id])
+    @conversation = current_user.conversations
+                                .includes(:participants)
+                                .find(params[:id])
 
     if @conversation.can_continue?
       # Always use streaming
@@ -160,15 +171,38 @@ class ConversationsController < ApplicationController
     # Delete all messages
     @conversation.messages.destroy_all
 
-    # Reset status if it was complete or failed, otherwise keep as is (e.g. interactive)
+    # Reset status if it was complete or failed, otherwise keep as is
     if @conversation.complete? || @conversation.failed?
-      @conversation.update(status: :interactive)
+      @conversation.update(status: :pending, current_round: 1)
     end
 
     # Optionally, reset other specific attributes if needed, e.g., current_round if stored explicitly
     # For now, deleting messages effectively resets the round count as it's calculated.
 
     redirect_to @conversation, notice: "Conversation has been restarted."
+  end
+
+  def destroy
+    @conversation = current_user.conversations.find(params[:id])
+
+    # Optimize deletion by bulk-deleting related records first
+    conversation_id = @conversation.id
+
+    # Bulk delete messages (fastest approach)
+    Message.where(conversation_id: conversation_id).delete_all
+
+    # Bulk delete participants
+    ConversationParticipant.where(conversation_id: conversation_id).delete_all
+
+    # Now delete the conversation (no cascade needed)
+    @conversation.delete
+
+    respond_to do |format|
+      format.html { redirect_to conversations_path, notice: "Conversation was successfully deleted." }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.remove("conversation-card-#{conversation_id}")
+      end
+    end
   end
 
   private
@@ -197,18 +231,21 @@ class ConversationsController < ApplicationController
   end
 
   def get_available_models
-    RubyLLM::Models.all.sort_by { |model| model.created_at || Time.at(0) }.reverse.map do |model|
-      { value: model.id, text: model.name }
-    end
-  rescue => e
-    Rails.logger.error "Failed to load models: #{e.message}"
-    # Fallback to hardcoded models if everything fails (original list)
+    # Curated list of supported models via OpenRouter
+    # Update this list manually when new models become available
     [
       { value: "openai/gpt-4o", text: "OpenAI: GPT-4o" },
       { value: "openai/gpt-4o-mini", text: "OpenAI: GPT-4o Mini" },
       { value: "anthropic/claude-3-5-sonnet", text: "Anthropic: Claude 3.5 Sonnet" },
       { value: "anthropic/claude-3-haiku", text: "Anthropic: Claude 3 Haiku" },
-      { value: "deepseek/deepseek-r1-0528", text: "DeepSeek: R1 0528 (OpenRouter)" } # Ensure DeepSeek is an option
+      { value: "anthropic/claude-3-opus", text: "Anthropic: Claude 3 Opus" },
+      { value: "google/gemini-pro-1.5", text: "Google: Gemini Pro 1.5" },
+      { value: "google/gemini-flash-1.5", text: "Google: Gemini Flash 1.5" },
+      { value: "meta-llama/llama-3.1-405b-instruct", text: "Meta: Llama 3.1 405B" },
+      { value: "meta-llama/llama-3.1-70b-instruct", text: "Meta: Llama 3.1 70B" },
+      { value: "deepseek/deepseek-r1-0528", text: "DeepSeek: R1 0528" },
+      { value: "mistral/mistral-large", text: "Mistral: Large" },
+      { value: "cohere/command-r-plus", text: "Cohere: Command R+" }
     ]
   end
 end

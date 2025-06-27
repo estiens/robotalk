@@ -1,64 +1,81 @@
-<div data-controller="conversation-updater" class="max-w-4xl mx-auto">
+<div data-controller="conversation-updater" class="mx-auto max-w-4xl">
   
-  <!-- Conversation Header Card -->
-  <div class="bg-base-100 rounded-lg shadow-sm border border-base-300/40 mb-6">
-    <div class="p-4 sm:p-6">
-      <!-- Breadcrumb -->
-      <div class="flex items-center text-sm text-base-content/80 mb-4">
-        <%= link_to conversations_path, class: "hover:text-primary transition-colors" do %>
+  <!-- Enhanced Conversation Header -->
+  <div class="bg-base-100 shadow-2xl mb-8 border-2 border-base-300 rounded-3xl overflow-hidden">
+    <!-- Header Accent Bar -->
+    <div class="bg-gradient-to-r from-primary via-secondary to-accent h-2"></div>
+    
+    <div class="p-6 sm:p-8">
+      <!-- Breadcrumb with enhanced styling -->
+      <div class="flex items-center mb-6 text-sm text-base-content/70">
+        <%= link_to conversations_path, class: "hover:text-primary transition-colors font-medium" do %>
+          <i class="mr-1 text-lg ph ph-chats-circle"></i>
           Conversations
         <% end %>
-        <span class="material-symbols-outlined text-lg mx-1">chevron_right</span>
-        <span class="font-medium text-base-content">Current Chat</span>
+        <i class="mx-2 text-base-content/30 text-lg ph-caret-right ph"></i>
+        <span class="font-bold text-base-content">AI Dialogue</span>
       </div>
 
       <!-- Participants & Topic -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex lg:flex-row flex-col justify-between lg:items-center gap-6">
         <div class="flex-1">
-          <!-- Participants -->
-          <div class="flex items-center space-x-3 mb-2">
+          <!-- Enhanced Participants Display -->
+          <div class="flex items-center space-x-4 mb-4">
             <% conversation.participants.ordered.each_with_index do |p, i| %>
-              <div class="flex items-center space-x-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br <%= i == 0 ? 'from-primary to-primary/80' : 'from-secondary to-secondary/80' %> flex items-center justify-center text-white font-semibold">
+              <div class="flex items-center space-x-3 bg-base-200 rounded-2xl px-4 py-3 shadow-lg border-2 <%= i == 0 ? 'border-primary/30' : 'border-secondary/30' %> transform hover:scale-105 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl <%= i == 0 ? 'bg-primary' : 'bg-secondary' %> flex items-center justify-center text-primary-content text-xl shadow-lg">
                   <%= model_avatar_emoji(p.model_id) %>
                 </div>
-                <span class="font-medium text-base-content"><%= p.name || "AI #{i + 1}" %></span>
+                <div>
+                  <div class="font-bold text-base-content text-lg"><%= p.name || "AI #{i + 1}" %></div>
+                  <div class="font-medium text-xs text-base-content/70"><%= friendly_model_name(p.model_id) %></div>
+                </div>
               </div>
               <% if i < conversation.participants.count - 1 %>
                 <div class="hidden sm:flex items-center">
-                  <span class="material-symbols-outlined text-base-content/40">bolt</span>
+                  <div class="flex justify-center items-center bg-accent shadow-lg rounded-full w-8 h-8 text-accent-content">
+                    <i class="text-lg ph ph-lightning"></i>
+                  </div>
                 </div>
               <% end %>
             <% end %>
           </div>
 
-          <!-- Topic -->
+          <!-- Enhanced Topic Display -->
           <% if conversation.conversation_topic.present? %>
-            <p class="text-sm text-base-content/70" data-test="conversation-topic">
-              <span class="font-medium">Topic:</span> <%= conversation.conversation_topic %>
-            </p>
+            <div class="bg-base-200 px-6 py-4 border-2 border-base-300 rounded-2xl" data-test="conversation-topic">
+              <div class="flex items-center gap-3">
+                <div class="flex justify-center items-center bg-accent shadow-lg rounded-xl w-10 h-10 text-accent-content">
+                  <i class="ph ph-chat-centered-text"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-sm text-base-content/70 uppercase tracking-wide">Discussion Topic</div>
+                  <div class="font-bold text-base-content text-xl"><%= conversation.conversation_topic %></div>
+                </div>
+              </div>
+            </div>
           <% end %>
         </div>
 
-        <!-- Actions -->
-        <div class="flex items-center space-x-2">
+        <!-- Enhanced Actions -->
+        <div class="flex items-center space-x-3">
           <%= link_to edit_conversation_path(conversation), 
-              class: "btn btn-ghost btn-sm gap-2" do %>
-            <span class="material-symbols-outlined text-lg">edit</span>
+              class: "btn btn-outline btn-neutral gap-2" do %>
+            <i class="ph ph-pencil"></i>
             Edit
           <% end %>
           
           <div class="dropdown dropdown-end">
-            <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
-              <span class="material-symbols-outlined">more_vert</span>
+            <label tabindex="0" class="btn btn-circle btn-ghost">
+              <i class="ph ph-dots-three-vertical"></i>
             </label>
-            <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-100 rounded-box w-48 border border-base-200/50">
+            <ul tabindex="0" class="z-50 bg-base-100 shadow-2xl mt-2 p-3 border-2 border-base-300 rounded-2xl w-52 dropdown-content menu">
               <li>
                 <%= button_to restart_conversation_path(conversation),
                     method: :post,
-                    class: "text-warning w-full text-left flex items-center gap-2",
+                    class: "btn btn-ghost btn-warning w-full justify-start gap-3",
                     data: { confirm: "Restart conversation? All messages will be deleted." } do %>
-                  <span class="material-symbols-outlined">replay</span>
+                  <i class="ph ph-arrow-counter-clockwise"></i>
                   Restart Chat
                 <% end %>
               </li>
@@ -69,128 +86,132 @@
     </div>
   </div>
 
-  <!-- Unified Status & Controls Bar -->
+  <!-- Enhanced Status & Controls Bar -->
   <div id="conversation-controls-container"> <%# Target for broadcast_controls %>
-    <div class="bg-neutral text-neutral-content rounded-lg shadow-lg border border-base-300/40 mb-6"
+    <div class="bg-neutral shadow-2xl mb-8 border-2 border-neutral-focus rounded-3xl overflow-hidden text-neutral-content"
         data-controller="streaming-conversation"
         data-streaming-conversation-conversation-id-value="<%= conversation.id %>"
         data-streaming-conversation-next-model-value="<%= conversation.next_speaker&.model_id %>">
-      <div class="p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <!-- Status Bar Accent -->
+      <div class="bg-gradient-to-r from-primary via-secondary to-accent h-1"></div>
+      
+      <div class="p-6 sm:p-8">
+        <div class="flex lg:flex-row flex-col justify-between lg:items-center gap-6">
           
-          <!-- Left: Progress Status -->
-          <div class="flex items-center space-x-4">
-            <!-- Round Progress -->
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center ring-2 ring-primary/50">
-                <span class="text-lg font-semibold text-primary">
-                  <%= [conversation.current_round, 1].max %>
-                </span>
+          <!-- Enhanced Progress Status -->
+          <div class="flex items-center space-x-6">
+            <!-- Round Progress Circle -->
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <div class="flex justify-center items-center bg-primary shadow-2xl rounded-2xl w-16 h-16">
+                  <span class="font-bold text-primary-content text-2xl">
+                    <%= [conversation.current_round, 1].max %>
+                  </span>
+                </div>
+                <!-- Animated Ring -->
+                <div class="absolute inset-0 bg-primary/30 rounded-2xl animate-ping"></div>
               </div>
               <div>
-                <div class="text-md font-semibold text-neutral-content" data-test="round-indicator">
+                <div class="font-bold text-neutral-content text-xl" data-test="round-indicator">
                   Round <%= [conversation.current_round, 1].max %> / <%= conversation.max_rounds %>
                 </div>
-                <div class="text-xs text-neutral-content/70">
+                <div class="font-medium text-neutral-content/70 text-sm">
                   <% assistant_messages_count = conversation.messages.where(role: 'assistant').count %>
                   <% if assistant_messages_count > 0 %>
-                    <%= pluralize(assistant_messages_count, 'message') %> exchanged
+                    <%= pluralize(assistant_messages_count, 'exchange', 'exchanges') %> complete
                   <% else %>
-                    Ready to start
+                    Ready to begin dialogue
                   <% end %>
                 </div>
               </div>
             </div>
 
-            <!-- Progress Bar -->
+            <!-- Enhanced Progress Bar -->
             <% if conversation.messages.any? %>
-              <div class="hidden sm:block w-32">
-                <div class="flex justify-between text-xs text-neutral-content/70 mb-1">
-                  <span><%= [conversation.current_round, 1].max %></span>
-                  <span><%= conversation.max_rounds %></span>
+              <div class="hidden lg:block w-48">
+                <div class="flex justify-between mb-2 font-semibold text-neutral-content/70 text-sm">
+                  <span>Round <%= [conversation.current_round, 1].max %></span>
+                  <span>of <%= conversation.max_rounds %></span>
                 </div>
-                <progress class="progress progress-primary w-full h-2.5" 
-                          value="<%= [conversation.current_round, 1].max %>" 
-                          max="<%= conversation.max_rounds %>"></progress>
+                <div class="relative bg-neutral-focus shadow-inner rounded-full h-3 overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500 ease-out" 
+                       style="width: <%= ([conversation.current_round, 1].max.to_f / conversation.max_rounds * 100).round(1) %>%">
+                  </div>
+                  <div class="absolute inset-0 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full animate-pulse"></div>
+                </div>
               </div>
             <% end %>
 
-            <!-- Next Speaker -->
-            <% if conversation.next_speaker && conversation.can_continue? && !conversation.generating? %>
-              <div class="flex items-center space-x-2 px-3 py-2 bg-neutral-focus rounded-lg shadow">
-                <span class="text-xs text-neutral-content/70">Next:</span>
-                <div class="w-6 h-6 rounded-full bg-<%= conversation.next_speaker.turn_order == 1 ? 'primary' : 'secondary' %> flex items-center justify-center ring-1 ring-offset-1 ring-offset-neutral-focus ring-<%= conversation.next_speaker.turn_order == 1 ? 'primary' : 'secondary' %>-focus">
-                  <span class="text-sm text-white">
+            <!-- Enhanced Next Speaker -->
+            <% if conversation.next_speaker && conversation.can_continue? && !conversation.in_progress? %>
+              <div class="flex items-center space-x-3 bg-success/20 shadow-lg px-4 py-3 border-2 border-success/30 rounded-2xl">
+                <span class="font-bold text-success text-sm">Next Speaker:</span>
+                <div class="w-10 h-10 rounded-xl <%= conversation.next_speaker.turn_order == 1 ? 'bg-primary' : 'bg-secondary' %> flex items-center justify-center text-primary-content shadow-lg">
+                  <span class="text-lg">
                     <%= model_avatar_emoji(conversation.next_speaker.model_id) %>
                   </span>
                 </div>
-                <span class="text-sm font-semibold text-neutral-content"><%= conversation.next_speaker.name %></span>
+                <div>
+                  <div class="font-bold text-neutral-content text-lg"><%= conversation.next_speaker.name %></div>
+                  <div class="text-neutral-content/70 text-xs"><%= friendly_model_name(conversation.next_speaker.model_id) %></div>
+                </div>
               </div>
-            <% elsif conversation.generating? %>
-              <div class="flex items-center space-x-2 px-3 py-2 bg-neutral-focus rounded-lg shadow">
-                <span class="loading loading-spinner loading-xs text-info"></span>
-                <span class="text-xs text-info animate-pulse">Generating response...</span>
+            <% elsif conversation.in_progress? %>
+              <div class="flex items-center space-x-3 bg-warning/20 shadow-lg px-4 py-3 border-2 border-warning/30 rounded-2xl">
+                <div class="flex justify-center items-center bg-warning rounded-xl w-8 h-8 text-warning-content">
+                  <div class="border-2 border-warning-content border-t-transparent rounded-full w-4 h-4 animate-spin"></div>
+                </div>
+                <span class="font-bold text-warning text-lg animate-pulse">AI is thinking...</span>
               </div>
             <% end %>
           </div>
 
-          <!-- Right: Status & Actions -->
-          <div class="flex items-center space-x-3">
-            <% if conversation.can_continue? && !conversation.generating? %>
-              <!-- Auto-continue Toggle -->
-              <div class="flex items-center space-x-2" title="Toggle Auto-Continue">
-                <label class="label cursor-pointer gap-2 py-0">
-                  <span class="material-symbols-outlined text-neutral-content/80 text-xl">autoplay</span>
-                  <input type="checkbox"
-                        class="toggle toggle-primary toggle-sm"
-                        data-controller="auto-continue"
-                        data-action="change->auto-continue#toggle"
-                        data-auto-continue-conversation-id-value="<%= conversation.id %>"
-                        data-auto-continue-max-rounds-value="<%= conversation.max_rounds %>"
-                        data-auto-continue-active-value="false"
-                        data-test="auto-continue-toggle" />
-                </label>
-              </div>
-
+          <!-- Enhanced Action Buttons -->
+          <div class="flex items-center space-x-4">
+            <% if conversation.can_continue? && !conversation.in_progress? %>
               <% if conversation.messages.where(role: "assistant").empty? %>
-                <!-- Start Button -->
+                <!-- Enhanced Start Button -->
                 <%= button_to start_conversation_path(conversation),
                     method: :post,
-                    class: "btn btn-primary btn-sm gap-2 shadow hover:shadow-lg",
+                    class: "btn btn-success btn-lg gap-3",
                     data: {
-                      turbo_frame: "conversation", # This might need to be the broader frame if controls are outside
+                      turbo_frame: "conversation",
                       streaming_conversation_target: "startButton",
                       controller: "conversation-controls",
                       action: "click->conversation-controls#showLoading",
                       test: "start-conversation-button"
                     } do %>
-                  <span class="material-symbols-outlined">play_arrow</span>
-                  Start
+                  <i class="text-2xl ph ph-play"></i>
+                  Start Dialogue
                 <% end %>
               <% else %>
-                <!-- Continue Button -->
+                <!-- Enhanced Continue Button -->
                 <%= button_to continue_conversation_path(conversation), 
                     method: :post,
-                    class: "btn btn-primary btn-sm gap-2 shadow hover:shadow-lg",
+                    class: "btn btn-primary btn-lg gap-3",
                     data: { 
-                      turbo_frame: "conversation", # This might need to be the broader frame
+                      turbo_frame: "conversation",
                       streaming_conversation_target: "continueButton",
                       controller: "conversation-controls",
                       action: "click->conversation-controls#showLoading",
                       test: "continue-conversation-button"
                     } do %>
-                  <span class="material-symbols-outlined">fast_forward</span>
-                  <span class="auto-continue-button-text">Next Round</span>
+                  <i class="text-2xl ph ph-skip-forward"></i>
+                  Next Round
                 <% end %>
               <% end %>
-            <% elsif !conversation.can_continue? && !conversation.generating? %>
-              <!-- Completed Status -->
-              <div class="badge badge-success gap-2 p-4 shadow">
-                <span class="material-symbols-outlined">check_circle</span>
-                <span class="font-medium">Completed</span>
+            <% elsif !conversation.can_continue? && !conversation.in_progress? %>
+              <!-- Enhanced Completed Status -->
+              <div class="flex items-center gap-3 bg-success/20 shadow-lg px-6 py-4 border-2 border-success/30 rounded-2xl">
+                <div class="flex justify-center items-center bg-success shadow-lg rounded-xl w-10 h-10 text-success-content">
+                  <i class="text-lg ph ph-check-circle"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-success text-lg">Dialogue Complete</div>
+                  <div class="text-neutral-content/70 text-sm">All rounds finished</div>
+                </div>
               </div>
             <% end %>
-            <!-- Note: While generating, no buttons are shown, only the spinner in the left section -->
           </div>
         </div>
       </div>

@@ -20,9 +20,8 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
     visit new_conversation_path
 
     # Should see the form with all the new sections
-    expect(page).to have_css('[data-test="page-title"]', text: 'New AI Conversation')
+    expect(page).to have_css('[data-test="page-title"]', text: 'Create a New Conversation')
     expect(page).to have_css('h2', text: 'Dialogue Instructions')
-    expect(page).to have_css('h2', text: 'Conversation Settings')
     expect(page).to have_css('h2', text: 'AI Participants')
 
     # Select a dialogue type
@@ -46,7 +45,7 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
 
     # Should be redirected to the conversation show page - use data attributes
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'Free Will vs Determinism')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/5')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1 / 5')
 
     # Verify the conversation was created with correct data
     conversation = Conversation.last
@@ -93,7 +92,7 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
 
     # Wait for the redirect to complete - check for conversation page elements
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'The Meaning of Life')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/3')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1 / 3')
 
     # Verify the conversation was created
     conversation = Conversation.last
@@ -134,7 +133,7 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
 
     # Wait for the redirect to complete
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'Climate Change Solutions')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/3')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1 / 3')
 
     # Verify the conversation was created
     conversation = Conversation.last
@@ -170,7 +169,7 @@ RSpec.describe 'Conversation Form', type: :feature, vcr: true do
 
     # Verify the conversation was created successfully
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'Test Topic')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/3')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1 / 3')
 
     conversation = Conversation.last
     expect(conversation).to be_present

@@ -20,13 +20,13 @@
           </svg>
         </div>
         <div class="text-neutral-content/70 stat-title">Currently Active</div>
-        <div class="text-secondary stat-value"><%= @conversations.generating.count + @conversations.interactive.count %></div>
+        <div class="text-secondary stat-value"><%= @conversations.in_progress.count + @conversations.pending.count %></div>
         <div class="text-neutral-content/70 stat-desc">In progress</div>
       </div>
       
       <div class="place-items-center stat">
         <div class="text-accent stat-figure">
-          <span class="material-symbols-outlined text-4xl">chat</span>
+          <i class="ph ph-chat-circle text-4xl"></i>
         </div>
         <div class="text-neutral-content/70 stat-title">Total Messages</div>
         <div class="text-accent stat-value"><%= Message.where(conversation: @conversations).count %></div>
@@ -82,7 +82,7 @@
           </p>
           
           <%= link_to new_conversation_path, class: "btn btn-primary btn-lg gap-3 mb-6" do %>
-            <span class="material-symbols-outlined">add</span>
+            <i class="ph ph-plus"></i>
             Create Your First Conversation
           <% end %>
           
