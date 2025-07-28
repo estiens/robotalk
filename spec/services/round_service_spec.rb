@@ -83,9 +83,9 @@ RSpec.describe RoundService, type: :service do
     end
 
     it 'sets status to in_progress during execution' do
-      allow(service).to receive(:perform_round!).and_wrap_original do |method|
+      allow(service).to receive(:perform_round!).and_wrap_original do |method, **args|
         expect(conversation.status).to eq('in_progress')
-        method.call
+        method.call(**args)
       end
 
       service.generate_full_conversation!
@@ -114,7 +114,7 @@ RSpec.describe RoundService, type: :service do
 
   describe '#have_current_speaker_respond!' do
     it 'CRITICAL BUG: should NOT advance round until ALL participants speak' do
-      # This test demonstrates the critical bug: have_current_speaker_respond! 
+      # This test demonstrates the critical bug: have_current_speaker_respond!
       # advances the round immediately after ANY participant speaks,
       # breaking multi-participant conversations
 
@@ -122,22 +122,22 @@ RSpec.describe RoundService, type: :service do
       expect(conversation.current_round).to eq(1)
       expect(conversation.next_speaker).to eq(alice)
 
-      # Alice speaks first 
+      # Alice speaks first
       service.have_current_speaker_respond!
       conversation.reload
 
       # CRITICAL BUG TEST: Round should still be 1 since Bob hasn't spoken yet
-      
-      expect(conversation.current_round).to eq(1), "Round should remain 1 until ALL participants speak"
-      expect(conversation.next_speaker).to eq(bob), "Bob should be next to speak in round 1"
+
+      expect(conversation.current_round).to eq(1), 'Round should remain 1 until ALL participants speak'
+      expect(conversation.next_speaker).to eq(bob), 'Bob should be next to speak in round 1'
 
       # Bob speaks second to complete the round
       service.have_current_speaker_respond!
       conversation.reload
 
       # NOW the round should advance to 2
-      expect(conversation.current_round).to eq(2), "Round should advance to 2 after BOTH participants speak"
-      expect(conversation.next_speaker).to eq(alice), "Alice should be first speaker in round 2"
+      expect(conversation.current_round).to eq(2), 'Round should advance to 2 after BOTH participants speak'
+      expect(conversation.next_speaker).to eq(alice), 'Alice should be first speaker in round 2'
     end
 
     it 'preserves individual speaker responses while maintaining proper round logic' do
@@ -145,7 +145,7 @@ RSpec.describe RoundService, type: :service do
       # while still maintaining proper round boundaries
 
       initial_round = conversation.current_round
-      
+
       # First speaker in the round
       first_speaker = conversation.next_speaker
       service.have_current_speaker_respond!
@@ -153,11 +153,11 @@ RSpec.describe RoundService, type: :service do
 
       # Round should not advance yet
       expect(conversation.current_round).to eq(initial_round)
-      
+
       # Second speaker should be different
       second_speaker = conversation.next_speaker
       expect(second_speaker).not_to eq(first_speaker)
-      
+
       service.have_current_speaker_respond!
       conversation.reload
 
@@ -189,7 +189,7 @@ RSpec.describe RoundService, type: :service do
 
       # After round 1 is complete, conversation should be at round 2
       conversation.update!(current_round: 2)
-      
+
       # Performing round 2 should advance to round 3
       service.perform_round!
 

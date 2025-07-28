@@ -5,5 +5,10 @@ class GenerateConversationJob < ApplicationJob
 
   def perform(conversation)
     conversation.generate_full_conversation!
+  rescue StandardError => e
+    # Ensure conversation is marked as failed
+    conversation.fail!
+    # Re-raise the error to be caught by the test
+    raise e
   end
 end

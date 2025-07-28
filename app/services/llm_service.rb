@@ -34,7 +34,7 @@ class LlmService
     content = extract_content_from_response(response)
 
     # Create message with response
-    AssistantMessage.create!(
+    Message.create!(
       conversation: conversation,
       conversation_participant: participant,
       model_id: participant.model_id,
@@ -49,7 +49,7 @@ class LlmService
     Rails.logger.error "[LlmService] Error: #{e.message}"
 
     # Create error message with error flag in metadata
-    AssistantMessage.create!(
+    Message.create!(
       conversation: conversation,
       conversation_participant: participant,
       model_id: participant.model_id,

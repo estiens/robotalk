@@ -25,31 +25,29 @@ RSpec.describe ConversationsController, type: :controller do
   describe 'conversation state deadlock bug' do
     it 'CRITICAL BUG: should recover from LLM failures and not leave conversation stuck in in_progress state' do
       # Start with pending conversation
-      expect(conversation.status).to eq('pending')
-      expect(conversation.can_start?).to be(true)
+      conversation.start!
+      expect(conversation.status).to eq('in_progress')
 
       # Mock LLM service to fail
       mock_client = double('OpenRouter::Client')
       allow(OpenRouter::Client).to receive(:new).and_return(mock_client)
       allow(mock_client).to receive(:complete).and_raise(StandardError.new('API timeout'))
 
-      # Attempt to start conversation (this should fail)
-      post :start, params: { id: conversation.id }
+      # Attempt to continue conversation (this should fail)
+      post :continue, params: { id: conversation.id }
       conversation.reload
 
       # CRITICAL BUG: Conversation should not be permanently stuck
-      # It should either:
-      # 1. Stay in 'pending' state so user can retry, OR  
-      # 2. Go to 'failed' state with ability to reset to 'pending'
-      expect(conversation.status).not_to eq('in_progress'), 
-        "Conversation should not be stuck in 'in_progress' after LLM failure"
+      # It should go to 'failed' state with ability to reset to 'pending'
+      expect(conversation.status).to eq('failed'),
+                                     "Conversation should be in 'failed' state after LLM failure"
 
       # User should be able to retry after failure
-      expect(conversation.can_start? || conversation.status == 'failed').to be(true),
-        "User should be able to retry or reset after LLM failure"
+      expect(conversation.reset!).to be(true)
+      expect(conversation.status).to eq('pending')
     end
 
-    it 'should handle continue action failures without deadlock' do
+    it 'handles continue action failures without deadlock' do
       # Manually set up a conversation that can continue
       conversation.update!(status: 'in_progress')
       Message.create!(
@@ -73,15 +71,15 @@ RSpec.describe ConversationsController, type: :controller do
       conversation.reload
 
       # Conversation should still be recoverable
-      expect(conversation.status).not_to eq('in_progress'), 
-        "Conversation should not remain stuck in 'in_progress' after continue failure"
-      
+      expect(conversation.status).not_to eq('in_progress'),
+                                         "Conversation should not remain stuck in 'in_progress' after continue failure"
+
       # Should either be retryable or failed with recovery option
       expect(conversation.can_continue? || conversation.status == 'failed').to be(true),
-        "User should be able to retry or recover after continue failure"
+                                                                               'User should be able to retry or recover after continue failure'
     end
 
-    it 'should provide a way to reset failed conversations' do
+    it 'provides a way to reset failed conversations' do
       # Simulate a failed conversation
       conversation.update!(status: 'failed')
 
@@ -91,7 +89,7 @@ RSpec.describe ConversationsController, type: :controller do
       expect(conversation.can_start?).to be(true)
     end
 
-    it 'should allow resetting completed conversations' do
+    it 'allows resetting completed conversations' do
       # Simulate a completed conversation
       conversation.update!(status: 'complete')
 
@@ -101,7 +99,7 @@ RSpec.describe ConversationsController, type: :controller do
       expect(conversation.can_start?).to be(true)
     end
 
-    it 'should not allow resetting in_progress conversations' do
+    it 'does not allow resetting in_progress conversations' do
       # In-progress conversations should not be reset (they should complete normally)
       conversation.update!(status: 'in_progress')
 

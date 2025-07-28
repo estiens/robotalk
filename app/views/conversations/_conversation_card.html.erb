@@ -160,7 +160,7 @@
             <i class="ph ph-play"></i>
             Start
           <% end %>
-        <% elsif conversation.can_continue? %>
+        <% elsif conversation.ready_for_next_round? %>
           <%= button_to continue_conversation_path(conversation),
               method: :post,
               class: "btn btn-success btn-sm gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",

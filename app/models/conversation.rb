@@ -11,6 +11,7 @@ class Conversation < ApplicationRecord
     pending: 'pending',
     in_progress: 'in_progress',
     generating: 'generating',
+    round_ready: 'round_ready',
     complete: 'complete',
     failed: 'failed'
   }
@@ -23,10 +24,28 @@ class Conversation < ApplicationRecord
 
   before_validation :set_defaults
   before_validation :ensure_user_exists
+  after_create :log_creation
 
   # Simple state machine methods
   def can_start?
     pending? && participants.size >= 2
+  end
+
+  def can_continue?
+    # Can continue if pending, in_progress, round_ready, or failed (for retry)
+    status_ok = pending? || in_progress? || round_ready? || failed?
+
+    # Check if we haven't exceeded max rounds
+    rounds_ok = current_round <= max_rounds
+
+    # Check if we have enough participants
+    participants_ok = participants.size >= 2
+
+    result = status_ok && rounds_ok && participants_ok
+    Rails.logger.debug do
+      "[DEBUG] Conversation ##{id} status: #{status}, pending?: #{pending?}, in_progress?: #{in_progress?}, round_ready?: #{round_ready?}, failed?: #{failed?}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}, can_continue?: #{result}"
+    end
+    result
   end
 
   def start!
@@ -41,6 +60,8 @@ class Conversation < ApplicationRecord
   end
 
   def fail!
+    Rails.logger.error "[CONVERSATION FAIL] Conversation ##{id} being marked as failed. Current status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}"
+    Rails.logger.error "[CONVERSATION FAIL] Backtrace: #{caller.join("\n")}"
     update!(status: :failed)
   end
 
@@ -59,7 +80,9 @@ class Conversation < ApplicationRecord
   delegate :next_speaker, to: :round_manager
 
   def ready_for_next_round?
-    in_progress? && current_round <= max_rounds
+    result = can_continue? && current_round <= max_rounds
+    Rails.logger.debug { "[DEBUG] Conversation ##{id} ready_for_next_round?: #{result}, can_continue?: #{can_continue?}, current_round: #{current_round}, max_rounds: #{max_rounds}" }
+    result
   end
 
   # Delegate to RoundService for individual speaker response
@@ -68,8 +91,8 @@ class Conversation < ApplicationRecord
   end
 
   # Delegate to RoundService for full round
-  def perform_round!
-    RoundService.new(self).perform_round!
+  def perform_round!(interactive: true)
+    RoundService.new(self).perform_round!(interactive: interactive)
   end
 
   # Generate full conversation (for background jobs)
@@ -106,13 +129,20 @@ class Conversation < ApplicationRecord
   end
 
   def set_defaults
+    return unless new_record?
+
     self.status = :pending if status.blank?
     self.dialogue_instructions = 'Have a thoughtful conversation about the given topic, exploring different perspectives and ideas.' if dialogue_instructions.blank?
     self.max_rounds = 10 if max_rounds.blank?
     self.current_round = 1 if current_round.blank?
+    Rails.logger.debug { "[CONVERSATION CREATE] Setting defaults for conversation - status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}" }
   end
 
   def ensure_user_exists
     self.user = User.anonymous if user.nil?
+  end
+
+  def log_creation
+    Rails.logger.info "[CONVERSATION CREATED] Conversation ##{id} created with status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}, can_continue?: #{can_continue?}"
   end
 end

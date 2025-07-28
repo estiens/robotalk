@@ -46,14 +46,17 @@ VCR.configure do |config|
     ['127.0.0.1', 'localhost'].include?(uri.host)
   end
 
-  # Add better error messages for unhandled requests
+  # Add better error messages for unhandled requests - only in debug mode
   config.before_record do |interaction|
-    puts "🎬 VCR: Recording NEW interaction with #{interaction.request.uri}"
-    puts "   Method: #{interaction.request.method}"
-    puts "   Headers: #{interaction.request.headers.keys.join(', ')}"
+    if ENV['VCR_DEBUG'] == 'true'
+      puts "🎬 VCR: Recording NEW interaction with #{interaction.request.uri}"
+      puts "   Method: #{interaction.request.method}"
+      puts "   Headers: #{interaction.request.headers.keys.join(', ')}"
+    end
   end
 
+  # Only show playback in debug mode
   config.before_playback do |interaction|
-    puts "▶️  VCR: Playing back recorded interaction with #{interaction.request.uri}"
+    puts "▶️  VCR: Playing back recorded interaction with #{interaction.request.uri}" if ENV['VCR_DEBUG'] == 'true'
   end
 end

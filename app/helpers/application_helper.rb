@@ -26,7 +26,7 @@ module ApplicationHelper
       participants: conversation.participants.count,
       current_round: conversation.current_round,
       max_rounds: conversation.max_rounds,
-      can_continue: conversation.can_continue?
+      can_continue: conversation.ready_for_next_round?
     }
   end
 

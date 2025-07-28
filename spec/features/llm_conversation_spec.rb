@@ -34,16 +34,12 @@ RSpec.describe 'LLM Conversation' do
     # Should see the topic clearly displayed using helper
     wait_for_test_element('conversation-topic')
 
-    # Start the conversation using helper
-    wait_for_test_element('start-conversation-button', timeout: CapybaraHelpers::QUICK_TIMEOUT)
-    click_test_element('start-conversation-button')
+    # Start the conversation using helper - now just one button type
+    wait_for_test_element('continue-conversation-button', timeout: CapybaraHelpers::QUICK_TIMEOUT)
+    click_test_element('continue-conversation-button')
 
     # Wait for the conversation to start using helper
     wait_for_round_indicator
-
-    # Wait for round 1 button and click it
-    wait_for_test_element('continue-conversation-button', timeout: CapybaraHelpers::LONG_TIMEOUT)
-    click_test_element('continue-conversation-button')
 
     # Wait for round 2 button and click it
     wait_for_test_element('continue-conversation-button', timeout: CapybaraHelpers::LONG_TIMEOUT)

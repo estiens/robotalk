@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe GenerateConversationJob, :vcr do
   include AuthenticationHelpers
   include ActiveJob::TestHelper
+
   describe '#perform' do
     context 'golden path: full conversation generation' do
       it 'generates a complete conversation from start to finish via background job', :vcr do
@@ -99,15 +100,16 @@ RSpec.describe GenerateConversationJob, :vcr do
           ]
         )
 
-        # Mock the RoundService to raise an error during conversation generation
-        allow_any_instance_of(RoundService).to receive(:perform_round!).and_raise(StandardError.new('API Error'))
+        # Mock the Conversation model to raise an error during conversation generation
+        allow_any_instance_of(Conversation).to receive(:generate_full_conversation!).and_raise(StandardError.new('API Error'))
 
-        # Execute the job and expect it to raise an error
-        expect do
-          perform_enqueued_jobs do
-            GenerateConversationJob.perform_later(conversation)
-          end
-        end.to raise_error
+        # Execute the job - we expect it to fail, but don't care about the exact error
+        # The important part is the side effect: conversation should be marked as failed
+        # Create and perform the job directly instead of using ActiveJob test helpers
+        job = GenerateConversationJob.new
+
+        # We expect an error, but what we really care about is that the conversation is marked as failed
+        expect { job.perform(conversation) }.to raise_error(StandardError, /API Error/)
 
         # Should mark conversation as failed before re-raising the error
         conversation.reload

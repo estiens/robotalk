@@ -119,10 +119,28 @@ class ConversationsController < ApplicationController
       return
     end
 
-    # System messages will be created by ruby_llm via with_instructions
+    begin
+      # Start conversation and perform first round
+      @conversation.start!
+      @conversation.perform_round!
 
-    @conversation.start!
-    redirect_to @conversation, notice: 'Conversation started!'
+      respond_to do |format|
+        format.html { redirect_to @conversation, notice: 'Conversation started and first round completed!' }
+        format.turbo_stream { redirect_to @conversation }
+      end
+    rescue StandardError => e
+      Rails.logger.error "[CONTROLLER] Start conversation failed for conversation ##{@conversation.id}: #{e.message}"
+      Rails.logger.error "[CONTROLLER] Start conversation error backtrace: #{e.backtrace.join("\n")}"
+      @conversation.fail!
+      Rails.logger.error "Failed to start conversation: #{e.message}"
+      respond_to do |format|
+        format.html { redirect_to @conversation, alert: "Failed to start conversation: #{e.message}" }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace('conversation', template: 'conversations/show',
+                                                                    locals: { conversation: @conversation })
+        end
+      end
+    end
   end
 
   def continue
@@ -132,14 +150,20 @@ class ConversationsController < ApplicationController
 
     if @conversation.ready_for_next_round?
       begin
-        # Generate response immediately
-        @conversation.have_current_speaker_respond!
+        # Set to in_progress when starting the round
+        @conversation.update!(status: :in_progress)
+
+        # Perform entire round (all participants speak)
+        @conversation.perform_round!
 
         respond_to do |format|
-          format.html { redirect_to @conversation, notice: 'Conversation continued!' }
+          format.html { redirect_to @conversation, notice: 'Round completed!' }
           format.turbo_stream { redirect_to @conversation }
         end
       rescue StandardError => e
+        Rails.logger.error "[CONTROLLER] Continue conversation failed for conversation ##{@conversation.id}: #{e.message}"
+        Rails.logger.error "[CONTROLLER] Continue conversation error backtrace: #{e.backtrace.join("\n")}"
+        @conversation.fail!
         Rails.logger.error "Failed to continue conversation: #{e.message}"
         respond_to do |format|
           format.html { redirect_to @conversation, alert: "Failed to continue conversation: #{e.message}" }

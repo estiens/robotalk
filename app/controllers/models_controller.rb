@@ -3,10 +3,15 @@
 class ModelsController < ApplicationController
   def index
     @models = get_available_models.map do |model|
-      OpenStruct.new(
+      model_struct = OpenStruct.new(
         id: model[:value],
-        name: model[:text]
+        name: model[:text],
+        provider: model[:value].split('/').first,
+        family: model[:text].split(':').last.strip,
+        context_window: 128_000 # Default context window
       )
+      Rails.logger.debug { "[DEBUG] Model created: id=#{model_struct.id}, provider=#{model_struct.provider}, family=#{model_struct.family}" }
+      model_struct
     end
   end
 

@@ -178,39 +178,23 @@
 
           <!-- Enhanced Action Buttons -->
           <div class="flex items-center space-x-4">
-            <% if conversation.ready_for_next_round? && !conversation.in_progress? %>
-              <% if conversation.messages.empty? %>
-                <!-- Enhanced Start Button -->
-                <%= button_to start_conversation_path(conversation),
-                    method: :post,
-                    class: "btn btn-success btn-lg gap-3",
-                    data: {
-                      turbo_frame: "conversation",
-                      streaming_conversation_target: "startButton",
-                      controller: "conversation-controls",
-                      action: "click->conversation-controls#showLoading",
-                      test: "start-conversation-button"
-                    } do %>
-                  <i class="text-2xl ph ph-play"></i>
-                  Start Dialogue
-                <% end %>
-              <% else %>
-                <!-- Enhanced Continue Button -->
-                <%= button_to continue_conversation_path(conversation), 
-                    method: :post,
-                    class: "btn btn-primary btn-lg gap-3",
-                    data: { 
-                      turbo_frame: "conversation",
-                      streaming_conversation_target: "continueButton",
-                      controller: "conversation-controls",
-                      action: "click->conversation-controls#showLoading",
-                      test: "continue-conversation-button"
-                    } do %>
-                  <i class="text-2xl ph ph-skip-forward"></i>
-                  Next Round
-                <% end %>
+            <% Rails.logger.debug "[DEBUG] View: conversation ##{conversation.id} - can_continue?: #{conversation.can_continue?}, status: #{conversation.status}, current_round: #{conversation.current_round}, max_rounds: #{conversation.max_rounds}, participants: #{conversation.participants.size}" %>
+            <% if conversation.can_continue? %>
+              <!-- Play Round Button -->
+              <%= button_to continue_conversation_path(conversation),
+                  method: :post,
+                  class: "btn btn-primary btn-lg gap-3",
+                  data: {
+                    turbo_frame: "conversation",
+                    streaming_conversation_target: "continueButton",
+                    controller: "conversation-controls",
+                    action: "click->conversation-controls#showLoading",
+                    test: "continue-conversation-button"
+                  } do %>
+                <i class="text-2xl ph ph-play"></i>
+                Play Round <%= conversation.current_round %> >>
               <% end %>
-            <% elsif !conversation.ready_for_next_round? && !conversation.in_progress? %>
+            <% else %>
               <!-- Enhanced Completed Status -->
               <div class="flex items-center gap-3 bg-success/20 shadow-lg px-6 py-4 border-2 border-success/30 rounded-2xl">
                 <div class="flex justify-center items-center bg-success shadow-lg rounded-xl w-10 h-10 text-success-content">
