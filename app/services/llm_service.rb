@@ -4,6 +4,8 @@ class LlmService
   attr_reader :conversation, :participant
 
   def initialize(conversation, participant)
+    raise 'OpenRouter API key not configured' if ENV.fetch('OPENROUTER_API_KEY', nil).blank?
+
     @conversation = conversation
     @participant = participant
   end
@@ -79,7 +81,7 @@ class LlmService
       messages << {
         role: 'assistant',
         content: msg.content,
-        name: msg.conversation_participant.name # OpenRouter supports name field
+        name: msg.conversation_participant.name.gsub(/[^\w-]/, '_') # Sanitize name for OpenRouter API
       }
     end
 

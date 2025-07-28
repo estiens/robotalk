@@ -26,6 +26,10 @@ Capybara.server = :puma, { Silent: true }
 # Faster Capybara settings
 Capybara.default_max_wait_time = 5
 Capybara.server_port = 3002
+Capybara.server_host = '127.0.0.1'
+
+# Fix host authorization issue - align Capybara's app_host with server_host
+Capybara.app_host = "http://#{Capybara.server_host}"
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are

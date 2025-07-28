@@ -5,8 +5,6 @@ class Conversation < ApplicationRecord
 
   belongs_to :user
   has_many :messages, dependent: :destroy
-  # All messages are assistant messages now
-  alias assistant_messages messages
   has_many :participants, class_name: 'ConversationParticipant', dependent: :destroy
 
   enum :status, {
@@ -48,7 +46,7 @@ class Conversation < ApplicationRecord
 
   def reset!
     return false unless failed? || complete?
-    
+
     update!(status: :pending)
     true
   end
@@ -60,8 +58,8 @@ class Conversation < ApplicationRecord
 
   delegate :next_speaker, to: :round_manager
 
-  def can_continue?
-    !complete? && !failed? && next_speaker.present?
+  def ready_for_next_round?
+    in_progress? && current_round <= max_rounds
   end
 
   # Delegate to RoundService for individual speaker response
@@ -79,11 +77,22 @@ class Conversation < ApplicationRecord
     RoundService.new(self).generate_full_conversation!
   end
 
-  # Expected by AssistantMessage callbacks
-  def process_new_assistant_message
-    # This method is called when an AssistantMessage is created
+  # Build conversation history as formatted text
+  def conversation_history(limit: nil)
+    query = messages.includes(:conversation_participant).order(:created_at)
+    query = query.last(limit) if limit
+
+    query.map do |message|
+      participant_name = message.conversation_participant&.name || 'Unknown'
+      "#{participant_name}: #{message.content}"
+    end.join("\n\n")
+  end
+
+  # Expected by Message callbacks
+  def process_new_message
+    # This method is called when a Message is created
     # Currently handled by RoundService, but keeping for compatibility
-    Rails.logger.info '[Conversation] Processing new assistant message'
+    Rails.logger.info '[Conversation] Processing new message'
   end
 
   private

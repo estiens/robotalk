@@ -80,7 +80,6 @@ group :test do
   gem 'selenium-webdriver', require: false
   gem 'shoulda-matchers', '~> 5.3'
   gem 'vcr', '~> 6.3', require: false
-  gem 'webdrivers', require: false
   gem 'webmock', '~> 3.25', require: false
 end
 

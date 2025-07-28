@@ -10,7 +10,7 @@ class ConversationsController < ApplicationController
 
   def show
     @conversation = current_user.conversations
-                                .includes(:participants, messages: :conversation_participant)
+                                .includes(:participants)
                                 .find(params[:id])
   end
 
@@ -74,7 +74,7 @@ class ConversationsController < ApplicationController
         dialogue_instructions: @conversation.dialogue_instructions,
         max_rounds: @conversation.max_rounds,
         current_round: @conversation.current_round,
-        can_continue: @conversation.can_continue?,
+        can_continue: @conversation.ready_for_next_round?,
         message_count: @conversation.messages.count,
         participant_count: @conversation.participants.count
       },
@@ -121,26 +121,8 @@ class ConversationsController < ApplicationController
 
     # System messages will be created by ruby_llm via with_instructions
 
-    begin
-      # Generate response immediately
-      @conversation.have_current_speaker_respond!
-
-      respond_to do |format|
-        format.html { redirect_to @conversation, notice: 'Conversation started!' }
-        format.turbo_stream { redirect_to @conversation }
-      end
-    rescue StandardError => e
-      Rails.logger.error "Failed to start conversation: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
-
-      respond_to do |format|
-        format.html { redirect_to @conversation, alert: "Failed to start conversation: #{e.message}" }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace('conversation', template: 'conversations/show',
-                                                                    locals: { conversation: @conversation })
-        end
-      end
-    end
+    @conversation.start!
+    redirect_to @conversation, notice: 'Conversation started!'
   end
 
   def continue
@@ -148,7 +130,7 @@ class ConversationsController < ApplicationController
                                 .includes(:participants)
                                 .find(params[:id])
 
-    if @conversation.can_continue?
+    if @conversation.ready_for_next_round?
       begin
         # Generate response immediately
         @conversation.have_current_speaker_respond!
@@ -235,8 +217,10 @@ class ConversationsController < ApplicationController
   end
 
   def conversation_params
-    params.expect(conversation: [:max_rounds, :conversation_topic, :dialogue_instructions,
-                                 { participants_attributes: %i[model_id system_prompt character_prompt turn_order name] }])
+    params.require(:conversation).permit(
+      :max_rounds, :conversation_topic, :dialogue_instructions,
+      participants_attributes: %i[id name model_id turn_order system_prompt character_prompt _destroy]
+    )
   end
 
   def get_available_models

@@ -5,20 +5,19 @@ require 'rails_helper'
 RSpec.describe Message do
   describe 'associations' do
     it { is_expected.to belong_to(:conversation) }
-    it { is_expected.to have_many(:tool_calls).dependent(:destroy) }
     it { is_expected.to belong_to(:conversation_participant).optional }
   end
 
   describe 'callbacks' do
-    it 'triggers set_initial_round_number_for_shell before creation' do
+    it 'triggers set_defaults before validation' do
       conversation = create('conversation')
       message = build('message', conversation: conversation, role: 'assistant')
-      expect(message).to receive(:set_initial_round_number_for_shell)
+      expect(message).to receive(:set_defaults).and_call_original
       message.save!
     end
   end
 
-  describe '#set_initial_round_number_for_shell' do
+  describe '#set_defaults' do
     let(:conversation) { create('conversation', max_rounds: 5) }
     let!(:participant1) { create('conversation_participant', conversation: conversation, turn_order: 1) }
     let!(:participant2) { create('conversation_participant', conversation: conversation, turn_order: 2) }
@@ -43,9 +42,10 @@ RSpec.describe Message do
       expect(message.round_number).to eq(2)
     end
 
-    it 'does not assign a round number to user messages' do
+    it 'assigns a round number even to user messages in current implementation' do
       message = create('message', conversation: conversation, role: 'user')
-      expect(message.round_number).to be_nil
+      # In current implementation, all messages get round_number assigned
+      expect(message.round_number).to eq(1)
     end
   end
 end

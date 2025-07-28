@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  def new; end
+  def new
+    Rails.logger.info "Reached SessionsController#new"
+  end
 
   def create
     user = User.find_by(email: params[:session][:email].downcase)

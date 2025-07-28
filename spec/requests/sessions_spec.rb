@@ -5,7 +5,16 @@ require 'rails_helper'
 RSpec.describe 'Sessions' do
   describe 'GET /login' do
     it 'returns http success' do
-      get '/login'
+      begin
+        get '/login'
+      rescue => e
+        puts "EXCEPTION: #{e.class}: #{e.message}"
+        puts e.backtrace.join("\n")
+        raise
+      end
+      puts "Status: #{response.status}"
+      puts "Body: #{response.body[0..500]}"
+      puts "Session user_id: #{session[:user_id]}"
       expect(response).to have_http_status(:success)
     end
   end

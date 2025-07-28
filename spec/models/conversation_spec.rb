@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Conversation do
-  let(:user) { User.create!(email: 'test@example.com', password: 'password') }
+  let(:user) { create(:user) }
   let(:conversation) do
     Conversation.create!(
       user: user,
@@ -50,7 +50,7 @@ RSpec.describe Conversation do
     end
 
     it 'has many messages' do
-      message = AssistantMessage.create!(
+      message = Message.create!(
         conversation: conversation,
         conversation_participant: conversation.participants.first,
         role: Message::ROLE_ASSISTANT,
@@ -119,7 +119,7 @@ RSpec.describe Conversation do
     end
 
     it 'returns second participant after first has spoken' do
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: conversation.participants.first,
         role: Message::ROLE_ASSISTANT,
@@ -135,7 +135,7 @@ RSpec.describe Conversation do
 
     it 'returns nil when all participants have spoken in current round' do
       conversation.participants.each do |participant|
-        AssistantMessage.create!(
+        Message.create!(
           conversation: conversation,
           conversation_participant: participant,
           role: Message::ROLE_ASSISTANT,

@@ -103,8 +103,8 @@
             <!-- Round Progress Circle -->
             <div class="flex items-center space-x-4">
               <div class="relative">
-                <% assistant_messages_count = conversation.messages.where(role: 'assistant').count %>
-                <% if assistant_messages_count > 0 %>
+                <% messages_count = conversation.messages.count %>
+                <% if messages_count > 0 %>
                   <div class="flex justify-center items-center bg-primary shadow-2xl rounded-2xl w-16 h-16">
                     <span class="font-bold text-primary-content text-2xl">
                       <%= conversation.current_round %>
@@ -120,15 +120,15 @@
               </div>
               <div>
                 <div class="font-bold text-neutral-content text-xl" data-test="round-indicator">
-                  <% if assistant_messages_count > 0 %>
+                  <% if messages_count > 0 %>
                     Round <%= conversation.current_round %> / <%= conversation.max_rounds %>
                   <% else %>
                     Ready to Begin
                   <% end %>
                 </div>
                 <div class="font-medium text-neutral-content/70 text-sm">
-                  <% if assistant_messages_count > 0 %>
-                    <%= pluralize(assistant_messages_count, 'exchange', 'exchanges') %> complete
+                  <% if messages_count > 0 %>
+                    <%= pluralize(messages_count, 'exchange', 'exchanges') %> complete
                   <% else %>
                     <%= pluralize(conversation.max_rounds, 'round', 'rounds') %> planned
                   <% end %>
@@ -137,7 +137,7 @@
             </div>
 
             <!-- Enhanced Progress Bar -->
-            <% if assistant_messages_count > 0 %>
+            <% if messages_count > 0 %>
               <div class="hidden lg:block w-48">
                 <div class="flex justify-between mb-2 font-semibold text-neutral-content/70 text-sm">
                   <span>Round <%= conversation.current_round %></span>
@@ -153,7 +153,7 @@
             <% end %>
 
             <!-- Enhanced Next Speaker -->
-            <% if conversation.next_speaker && conversation.can_continue? && !conversation.in_progress? %>
+            <% if conversation.next_speaker && conversation.ready_for_next_round? && !conversation.in_progress? %>
               <div class="flex items-center space-x-3 bg-success/20 shadow-lg px-4 py-3 border-2 border-success/30 rounded-2xl">
                 <span class="font-bold text-success text-sm">Next Speaker:</span>
                 <div class="w-10 h-10 rounded-xl <%= conversation.next_speaker.turn_order == 1 ? 'bg-primary' : 'bg-secondary' %> flex items-center justify-center text-primary-content shadow-lg">
@@ -178,8 +178,8 @@
 
           <!-- Enhanced Action Buttons -->
           <div class="flex items-center space-x-4">
-            <% if conversation.can_continue? && !conversation.in_progress? %>
-              <% if conversation.messages.where(role: "assistant").empty? %>
+            <% if conversation.ready_for_next_round? && !conversation.in_progress? %>
+              <% if conversation.messages.empty? %>
                 <!-- Enhanced Start Button -->
                 <%= button_to start_conversation_path(conversation),
                     method: :post,
@@ -210,7 +210,7 @@
                   Next Round
                 <% end %>
               <% end %>
-            <% elsif !conversation.can_continue? && !conversation.in_progress? %>
+            <% elsif !conversation.ready_for_next_round? && !conversation.in_progress? %>
               <!-- Enhanced Completed Status -->
               <div class="flex items-center gap-3 bg-success/20 shadow-lg px-6 py-4 border-2 border-success/30 rounded-2xl">
                 <div class="flex justify-center items-center bg-success shadow-lg rounded-xl w-10 h-10 text-success-content">

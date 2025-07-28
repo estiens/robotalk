@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Conversation Flow', type: :model do
-  let(:user) { User.create!(email: 'test@example.com', password: 'password') }
+  let(:user) { create(:user) }
   let(:conversation) do
     Conversation.create!(
       user: user,
@@ -42,7 +42,7 @@ RSpec.describe 'Conversation Flow', type: :model do
     end
 
     def create_mock_message_for(participant)
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: participant,
         role: Message::ROLE_ASSISTANT,
@@ -77,16 +77,15 @@ RSpec.describe 'Conversation Flow', type: :model do
     end
 
     it 'tracks round completion correctly' do
-      expect(conversation.round_complete?).to be false
-
-      # Alice speaks
-      conversation.have_current_speaker_respond!
-      expect(conversation.round_complete?).to be false
       expect(conversation.current_round).to eq(1)
 
-      # Bob speaks - should complete round 1
+      # Alice speaks - should still be in round 1
       conversation.have_current_speaker_respond!
-      expect(conversation.current_round).to eq(2)
+      expect(conversation.reload.current_round).to eq(1)
+
+      # Bob speaks - should complete round 1 and advance to round 2
+      conversation.have_current_speaker_respond!
+      expect(conversation.reload.current_round).to eq(2)
     end
 
     it 'completes conversation after max rounds' do
@@ -121,7 +120,7 @@ RSpec.describe 'Conversation Flow', type: :model do
   describe 'message history' do
     before do
       # Create some test messages
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: alice,
         role: Message::ROLE_ASSISTANT,
@@ -130,7 +129,7 @@ RSpec.describe 'Conversation Flow', type: :model do
         content: "Hello, I'm Alice!"
       )
 
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: bob,
         role: Message::ROLE_ASSISTANT,
@@ -139,7 +138,7 @@ RSpec.describe 'Conversation Flow', type: :model do
         content: "Nice to meet you Alice, I'm Bob!"
       )
 
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: alice,
         role: Message::ROLE_ASSISTANT,
@@ -191,7 +190,7 @@ RSpec.describe 'Conversation Flow', type: :model do
           hash_including(role: 'system', content: alice.system_prompt_with_topic),
           hash_including(role: 'user', content: 'Please introduce yourself and start discussing: AI and the Future')
         ),
-        hash_including(model: 'openai/gpt-4o-mini')
+        hash_including(model: ['openai/gpt-4o-mini'])
       )
 
       service.generate_response
@@ -199,7 +198,7 @@ RSpec.describe 'Conversation Flow', type: :model do
 
     it 'includes conversation history in subsequent calls' do
       # Add a message to create history
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: alice,
         role: Message::ROLE_ASSISTANT,
@@ -220,11 +219,11 @@ RSpec.describe 'Conversation Flow', type: :model do
       service.generate_response
     end
 
-    it 'creates AssistantMessage with correct attributes' do
+    it 'creates Message with correct attributes' do
       service = LlmService.new(conversation, alice)
       message = service.generate_response
 
-      expect(message).to be_a(AssistantMessage)
+      expect(message).to be_a(Message)
       expect(message.conversation).to eq(conversation)
       expect(message.conversation_participant).to eq(alice)
       expect(message.role).to eq(Message::ROLE_ASSISTANT)

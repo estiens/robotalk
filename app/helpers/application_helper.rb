@@ -22,8 +22,6 @@ module ApplicationHelper
   def conversation_debug_info(conversation)
     {
       total_messages: conversation.messages.count,
-      system_messages: conversation.messages.where(role: 'system').count,
-      assistant_messages: conversation.messages.where(role: 'assistant').count,
       content_missing: content_missing_count(conversation),
       participants: conversation.participants.count,
       current_round: conversation.current_round,

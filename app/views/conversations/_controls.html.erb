@@ -23,11 +23,21 @@
         <% end %>
       </div>
       
-    <% elsif conversation.can_continue? %>
+    <% elsif conversation.ready_for_next_round? %>
       <!-- Manual Continue Mode -->
       <div class="py-6 text-center">
-        <h3 class="mb-2 font-semibold text-lg">Ready for Next Round</h3>
-        <p class="text-base-content/70 mb-4">Click "Next Round" to continue the conversation</p>
+        <h3 class="mb-2 font-semibold text-lg">Ready for Round <%= conversation.current_round %></h3>
+        <p class="text-base-content/70 mb-4">Click the button to run the next round.</p>
+        <%= button_to "Round #{conversation.current_round} >>", continue_conversation_path(conversation),
+            method: :post,
+            class: "btn btn-primary btn-md gap-2",
+            data: {
+              turbo_frame: "conversation",
+              streaming_conversation_target: "continueButton",
+              controller: "conversation-controls",
+              action: "click->conversation-controls#showLoading",
+              test: "continue-conversation-button"
+            } %>
       </div>
     <% else %>
       <!-- Conversation Complete -->

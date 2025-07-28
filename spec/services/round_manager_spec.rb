@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe RoundManager, type: :service do
-  let(:user) { User.create!(email: 'test@example.com', password: 'password123') }
+  let(:user) { create(:user) }
   let(:conversation) { Conversation.create!(user: user, max_rounds: 3, conversation_topic: 'Test Topic') }
   let(:round_manager) { RoundManager.new(conversation) }
 
@@ -18,51 +18,6 @@ RSpec.describe RoundManager, type: :service do
       expect(conversation.current_round).to eq(1)
     end
 
-    xit 'stays at 1 for rounds 1-3 assistant messages - PENDING: round counting logic changed' do
-      participants = conversation.participants.ordered
-
-      conversation.messages.create!(
-        role: 'assistant',
-        content: 'Message',
-        model_id: participants[0].model_id,
-        conversation_participant: participants[0]
-      )
-      conversation.reload
-      expect(conversation.current_round).to eq(1)
-
-      conversation.messages.create!(
-        role: 'assistant',
-        content: 'Message',
-        model_id: participants[1].model_id,
-        conversation_participant: participants[1]
-      )
-      conversation.reload
-      expect(conversation.current_round).to eq(1)
-
-      conversation.messages.create!(
-        role: 'assistant',
-        content: 'Message',
-        model_id: participants[2].model_id,
-        conversation_participant: participants[2]
-      )
-      conversation.reload
-      expect(conversation.current_round).to eq(2)
-    end
-
-    xit 'advances to 2 after round 1 completes, then continues in round 2 - PENDING: round counting logic changed' do
-      participants = conversation.participants.ordered
-      4.times do |i|
-        participant = participants[i % 3]
-        conversation.messages.create!(
-          role: 'assistant',
-          content: "Message #{i + 1}",
-          model_id: participant.model_id,
-          conversation_participant: participant
-        )
-      end
-      conversation.reload
-      expect(conversation.current_round).to eq(2)
-    end
 
     it 'handles zero participants gracefully' do
       conversation.participants.destroy_all
@@ -90,20 +45,6 @@ RSpec.describe RoundManager, type: :service do
       expect(next_speaker.turn_order).to eq(2)
     end
 
-    xit 'cycles back to first participant after last has spoken - PENDING: next_speaker logic changed' do
-      conversation.participants.ordered.each do |participant|
-        conversation.messages.create!(
-          role: 'assistant',
-          content: "Message from #{participant.name}",
-          model_id: participant.model_id,
-          conversation_participant: participant
-        )
-      end
-
-      next_speaker = round_manager.next_speaker
-      expect(next_speaker).to eq(conversation.participants.ordered.first)
-      expect(next_speaker.turn_order).to eq(1)
-    end
 
     it 'returns nil if message has no conversation_participant' do
       conversation.messages.create!(role: 'assistant', content: 'Message', model_id: 'unknown/model',

@@ -92,15 +92,15 @@ RSpec.describe 'Conversation deletion' do
 
       visit conversations_path
 
-      # Record initial count
-      initial_count = Conversation.count
+      # Record initial count for this user
+      initial_count = user.conversations.count
       expect(initial_count).to eq(2)
 
       # Delete one conversation using helper
       click_conversation_delete(conversation1.id)
 
       # Count should be reduced by 1
-      expect(Conversation.count).to eq(initial_count - 1)
+      expect(user.conversations.count).to eq(initial_count - 1)
 
       # Specific conversation should no longer exist
       expect_record_not_to_exist(Conversation, conversation1.id)

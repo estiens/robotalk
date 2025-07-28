@@ -4,17 +4,8 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe 'Simple Conversation Flow', type: :system do
-  before do
-    # Stub the call to RubyLLM::Models.all to prevent live API calls
-    models_payload = [
-      { id: 'openai/gpt-4o-mini', name: 'OpenAI: GPT-4o Mini' },
-      { id: 'anthropic/claude-3-haiku', name: 'Anthropic: Claude 3 Haiku' }
-    ].map { |h| OpenStruct.new(h) }
 
-    allow(RubyLLM::Models).to receive(:all).and_return(models_payload)
-  end
-
-  xit 'allows creating a basic conversation - PENDING: text format changed', :vcr do
+  it 'allows creating a basic conversation', :vcr do
     visit new_conversation_path
 
     # Fill in basic conversation details
@@ -33,7 +24,7 @@ RSpec.describe 'Simple Conversation Flow', type: :system do
 
     # Should be redirected to the conversation show page
     expect(page).to have_css('[data-test="conversation-topic"]', text: 'Test Conversation')
-    expect(page).to have_css('[data-test="round-indicator"]', text: 'Round 1/2')
+    expect(page).to have_css('[data-test="round-indicator"]', text: 'Ready to Begin')
 
     # Verify the conversation was created
     conversation = Conversation.last

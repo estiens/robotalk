@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_28_202053) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_210553) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -35,6 +35,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_202053) do
     t.integer "user_id", null: false
     t.string "status"
     t.integer "current_round", default: 1, null: false
+    t.index ["created_at"], name: "index_conversations_on_created_at"
+    t.index ["status"], name: "index_conversations_on_status"
+    t.index ["user_id", "created_at"], name: "index_conversations_on_user_id_and_created_at"
+    t.index ["user_id", "status"], name: "index_conversations_on_user_id_and_status"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
@@ -50,9 +54,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_202053) do
     t.integer "output_tokens"
     t.integer "conversation_participant_id"
     t.integer "round_number"
+    t.index ["conversation_id", "role"], name: "index_messages_on_conversation_id_and_role"
     t.index ["conversation_id", "round_number"], name: "index_messages_on_conversation_and_round"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["conversation_participant_id"], name: "index_messages_on_conversation_participant_id"
+    t.index ["created_at"], name: "index_messages_on_created_at"
+    t.index ["role"], name: "index_messages_on_role"
   end
 
   create_table "users", force: :cascade do |t|

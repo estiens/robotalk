@@ -28,7 +28,7 @@ module TurboStreamable
         conversation: self,
         # Index can be based on existing assistant messages for animation delay,
         # or simply 0 if this is the only way new messages appear.
-        index: assistant_messages.count
+        index: messages.count
       }
     )
     Rails.logger.info "[TurboStreamable##broadcast_new_message] Broadcasted new message shell for Message ID #{message_shell.id}, Participant: #{participant_for_shell&.name}"

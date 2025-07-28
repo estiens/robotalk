@@ -5,7 +5,7 @@ class Message < ApplicationRecord
   ROLE_ASSISTANT = 'assistant'
 
   belongs_to :conversation
-  belongs_to :conversation_participant
+  belongs_to :conversation_participant, optional: true
   # Removed: has_many :tool_calls (no more tool calling)
 
   validates :content, presence: true, unless: :streaming_message?
@@ -42,9 +42,6 @@ class Message < ApplicationRecord
   end
 
   def trigger_conversation_processing
-    conversation.process_new_assistant_message
+    conversation.process_new_message
   end
 end
-
-# Keep AssistantMessage as alias for backward compatibility
-AssistantMessage = Message

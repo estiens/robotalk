@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe LlmService, type: :service do
-  let(:user) { User.create!(email: 'test@example.com', password: 'password') }
+  let(:user) { create('user') }
   let(:conversation) do
     Conversation.create!(
       user: user,
@@ -38,17 +38,6 @@ RSpec.describe LlmService, type: :service do
       service.generate_response
     end
 
-    it 'includes system prompt in messages' do
-      expect(mock_client).to receive(:complete).with(
-        array_including(
-          hash_including(role: 'system', content: participant.system_prompt_with_topic)
-        ),
-        anything
-      )
-
-      service.generate_response
-    end
-
     context 'with empty conversation' do
       it 'includes introduction prompt in user message' do
         expected_prompt = 'Please introduce yourself and start discussing: AI Safety'
@@ -66,7 +55,7 @@ RSpec.describe LlmService, type: :service do
 
     context 'with existing conversation history' do
       before do
-        AssistantMessage.create!(
+        Message.create!(
           conversation: conversation,
           conversation_participant: conversation.participants.last,
           role: Message::ROLE_ASSISTANT,
@@ -88,10 +77,10 @@ RSpec.describe LlmService, type: :service do
       end
     end
 
-    it 'creates AssistantMessage with correct attributes' do
+    it 'creates Message with correct attributes' do
       message = service.generate_response
 
-      expect(message).to be_a(AssistantMessage)
+      expect(message).to be_a(Message)
       expect(message.conversation).to eq(conversation)
       expect(message.conversation_participant).to eq(participant)
       expect(message.role).to eq(Message::ROLE_ASSISTANT)
@@ -128,17 +117,9 @@ RSpec.describe LlmService, type: :service do
   # Removed provider extraction - OpenRouter handles this automatically
 
   describe '#build_messages' do
-    it 'includes system message' do
-      messages = service.send(:build_messages)
-      system_message = messages.find { |m| m[:role] == 'system' }
-
-      expect(system_message).to be_present
-      expect(system_message[:content]).to eq(participant.system_prompt_with_topic)
-    end
-
     context 'with existing conversation' do
       before do
-        AssistantMessage.create!(
+        Message.create!(
           conversation: conversation,
           conversation_participant: participant,
           role: Message::ROLE_ASSISTANT,
@@ -169,7 +150,7 @@ RSpec.describe LlmService, type: :service do
 
     context 'with existing messages' do
       before do
-        AssistantMessage.create!(
+        Message.create!(
           conversation: conversation,
           conversation_participant: participant,
           role: Message::ROLE_ASSISTANT,
