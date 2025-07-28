@@ -1,53 +1,50 @@
+# frozen_string_literal: true
+
+# All messages are assistant messages in our simplified system
 class Message < ApplicationRecord
-  # We're consolidating to only store assistant messages (actual conversation content)
-  # No more user/system messages stored - those are generated on-the-fly for LLM context
-  ROLE_ASSISTANT = "assistant".freeze
+  ROLE_ASSISTANT = 'assistant'
 
   belongs_to :conversation
-  belongs_to :conversation_participant # Always required now - every message has a speaker
-  has_many :tool_calls, dependent: :destroy
+  belongs_to :conversation_participant
+  # Removed: has_many :tool_calls (no more tool calling)
 
-  # All messages are assistant messages now, with STI for future extensibility
-  validates :role, inclusion: { in: [ ROLE_ASSISTANT ] }
-  validates :content, presence: true
-  validates :conversation_participant, presence: true
+  validates :content, presence: true, unless: :streaming_message?
   validates :round_number, presence: true
 
-  # Set round_number for assistant messages based on conversation state
-  before_create :set_round_number_for_assistant_messages
+  before_validation :set_defaults
+  after_create_commit :trigger_conversation_processing
 
-  # Broadcasting will be handled manually through LlmService to avoid route issues
-  # broadcasts_to removed to prevent automatic broadcast errors
-
-  # Helper to broadcast chunks during streaming
-  def broadcast_append_chunk(chunk_content)
-    target_id = ActionView::RecordIdentifier.dom_id(self, "content")
-    # Ensure content is HTML-safe if it's plain text being inserted as HTML
-    safe_chunk_content = ERB::Util.html_escape(chunk_content)
-    Turbo::StreamsChannel.broadcast_append_to(
-      [ conversation, "messages" ], # Stream target
-      target: target_id,            # DOM ID to append to
-      html: safe_chunk_content      # The content to append
-    )
+  # Safe metadata access
+  def metadata
+    super || {}
   end
 
-  # Helper to broadcast the first chunk, replacing the placeholder content
-  def broadcast_update_chunk(chunk_content)
-    target_id = ActionView::RecordIdentifier.dom_id(self, "content")
-    safe_chunk_content = ERB::Util.html_escape(chunk_content)
-    Turbo::StreamsChannel.broadcast_update_to(
-      [ conversation, "messages" ], # Stream target
-      target: target_id,            # DOM ID to update
-      html: safe_chunk_content      # The new content
-    )
+  def metadata_value(key, default = nil)
+    metadata[key.to_s] || default
+  end
+
+  def error_message?
+    metadata_value('is_error') == true
+  end
+
+  def streaming_message?
+    metadata_value('status') == 'streaming'
   end
 
   private
 
-  def set_round_number_for_assistant_messages
-    if self.conversation.present? && self.round_number.nil?
-      self.round_number = self.conversation.current_round
-      Rails.logger.info "[Message##set_round_number_for_assistant_messages] Set round_number to #{self.round_number} for message (ID: #{self.id || 'new'}) in conversation #{conversation.id}"
-    end
+  def set_defaults
+    self.role = ROLE_ASSISTANT if role.nil?
+
+    return unless conversation.present? && round_number.nil?
+
+    self.round_number = conversation.current_round
+  end
+
+  def trigger_conversation_processing
+    conversation.process_new_assistant_message
   end
 end
+
+# Keep AssistantMessage as alias for backward compatibility
+AssistantMessage = Message

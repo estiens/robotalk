@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module AuthenticationHelpers
   def create_user
     User.create!(
-      email: "test@example.com",
-      password: "password123",
-      password_confirmation: "password123"
+      email: 'test@example.com',
+      password: 'password123',
+      password_confirmation: 'password123'
     )
   end
 

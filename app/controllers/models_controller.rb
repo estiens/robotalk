@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModelsController < ApplicationController
   def index
     @models = RubyLLM::Models.all.sort_by(&:name)

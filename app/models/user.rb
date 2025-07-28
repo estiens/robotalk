@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   has_secure_password
 
@@ -8,7 +10,7 @@ class User < ApplicationRecord
   after_initialize :set_defaults
 
   def self.anonymous
-    find_or_create_by(email: "anonymous@roboconvo.local") do |user|
+    find_or_create_by(email: 'anonymous@roboconvo.local') do |user|
       user.password = SecureRandom.hex(16)
     end
   end
@@ -16,6 +18,6 @@ class User < ApplicationRecord
   private
 
   def set_defaults
-    self.default_model ||= "claude-sonnet-4-20250514" if new_record?
+    self.default_model ||= 'claude-sonnet-4-20250514' if new_record?
   end
 end

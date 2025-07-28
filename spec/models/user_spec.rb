@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe User, type: :model do
+RSpec.describe User do
   describe 'validations' do
     # Create a user before each test to check for uniqueness
-    subject { create(:user) }
+    subject { create('user') }
 
-    it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:email) }
-    it { should have_secure_password }
+    it { is_expected.to validate_presence_of(:email) }
+    it { is_expected.to validate_uniqueness_of(:email) }
+    it { is_expected.to have_secure_password }
   end
 
   describe 'associations' do
-    it { should have_many(:conversations).dependent(:destroy) }
+    it { is_expected.to have_many(:conversations).dependent(:destroy) }
   end
 
   describe '.anonymous' do

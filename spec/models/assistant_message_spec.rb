@@ -1,81 +1,87 @@
-require "rails_helper"
+# frozen_string_literal: true
 
-RSpec.describe AssistantMessage, type: :model do
-  let(:conversation) { create(:conversation, max_rounds: 3) }
-  let(:participant) { create(:conversation_participant, conversation: conversation) }
+require 'rails_helper'
 
+RSpec.describe AssistantMessage do
+  let(:conversation) { create('conversation', max_rounds: 3) }
+  let(:participant) { create('conversation_participant', conversation: conversation) }
 
-  describe "STI inheritance" do
-    it "inherits from Message" do
+  describe 'STI inheritance' do
+    it 'inherits from Message' do
       expect(AssistantMessage.superclass).to eq(Message)
     end
 
-    it "uses the messages table" do
-      expect(AssistantMessage.table_name).to eq("messages")
+    it 'uses the messages table' do
+      expect(AssistantMessage.table_name).to eq('messages')
     end
 
-    it "sets type column automatically" do
+    it 'sets type column automatically' do
       message = AssistantMessage.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "Test content"
+        conversation_participant: participant,
+        role: 'assistant',
+        content: 'Test content'
       )
-      expect(message.type).to eq("AssistantMessage")
+      expect(message.type).to eq('AssistantMessage')
     end
   end
 
-  describe "default scope" do
+  describe 'default scope' do
     before do
       # Create messages with different roles
-      create(:message, conversation: conversation, role: "system", content: "System message")
-      create(:message, conversation: conversation, role: "user", content: "User message")
+      create('message', conversation: conversation, conversation_participant: participant, role: 'system', content: 'System message')
+      create('message', conversation: conversation, conversation_participant: participant, role: 'user', content: 'User message')
       # Create an assistant message using the Message model but with type set
       Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "Assistant message 1",
-        type: "AssistantMessage"
+        conversation_participant: participant,
+        role: 'assistant',
+        content: 'Assistant message 1',
+        type: 'AssistantMessage'
       )
       Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "Assistant message 2",
-        type: "AssistantMessage"
+        conversation_participant: participant,
+        role: 'assistant',
+        content: 'Assistant message 2',
+        type: 'AssistantMessage'
       )
     end
 
-    it "only returns messages with assistant role" do
+    it 'only returns messages with assistant role' do
       messages = AssistantMessage.all
       expect(messages.count).to eq(2)
-      expect(messages.pluck(:role).uniq).to eq([ "assistant" ])
+      expect(messages.pluck(:role).uniq).to eq(['assistant'])
     end
 
-    it "filters out non-assistant messages even if type is set incorrectly" do
+    it 'filters out non-assistant messages even if type is set incorrectly' do
       # Attempt to create an AssistantMessage with wrong role
       message = Message.create!(
         conversation: conversation,
-        role: "user",
-        content: "Wrong role",
-        type: "AssistantMessage"
+        conversation_participant: participant,
+        role: 'user',
+        content: 'Wrong role',
+        type: 'AssistantMessage'
       )
 
       expect(AssistantMessage.all).not_to include(message)
     end
   end
 
-  describe "callbacks" do
-    describe "#trigger_conversation_processing" do
-      it "calls process_new_assistant_message on conversation after create" do
+  describe 'callbacks' do
+    describe '#trigger_conversation_processing' do
+      it 'calls process_new_assistant_message on conversation after create' do
         expect_any_instance_of(Conversation).to receive(:process_new_assistant_message)
 
         AssistantMessage.create!(
           conversation: conversation,
-          role: "assistant",
-          content: "Test message"
+          conversation_participant: participant,
+          role: 'assistant',
+          content: 'Test message'
         )
       end
 
-      it "uses after_create_commit to ensure transaction completion" do
+      it 'uses after_create_commit to ensure transaction completion' do
         # Verify the callback is registered correctly
         callbacks = AssistantMessage._commit_callbacks.select do |cb|
           cb.filter == :trigger_conversation_processing
@@ -87,31 +93,32 @@ RSpec.describe AssistantMessage, type: :model do
     end
   end
 
-  describe "type promotion from Message to AssistantMessage" do
+  describe 'type promotion from Message to AssistantMessage' do
     let(:message) do
       Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "",
-        metadata: { status: "streaming" }
+        conversation_participant: participant,
+        role: 'assistant',
+        content: '',
+        metadata: { status: 'streaming' }
       )
     end
 
-    it "can be promoted by updating type column" do
+    it 'can be promoted by updating type column' do
       expect(message.type).to be_nil
 
       # Simulate the promotion process
-      message.update_columns(type: "AssistantMessage", content: "Completed content")
+      message.update_columns(type: 'AssistantMessage', content: 'Completed content')
       reloaded = Message.find(message.id)
 
       expect(reloaded).to be_a(AssistantMessage)
-      expect(reloaded.type).to eq("AssistantMessage")
-      expect(reloaded.content).to eq("Completed content")
+      expect(reloaded.type).to eq('AssistantMessage')
+      expect(reloaded.content).to eq('Completed content')
     end
 
-    it "does not trigger create callbacks after promotion since record already exists" do
+    it 'does not trigger create callbacks after promotion since record already exists' do
       # update_columns bypasses callbacks
-      message.update_columns(type: "AssistantMessage")
+      message.update_columns(type: 'AssistantMessage')
 
       # Reload as AssistantMessage
       assistant_message = AssistantMessage.find(message.id)
@@ -124,21 +131,21 @@ RSpec.describe AssistantMessage, type: :model do
     end
   end
 
-  describe "round management integration" do
+  describe 'round management integration' do
     before do
       # Create initial system messages
-      create(:message, conversation: conversation, role: "system", content: "System prompt")
+      create('message', conversation: conversation, conversation_participant: participant, role: 'system', content: 'System prompt')
     end
 
-    it "increments round count when multiple assistant messages are created" do
+    it 'increments round count when multiple assistant messages are created' do
       expect(conversation.current_round).to eq(1)
 
       # First assistant message
       AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant,
-        role: "assistant",
-        content: "First message",
+        role: 'assistant',
+        content: 'First message',
         round_number: 1
       )
 
@@ -147,53 +154,55 @@ RSpec.describe AssistantMessage, type: :model do
       expect(conversation.current_round).to eq(2)
     end
 
-    it "properly tracks finalized messages for round calculation" do
+    it 'properly tracks finalized messages for round calculation' do
       # Create a streaming message (not finalized)
-      streaming_message = Message.create!(
+      Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "",
-        metadata: { status: "streaming" }
+        conversation_participant: participant,
+        role: 'assistant',
+        content: '',
+        metadata: { status: 'streaming' }
       )
 
       # Create a finalized assistant message
-      finalized_message = AssistantMessage.create!(
+      AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant,
-        role: "assistant",
-        content: "Complete message",
+        role: 'assistant',
+        content: 'Complete message',
         round_number: 1
       )
 
       # Only finalized messages should count
       expect(conversation.assistant_messages.count).to eq(1)
-      expect(conversation.messages.where(role: "assistant").count).to eq(2)
+      expect(conversation.messages.where(role: 'assistant').count).to eq(2)
     end
   end
 
-  describe "validation and data integrity" do
-    it "requires conversation association" do
-      message = AssistantMessage.new(role: "assistant", content: "Test")
+  describe 'validation and data integrity' do
+    it 'requires conversation association' do
+      message = AssistantMessage.new(role: 'assistant', content: 'Test')
       expect(message).not_to be_valid
-      expect(message.errors[:conversation]).to include("must exist")
+      expect(message.errors[:conversation]).to include('must exist')
     end
 
-    it "automatically sets role to assistant if not provided" do
-      message = AssistantMessage.new(
+    it 'automatically sets role to assistant if not provided' do
+      AssistantMessage.new(
         conversation: conversation,
-        content: "Test content"
+        conversation_participant: participant,
+        content: 'Test content'
       )
 
       # The default scope will enforce this when querying
       expect(AssistantMessage.where(conversation: conversation)).to be_empty
     end
 
-    it "maintains referential integrity with conversation_participant" do
+    it 'maintains referential integrity with conversation_participant' do
       message = AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant,
-        role: "assistant",
-        content: "Test"
+        role: 'assistant',
+        content: 'Test'
       )
 
       expect(message.conversation_participant).to eq(participant)

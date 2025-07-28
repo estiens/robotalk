@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 class ConversationParticipant < ApplicationRecord
   belongs_to :conversation
   has_many :messages, dependent: :nullify # Or :destroy, nullify is safer for history
-
 
   validates :model_id, presence: true
   validates :turn_order, presence: true, uniqueness: { scope: :conversation_id }
@@ -14,8 +15,8 @@ class ConversationParticipant < ApplicationRecord
   # Checks if this participant has a successful (non-error) message in the given round_number
   def has_spoken_in_round?(round_number_to_check)
     messages.where(round_number: round_number_to_check)
-           .where.not("metadata->>'is_error' = ?", "true")
-           .exists?
+            .where("metadata IS NULL OR metadata->>'is_error' != 'true'")
+            .exists?
   end
 
   def system_prompt_with_topic
@@ -26,24 +27,16 @@ class ConversationParticipant < ApplicationRecord
     prompt_parts << base_system_prompt
 
     # 2. Character-specific prompt (if provided)
-    if character_prompt.present?
-      prompt_parts << character_prompt
-    end
+    prompt_parts << character_prompt if character_prompt.present?
 
     # 3. Dialogue instructions (if provided)
-    if conversation.dialogue_instructions.present?
-      prompt_parts << "Dialogue Instructions: #{conversation.dialogue_instructions}"
-    end
+    prompt_parts << "Dialogue Instructions: #{conversation.dialogue_instructions}" if conversation.dialogue_instructions.present?
 
     # 4. Conversation topic context (if provided)
-    if conversation.conversation_topic.present?
-      prompt_parts << "Conversation Topic: #{conversation.conversation_topic}"
-    end
+    prompt_parts << "Conversation Topic: #{conversation.conversation_topic}" if conversation.conversation_topic.present?
 
     # 5. Custom system prompt override (if provided)
-    if system_prompt.present?
-      prompt_parts << "Additional Instructions: #{system_prompt}"
-    end
+    prompt_parts << "Additional Instructions: #{system_prompt}" if system_prompt.present?
 
     final_prompt = prompt_parts.join("\n\n")
 
@@ -62,9 +55,7 @@ class ConversationParticipant < ApplicationRecord
 
   def set_defaults
     # Set default name if not provided - use model_id
-    if name.blank?
-      self.name = model_id.present? ? model_id : "Participant #{turn_order || (conversation&.participants&.count || 0) + 1}"
-    end
+    self.name = (model_id.presence || "Participant #{turn_order || ((conversation&.participants&.count || 0) + 1)}") if name.blank?
 
     # Set default turn_order if not provided
     if turn_order.blank?
@@ -73,14 +64,16 @@ class ConversationParticipant < ApplicationRecord
     end
 
     # Set default character_prompt if not provided
-    if character_prompt.blank?
-      self.character_prompt = "You are a helpful AI assistant participating in this conversation. Be engaging and thoughtful in your responses."
-    end
+    return if character_prompt.present?
+
+    self.character_prompt = 'You are a helpful AI assistant participating in this conversation. Be engaging and thoughtful in your responses.'
   end
 
   def base_system_prompt
     other_participants = conversation.participants.where.not(id: id)
-    other_names_and_models = other_participants.map { |p| "#{p.name} (#{get_friendly_model_name(p.model_id)})" }.join(", ")
+    other_names_and_models = other_participants.map do |p|
+      "#{p.name} (#{get_friendly_model_name(p.model_id)})"
+    end.join(', ')
 
     <<~PROMPT.strip
       You are #{name}, an AI assistant participating in a multi-model conversation. Your underlying model is #{get_friendly_model_name(model_id)}.

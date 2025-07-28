@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 class LlmService
   attr_reader :conversation, :participant
@@ -16,15 +17,10 @@ class LlmService
     Rails.logger.info "[LlmService] Sending #{messages.count} messages to #{participant.model_id}"
 
     # Use OpenRouter client directly
-    begin
-      client = OpenRouter::Client.new
-    rescue NameError => e
-      Rails.logger.error "[LlmService] OpenRouter not available: #{e.message}"
-      raise "OpenRouter gem not properly loaded. Please check your configuration."
-    end
+    client = OpenRouter::Client.new
     response = client.complete(
       messages,
-      model: [ participant.model_id ],  # OpenRouter expects model as array
+      model: [participant.model_id], # OpenRouter expects model as array
       extras: {
         # Optional parameters can be added here
         # max_tokens: 1000,
@@ -39,31 +35,29 @@ class LlmService
     AssistantMessage.create!(
       conversation: conversation,
       conversation_participant: participant,
-      role: Message::ROLE_ASSISTANT,
       model_id: participant.model_id,
       round_number: conversation.current_round,
       content: content,
       metadata: {
         model_name: participant.model_id,
-        response_metadata: response.to_h.slice("usage", "model", "created")
+        response_metadata: response.to_h.slice('usage', 'model', 'created')
       }
     )
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error "[LlmService] Error: #{e.message}"
 
     # Create error message with error flag in metadata
-    error_message = AssistantMessage.create!(
+    AssistantMessage.create!(
       conversation: conversation,
       conversation_participant: participant,
-      role: Message::ROLE_ASSISTANT,
       model_id: participant.model_id,
       round_number: conversation.current_round,
-      content: "Sorry, I encountered an error generating my response.",
+      content: 'Sorry, I encountered an error generating my response.',
       metadata: { error: e.message, is_error: true }
     )
 
-    # Return the error message instead of raising
-    error_message
+    # Re-raise the error for proper handling
+    raise e
   end
 
   private
@@ -73,17 +67,17 @@ class LlmService
 
     # Add system message with participant's full prompt
     messages << {
-      role: "system",
+      role: 'system',
       content: participant.system_prompt_with_topic
     }
 
     # Add conversation history as individual messages
     conversation.messages.includes(:conversation_participant)
-                        .order(:created_at)
-                        .last(10) # Limit for context window
-                        .each do |msg|
+                .order(:created_at)
+                .last(10) # Limit for context window
+                .each do |msg|
       messages << {
-        role: "assistant",
+        role: 'assistant',
         content: msg.content,
         name: msg.conversation_participant.name # OpenRouter supports name field
       }
@@ -91,7 +85,7 @@ class LlmService
 
     # Add user message to prompt next response
     messages << {
-      role: "user",
+      role: 'user',
       content: build_user_message
     }
 
@@ -110,10 +104,10 @@ class LlmService
     # Handle different response formats from OpenRouter
     if response.is_a?(Hash)
       # Standard OpenAI-style response
-      response.dig("choices", 0, "message", "content") ||
-      response.dig("message", "content") ||
-      response["content"] ||
-      "No content in response"
+      response.dig('choices', 0, 'message', 'content') ||
+        response.dig('message', 'content') ||
+        response['content'] ||
+        'No content in response'
     elsif response.respond_to?(:content)
       response.content
     else

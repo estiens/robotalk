@@ -1,7 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe GenerateConversationJob, type: :job, vcr: true do
-  around(:each) { |example| pending("PENDING: timing out during LLM interactions"); example.run }
+RSpec.describe GenerateConversationJob, :vcr do
+  around do |example|
+    pending('PENDING: timing out during LLM interactions')
+    example.run
+  end
+
   include AuthenticationHelpers
   include ActiveJob::TestHelper
   describe '#perform' do
@@ -37,7 +43,6 @@ RSpec.describe GenerateConversationJob, type: :job, vcr: true do
           # Reload to get updated state
           conversation.reload
 
-
           # Verify final conversation state
           expect(conversation.status).to eq('complete')
           expect(conversation.current_round).to eq(5)
@@ -49,7 +54,7 @@ RSpec.describe GenerateConversationJob, type: :job, vcr: true do
 
           # System messages - ruby_llm creates them via with_instructions, may only have the last one
           system_messages = messages.where(role: 'system')
-          expect(system_messages.count).to be >= 1  # At least one system message should exist
+          expect(system_messages.count).to be >= 1 # At least one system message should exist
 
           system_messages.each do |msg|
             expect(msg.content).to include(conversation.conversation_topic)
@@ -61,7 +66,7 @@ RSpec.describe GenerateConversationJob, type: :job, vcr: true do
           expect(assistant_messages.count).to be <= 10 # Not more than expected
 
           # Verify that all assistant messages have content and model_id
-          assistant_messages.each_with_index do |message, index|
+          assistant_messages.each_with_index do |message, _index|
             expect(message.content).to be_present
             expect(message.content.length).to be > 30 # Ensure substantial responses
             expect(message.model_id).to be_present
@@ -74,7 +79,7 @@ RSpec.describe GenerateConversationJob, type: :job, vcr: true do
           expect(first_message.content.downcase).to match(/climate|energy|renewable|scientist/)
 
           # Subsequent messages should reference previous discussion
-          assistant_messages[1..-1].each do |message|
+          assistant_messages[1..].each do |message|
             # Each response should be contextually relevant (basic check)
             expect(message.content.length).to be > 30
           end

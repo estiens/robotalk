@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :message do
-    association :conversation
-    role { "user" }
+    conversation
+    role { 'user' }
     content { Faker::Lorem.sentence }
-    association :conversation_participant, factory: :conversation_participant
+    conversation_participant factory: %i[conversation_participant]
   end
 end

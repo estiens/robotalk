@@ -1,17 +1,19 @@
-require "rails_helper"
+# frozen_string_literal: true
 
-RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
-  let(:conversation) { create(:conversation, max_rounds: 3) }
-  let(:participant1) { create(:conversation_participant, conversation: conversation, turn_order: 1) }
-  let(:participant2) { create(:conversation_participant, conversation: conversation, turn_order: 2) }
+require 'rails_helper'
 
-  describe "Message type promotion flow" do
-    it "correctly handles the full streaming to finalized message flow" do
+RSpec.describe 'AssistantMessage STI Edge Cases' do
+  let(:conversation) { create('conversation', max_rounds: 3) }
+  let(:participant1) { create('conversation_participant', conversation: conversation, turn_order: 1) }
+  let(:participant2) { create('conversation_participant', conversation: conversation, turn_order: 2) }
+
+  describe 'Message type promotion flow' do
+    it 'correctly handles the full streaming to finalized message flow' do
       # Step 1: acts_as_chat creates an empty shell
       shell_message = Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "",
+        role: 'assistant',
+        content: '',
         round_number: 1
       )
 
@@ -20,15 +22,15 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
       expect(shell_message).not_to be_a(AssistantMessage)
 
       # Step 2: During streaming, content is updated incrementally
-      shell_message.update!(content: "Hello, ")
-      shell_message.update!(content: "Hello, world!")
+      shell_message.update!(content: 'Hello, ')
+      shell_message.update!(content: 'Hello, world!')
 
       # Message is still a base Message, not AssistantMessage
       expect(Message.find(shell_message.id).type).to be_nil
 
       # Step 3: persist_message_completion promotes to AssistantMessage
       shell_message.update_columns(
-        type: "AssistantMessage",
+        type: 'AssistantMessage',
         conversation_participant_id: participant1.id,
         input_tokens: 10,
         output_tokens: 20
@@ -44,8 +46,8 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
     end
   end
 
-  describe "Concurrent message creation" do
-    it "handles multiple participants creating messages simultaneously" do
+  describe 'Concurrent message creation' do
+    it 'handles multiple participants creating messages simultaneously' do
       # Simulate concurrent message creation
       message1 = nil
       message2 = nil
@@ -55,8 +57,8 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
           message1 = AssistantMessage.create!(
             conversation: conversation.reload,
             conversation_participant: participant1,
-            role: "assistant",
-            content: "Participant 1 message",
+            role: 'assistant',
+            content: 'Participant 1 message',
             round_number: 1
           )
         end
@@ -67,8 +69,8 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
           message2 = AssistantMessage.create!(
             conversation: conversation.reload,
             conversation_participant: participant2,
-            role: "assistant",
-            content: "Participant 2 message",
+            role: 'assistant',
+            content: 'Participant 2 message',
             round_number: 1
           )
         end
@@ -92,14 +94,14 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
     end
   end
 
-  describe "Failed streaming scenarios" do
-    it "handles messages that fail during streaming" do
+  describe 'Failed streaming scenarios' do
+    it 'handles messages that fail during streaming' do
       # Create a shell that simulates a failed stream
       failed_shell = Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "",
-        metadata: { status: "streaming", error: "Connection lost" }
+        role: 'assistant',
+        content: '',
+        metadata: { status: 'streaming', error: 'Connection lost' }
       )
 
       # Message remains as base Message type
@@ -112,13 +114,13 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
       expect(conversation.current_round).to eq(1)
     end
 
-    it "handles partial participant assignment failure" do
+    it 'handles partial participant assignment failure' do
       # Create message without participant (simulating assignment failure)
       orphan_message = AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: nil,
-        role: "assistant",
-        content: "Orphaned message",
+        role: 'assistant',
+        content: 'Orphaned message',
         round_number: 1
       )
 
@@ -130,7 +132,7 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
     end
   end
 
-  describe "Round number edge cases" do
+  describe 'Round number edge cases' do
     before do
       # Force creation of participants
       participant1
@@ -138,26 +140,27 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
       # Ensure we have exactly 2 participants for these tests
       expect(conversation.participants.count).to eq(2)
     end
+
     it "automatically sets round_number from conversation's current_round" do
       conversation.update!(current_round: 3)
 
       message = AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant1,
-        role: "assistant",
-        content: "Auto round number"
+        role: 'assistant',
+        content: 'Auto round number'
       )
 
       # The before_create callback should set round_number
       expect(message.round_number).to eq(3)
     end
 
-    it "handles messages with explicitly set round_number" do
+    it 'handles messages with explicitly set round_number' do
       message = AssistantMessage.new(
         conversation: conversation,
         conversation_participant: participant1,
-        role: "assistant",
-        content: "Explicit round",
+        role: 'assistant',
+        content: 'Explicit round',
         round_number: 5
       )
 
@@ -167,17 +170,17 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
       expect(message.round_number).to eq(5)
     end
 
-    it "shows round advancement logic behavior with incomplete rounds" do
+    it 'shows round advancement logic behavior with incomplete rounds' do
       # Start with current_round = 1
       expect(conversation.current_round).to eq(1)
       expect(conversation.participants.count).to eq(2)
 
       # Create a message for round 2 (future round) - only 1 of 2 participants
-      future_message = AssistantMessage.create!(
+      AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant1,
-        role: "assistant",
-        content: "Future round",
+        role: 'assistant',
+        content: 'Future round',
         round_number: 2
       )
 
@@ -189,8 +192,8 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
       AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant2,
-        role: "assistant",
-        content: "Round 2 participant 2",
+        role: 'assistant',
+        content: 'Round 2 participant 2',
         round_number: 2
       )
 
@@ -200,45 +203,45 @@ RSpec.describe "AssistantMessage STI Edge Cases", type: :model do
     end
   end
 
-  describe "Query scope validation" do
+  describe 'Query scope validation' do
     before do
       # Create a mix of message types
-      create(:message, conversation: conversation, role: "system")
-      create(:message, conversation: conversation, role: "user")
+      create('message', conversation: conversation, role: 'system')
+      create('message', conversation: conversation, role: 'user')
 
       # Regular assistant message (not promoted)
       Message.create!(
         conversation: conversation,
-        role: "assistant",
-        content: "Not finalized"
+        role: 'assistant',
+        content: 'Not finalized'
       )
 
       # Finalized assistant messages
       AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant1,
-        role: "assistant",
-        content: "Finalized 1",
+        role: 'assistant',
+        content: 'Finalized 1',
         round_number: 1
       )
 
       AssistantMessage.create!(
         conversation: conversation,
         conversation_participant: participant2,
-        role: "assistant",
-        content: "Finalized 2",
+        role: 'assistant',
+        content: 'Finalized 2',
         round_number: 1
       )
     end
 
-    it "correctly filters messages by type" do
+    it 'correctly filters messages by type' do
       expect(conversation.messages.count).to eq(5)
-      expect(conversation.messages.where(role: "assistant").count).to eq(3)
+      expect(conversation.messages.where(role: 'assistant').count).to eq(3)
       expect(conversation.assistant_messages.count).to eq(2) # Only finalized
 
       # Verify the association is working correctly
       expect(conversation.assistant_messages).to all(be_a(AssistantMessage))
-      expect(conversation.assistant_messages.pluck(:type).uniq).to eq([ "AssistantMessage" ])
+      expect(conversation.assistant_messages.pluck(:type).uniq).to eq(['AssistantMessage'])
     end
   end
 end

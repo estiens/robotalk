@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'vcr'
 
 VCR.configure do |config|
-  config.cassette_library_dir = "spec/vcr_cassettes"
+  config.cassette_library_dir = 'spec/vcr_cassettes'
   config.hook_into :webmock
   config.configure_rspec_metadata!
 
   # Filter out sensitive data
-  config.filter_sensitive_data('<OPENROUTER_API_KEY>') { ENV['OPENROUTER_API_KEY'] }
-  config.filter_sensitive_data('<OPENAI_API_KEY>') { ENV['OPENAI_API_KEY'] }
-  config.filter_sensitive_data('<ANTHROPIC_API_KEY>') { ENV['ANTHROPIC_API_KEY'] }
-  config.filter_sensitive_data('<GEMINI_API_KEY>') { ENV['GEMINI_API_KEY'] }
-  config.filter_sensitive_data('<DEEPSEEK_API_KEY>') { ENV['DEEPSEEK_API_KEY'] }
+  config.filter_sensitive_data('<OPENROUTER_API_KEY>') { ENV.fetch('OPENROUTER_API_KEY', nil) }
+  config.filter_sensitive_data('<OPENAI_API_KEY>') { ENV.fetch('OPENAI_API_KEY', nil) }
+  config.filter_sensitive_data('<ANTHROPIC_API_KEY>') { ENV.fetch('ANTHROPIC_API_KEY', nil) }
+  config.filter_sensitive_data('<GEMINI_API_KEY>') { ENV.fetch('GEMINI_API_KEY', nil) }
+  config.filter_sensitive_data('<DEEPSEEK_API_KEY>') { ENV.fetch('DEEPSEEK_API_KEY', nil) }
 
   # STRICT MODE: Prevent external API calls outside of VCR cassettes
   # This ensures all external API calls are either recorded or replayed
@@ -19,16 +21,16 @@ VCR.configure do |config|
   # Use :once mode for strict recording - record if cassette doesn't exist,
   # error if trying to make new requests when cassette exists
   record_mode = case ENV['VCR_RECORD_MODE']&.to_sym
-  when :all then :all       # Re-record everything
-  when :none then :none     # Never record, only replay
-  when :new_episodes then :new_episodes  # Add new interactions to existing cassettes
-  else :once                # Default: record once, then replay
-  end
+                when :all then :all       # Re-record everything
+                when :none then :none     # Never record, only replay
+                when :new_episodes then :new_episodes # Add new interactions to existing cassettes
+                else :once # Default: record once, then replay
+                end
 
   config.default_cassette_options = {
     record: record_mode,
     # Strict request matching to prevent cassette mismatches
-    match_requests_on: [ :method, :uri, :body, :headers ],
+    match_requests_on: %i[method uri body headers],
     allow_playback_repeats: true,
     preserve_exact_body_bytes: true,
     # Serialize with YAML for better readability and debugging
@@ -41,7 +43,7 @@ VCR.configure do |config|
   config.ignore_request do |request|
     uri = URI.parse(request.uri)
     # Ignore localhost requests (Capybara server, Selenium WebDriver, etc.)
-    uri.host == '127.0.0.1' || uri.host == 'localhost'
+    ['127.0.0.1', 'localhost'].include?(uri.host)
   end
 
   # Add better error messages for unhandled requests

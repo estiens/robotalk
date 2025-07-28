@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSystemPromptsAndTopicToConversations < ActiveRecord::Migration[8.0]
   def change
     add_column :conversations, :conversation_topic, :text

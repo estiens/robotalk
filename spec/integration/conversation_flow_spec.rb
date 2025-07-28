@@ -1,41 +1,43 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Conversation Flow", type: :model do
-  let(:user) { User.create!(email: "test@example.com", password: "password") }
+RSpec.describe 'Conversation Flow', type: :model do
+  let(:user) { User.create!(email: 'test@example.com', password: 'password') }
   let(:conversation) do
     Conversation.create!(
       user: user,
-      conversation_topic: "AI and the Future",
+      conversation_topic: 'AI and the Future',
       max_rounds: 3,
       participants_attributes: [
-        { name: "Alice", model_id: "openai/gpt-4o-mini", turn_order: 1 },
-        { name: "Bob", model_id: "anthropic/claude-3-haiku", turn_order: 2 }
+        { name: 'Alice', model_id: 'openai/gpt-4o-mini', turn_order: 1 },
+        { name: 'Bob', model_id: 'anthropic/claude-3-haiku', turn_order: 2 }
       ]
     )
   end
 
-  let(:alice) { conversation.participants.find_by(name: "Alice") }
-  let(:bob) { conversation.participants.find_by(name: "Bob") }
+  let(:alice) { conversation.participants.find_by(name: 'Alice') }
+  let(:bob) { conversation.participants.find_by(name: 'Bob') }
 
-  describe "initial state" do
-    it "starts with correct initial values" do
+  describe 'initial state' do
+    it 'starts with correct initial values' do
       expect(conversation.current_round).to eq(1)
-      expect(conversation.status).to eq("pending")
+      expect(conversation.status).to eq('pending')
       expect(conversation.messages.count).to eq(0)
       expect(conversation.can_start?).to be true
       expect(conversation.can_continue?).to be true
     end
 
-    it "determines first speaker correctly" do
+    it 'determines first speaker correctly' do
       expect(conversation.current_speaker).to eq(alice)
     end
   end
 
-  describe "speaker order and round management" do
+  describe 'speaker order and round management' do
     before do
       # Mock LlmService to avoid actual API calls
-      allow(LlmService).to receive(:new) do |conv, participant|
-        double("LlmService", generate_response: create_mock_message_for(participant))
+      allow(LlmService).to receive(:new) do |_conv, participant|
+        double('LlmService', generate_response: create_mock_message_for(participant))
       end
     end
 
@@ -50,7 +52,7 @@ RSpec.describe "Conversation Flow", type: :model do
       )
     end
 
-    it "follows correct speaker order within a round" do
+    it 'follows correct speaker order within a round' do
       # Round 1: Alice speaks first
       expect(conversation.current_speaker).to eq(alice)
       expect(conversation.current_round).to eq(1)
@@ -74,7 +76,7 @@ RSpec.describe "Conversation Flow", type: :model do
       expect(conversation.current_speaker).to eq(alice)
     end
 
-    it "tracks round completion correctly" do
+    it 'tracks round completion correctly' do
       expect(conversation.round_complete?).to be false
 
       # Alice speaks
@@ -87,16 +89,16 @@ RSpec.describe "Conversation Flow", type: :model do
       expect(conversation.current_round).to eq(2)
     end
 
-    it "completes conversation after max rounds" do
+    it 'completes conversation after max rounds' do
       # Complete 3 rounds (6 total messages)
       6.times { conversation.have_current_speaker_respond! }
 
       expect(conversation.current_round).to eq(4) # Past max_rounds
-      expect(conversation.status).to eq("complete")
+      expect(conversation.status).to eq('complete')
       expect(conversation.can_continue?).to be false
     end
 
-    it "tracks has_spoken_in_round correctly" do
+    it 'tracks has_spoken_in_round correctly' do
       expect(alice.has_spoken_in_round?(1)).to be false
       expect(bob.has_spoken_in_round?(1)).to be false
 
@@ -116,7 +118,7 @@ RSpec.describe "Conversation Flow", type: :model do
     end
   end
 
-  describe "message history" do
+  describe 'message history' do
     before do
       # Create some test messages
       AssistantMessage.create!(
@@ -143,59 +145,59 @@ RSpec.describe "Conversation Flow", type: :model do
         role: Message::ROLE_ASSISTANT,
         model_id: alice.model_id,
         round_number: 2,
-        content: "How are you doing today?"
+        content: 'How are you doing today?'
       )
     end
 
-    it "builds conversation history correctly" do
+    it 'builds conversation history correctly' do
       history = conversation.conversation_history
 
       expect(history).to include("Alice: Hello, I'm Alice!")
       expect(history).to include("Bob: Nice to meet you Alice, I'm Bob!")
-      expect(history).to include("Alice: How are you doing today?")
+      expect(history).to include('Alice: How are you doing today?')
 
       # Should be in chronological order
       lines = history.split("\n\n")
       expect(lines[0]).to eq("Alice: Hello, I'm Alice!")
       expect(lines[1]).to eq("Bob: Nice to meet you Alice, I'm Bob!")
-      expect(lines[2]).to eq("Alice: How are you doing today?")
+      expect(lines[2]).to eq('Alice: How are you doing today?')
     end
 
-    it "respects history limit" do
+    it 'respects history limit' do
       history = conversation.conversation_history(limit: 2)
       lines = history.split("\n\n")
 
       expect(lines.count).to eq(2)
       expect(lines[0]).to eq("Bob: Nice to meet you Alice, I'm Bob!")
-      expect(lines[1]).to eq("Alice: How are you doing today?")
+      expect(lines[1]).to eq('Alice: How are you doing today?')
     end
   end
 
-  describe "LlmService integration" do
-    let(:mock_client) { double("OpenRouter::Client") }
-    let(:mock_response) { { "choices" => [ { "message" => { "content" => "Test response content" } } ] } }
+  describe 'LlmService integration' do
+    let(:mock_client) { double('OpenRouter::Client') }
+    let(:mock_response) { { 'choices' => [{ 'message' => { 'content' => 'Test response content' } }] } }
 
     before do
       allow(OpenRouter::Client).to receive(:new).and_return(mock_client)
       allow(mock_client).to receive(:complete).and_return(mock_response)
     end
 
-    it "sends correct messages to OpenRouter" do
+    it 'sends correct messages to OpenRouter' do
       service = LlmService.new(conversation, alice)
 
       expect(OpenRouter::Client).to receive(:new)
       expect(mock_client).to receive(:complete).with(
         array_including(
-          hash_including(role: "system", content: alice.system_prompt_with_topic),
-          hash_including(role: "user", content: "Please introduce yourself and start discussing: AI and the Future")
+          hash_including(role: 'system', content: alice.system_prompt_with_topic),
+          hash_including(role: 'user', content: 'Please introduce yourself and start discussing: AI and the Future')
         ),
-        hash_including(model: "openai/gpt-4o-mini")
+        hash_including(model: 'openai/gpt-4o-mini')
       )
 
       service.generate_response
     end
 
-    it "includes conversation history in subsequent calls" do
+    it 'includes conversation history in subsequent calls' do
       # Add a message to create history
       AssistantMessage.create!(
         conversation: conversation,
@@ -203,14 +205,14 @@ RSpec.describe "Conversation Flow", type: :model do
         role: Message::ROLE_ASSISTANT,
         model_id: alice.model_id,
         round_number: 1,
-        content: "Previous message content"
+        content: 'Previous message content'
       )
 
       service = LlmService.new(conversation, bob)
 
       expect(mock_client).to receive(:complete).with(
         array_including(
-          hash_including(role: "assistant", content: "Previous message content", name: "Alice")
+          hash_including(role: 'assistant', content: 'Previous message content', name: 'Alice')
         ),
         anything
       )
@@ -218,7 +220,7 @@ RSpec.describe "Conversation Flow", type: :model do
       service.generate_response
     end
 
-    it "creates AssistantMessage with correct attributes" do
+    it 'creates AssistantMessage with correct attributes' do
       service = LlmService.new(conversation, alice)
       message = service.generate_response
 
@@ -228,40 +230,39 @@ RSpec.describe "Conversation Flow", type: :model do
       expect(message.role).to eq(Message::ROLE_ASSISTANT)
       expect(message.model_id).to eq(alice.model_id)
       expect(message.round_number).to eq(conversation.current_round)
-      expect(message.content).to eq("Test response content")
+      expect(message.content).to eq('Test response content')
     end
   end
 
-  describe "error handling" do
+  describe 'error handling' do
     before do
       # Mock OpenRouter for this test
       allow(OpenRouter::Client).to receive(:new) do
-        client = double("OpenRouter::Client")
-        allow(client).to receive(:complete) do |messages, options|
-          { "choices" => [ { "message" => { "content" => "Mock response" } } ] }
-        end
+        client = double('OpenRouter::Client')
+        allow(client).to receive(:complete).and_return({ 'choices' => [{ 'message' => { 'content' => 'Mock response' } }] })
         client
       end
     end
 
-    it "handles missing current speaker gracefully" do
+    it 'handles missing current speaker gracefully' do
       # Use the actual have_current_speaker_respond! method which handles advancement
-      6.times do |i|
+      6.times do |_i|
         break unless conversation.current_speaker # Stop when no more speakers
+
         conversation.have_current_speaker_respond!
       end
 
       expect(conversation.current_speaker).to be_nil
-      expect { conversation.have_current_speaker_respond! }.to raise_error("No current speaker available")
+      expect { conversation.have_current_speaker_respond! }.to raise_error('No current speaker available')
     end
   end
 
-  describe "full conversation generation", :vcr do
-    it "generates complete conversation automatically with real API calls" do
-      VCR.use_cassette("conversation_flow/full_generation", record: :new_episodes) do
+  describe 'full conversation generation', :vcr do
+    it 'generates complete conversation automatically with real API calls' do
+      VCR.use_cassette('conversation_flow/full_generation', record: :new_episodes) do
         conversation.generate_full_conversation!
 
-        expect(conversation.status).to eq("complete")
+        expect(conversation.status).to eq('complete')
         expect(conversation.current_round).to eq(4) # Past max_rounds of 3
         expect(conversation.messages.count).to eq(6) # 3 rounds × 2 participants
 

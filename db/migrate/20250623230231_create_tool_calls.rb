@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateToolCalls < ActiveRecord::Migration[8.0]
   def change
     create_table :tool_calls do |t|

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'ostruct'
 
-RSpec.describe 'Conversation Form', type: :feature, vcr: true do
+RSpec.describe 'Conversation Form', :vcr do
   before do
     # Stub the call to RubyLLM::Models.all to prevent live API calls in these feature specs
     # and ensure consistent data for the model dropdowns.

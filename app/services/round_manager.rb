@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RoundManager
   attr_reader :conversation
 

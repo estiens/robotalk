@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe 'Models', type: :request do
+RSpec.describe 'Models' do
   before do
     # Stub RubyLLM::Models.all to return test data with all required attributes
     models_data = [
@@ -9,9 +11,9 @@ RSpec.describe 'Models', type: :request do
         name: 'OpenAI: GPT-4o',
         provider: 'openai',
         family: 'GPT-4',
-        context_window: 128000,
+        context_window: 128_000,
         max_output_tokens: 4096,
-        capabilities: [ 'text-generation', 'vision' ],
+        capabilities: %w[text-generation vision],
         pricing: OpenStruct.new(
           text_tokens: OpenStruct.new(
             standard: OpenStruct.new(
@@ -26,9 +28,9 @@ RSpec.describe 'Models', type: :request do
         name: 'Anthropic: Claude 3.5 Sonnet',
         provider: 'anthropic',
         family: 'Claude',
-        context_window: 200000,
+        context_window: 200_000,
         max_output_tokens: 4096,
-        capabilities: [ 'text-generation' ],
+        capabilities: ['text-generation'],
         pricing: OpenStruct.new(
           text_tokens: OpenStruct.new(
             standard: OpenStruct.new(

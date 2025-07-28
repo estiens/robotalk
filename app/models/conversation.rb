@@ -1,16 +1,20 @@
+# frozen_string_literal: true
+
 class Conversation < ApplicationRecord
   include TurboStreamable
 
   belongs_to :user
   has_many :messages, dependent: :destroy
-  has_many :assistant_messages, -> { order(created_at: :asc) }, class_name: "AssistantMessage"
-  has_many :participants, class_name: "ConversationParticipant", dependent: :destroy
+  # All messages are assistant messages now
+  alias assistant_messages messages
+  has_many :participants, class_name: 'ConversationParticipant', dependent: :destroy
 
   enum :status, {
-    pending: "pending",
-    in_progress: "in_progress",
-    complete: "complete",
-    failed: "failed"
+    pending: 'pending',
+    in_progress: 'in_progress',
+    generating: 'generating',
+    complete: 'complete',
+    failed: 'failed'
   }
 
   validates :max_rounds, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 50 }
@@ -29,6 +33,7 @@ class Conversation < ApplicationRecord
 
   def start!
     return false unless can_start?
+
     update!(status: :in_progress)
     true
   end
@@ -46,9 +51,7 @@ class Conversation < ApplicationRecord
     round_manager.next_speaker
   end
 
-  def next_speaker
-    round_manager.next_speaker
-  end
+  delegate :next_speaker, to: :round_manager
 
   def can_continue?
     !complete? && !failed? && next_speaker.present?
@@ -69,6 +72,13 @@ class Conversation < ApplicationRecord
     RoundService.new(self).generate_full_conversation!
   end
 
+  # Expected by AssistantMessage callbacks
+  def process_new_assistant_message
+    # This method is called when an AssistantMessage is created
+    # Currently handled by RoundService, but keeping for compatibility
+    Rails.logger.info '[Conversation] Processing new assistant message'
+  end
+
   private
 
   def round_manager
@@ -76,12 +86,12 @@ class Conversation < ApplicationRecord
   end
 
   def must_have_at_least_two_participants
-    errors.add(:participants, "must have at least 2 participants") if participants.size < 2
+    errors.add(:participants, 'must have at least 2 participants') if participants.size < 2
   end
 
   def set_defaults
     self.status = :pending if status.blank?
-    self.dialogue_instructions = "Have a thoughtful conversation about the given topic, exploring different perspectives and ideas." if dialogue_instructions.blank?
+    self.dialogue_instructions = 'Have a thoughtful conversation about the given topic, exploring different perspectives and ideas.' if dialogue_instructions.blank?
     self.max_rounds = 10 if max_rounds.blank?
     self.current_round = 1 if current_round.blank?
   end

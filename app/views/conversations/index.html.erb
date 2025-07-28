@@ -26,10 +26,10 @@
       
       <div class="place-items-center stat">
         <div class="text-accent stat-figure">
-          <i class="ph ph-chat-circle text-4xl"></i>
+          <i class="text-4xl ph ph-chat-circle"></i>
         </div>
         <div class="text-neutral-content/70 stat-title">Total Messages</div>
-        <div class="text-accent stat-value"><%= Message.where(conversation: @conversations).count %></div>
+        <div class="text-accent stat-value"><%= AssistantMessage.where(conversation: @conversations).count %></div>
         <div class="text-neutral-content/70 stat-desc">All conversations</div>
       </div>
       

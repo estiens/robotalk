@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RoundService
   attr_reader :conversation
 
@@ -9,7 +11,7 @@ class RoundService
     conversation.start! if conversation.pending?
 
     speaker = conversation.current_speaker
-    raise "No current speaker available" unless speaker
+    raise 'No current speaker available' unless speaker
 
     Rails.logger.info "[RoundService] #{speaker.name} responding in round #{conversation.current_round}"
 
@@ -17,7 +19,7 @@ class RoundService
     message = LlmService.new(conversation, speaker).generate_response
 
     # Check if it was an error message
-    if message.metadata&.dig("is_error")
+    if message.metadata&.dig('is_error')
       Rails.logger.error "[RoundService] #{speaker.name} failed to respond in round #{conversation.current_round}"
       raise "LLM service failed for #{speaker.name}: #{message.metadata['error']}"
     else
@@ -45,7 +47,7 @@ class RoundService
       message = LlmService.new(conversation, participant).generate_response
 
       # Check if it was an error message
-      if message.metadata&.dig("is_error")
+      if message.metadata&.dig('is_error')
         Rails.logger.error "[RoundService] #{participant.name} failed to respond in round #{current_round_number}"
         raise "LLM service failed for #{participant.name}: #{message.metadata['error']}"
       else
@@ -75,7 +77,7 @@ class RoundService
 
     conversation.complete!
     Rails.logger.info "[RoundService] Full conversation completed after #{conversation.max_rounds} rounds"
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error "[RoundService] Failed to generate conversation #{conversation.id}: #{e.message}"
     conversation.fail!
     raise e
@@ -98,9 +100,9 @@ class RoundService
     conversation.update!(current_round: new_round)
 
     # Check if conversation is complete
-    if conversation.current_round > conversation.max_rounds
-      conversation.complete!
-      Rails.logger.info "[RoundService] Conversation complete after #{conversation.max_rounds} rounds"
-    end
+    return unless conversation.current_round > conversation.max_rounds
+
+    conversation.complete!
+    Rails.logger.info "[RoundService] Conversation complete after #{conversation.max_rounds} rounds"
   end
 end

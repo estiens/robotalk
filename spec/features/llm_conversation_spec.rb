@@ -1,19 +1,24 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe 'LLM Conversation', type: :feature do
+RSpec.describe 'LLM Conversation' do
   include CapybaraHelpers
   before do
     allow(RubyLLM::Models).to receive(:all).and_return([
-      double(id: 'google/gemini-2.0-flash-001', name: 'Google Gemini 2.0 Flash', provider: 'Google'),
-      double(id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI')
-    ])
+                                                         double(id: 'google/gemini-2.0-flash-001',
+                                                                name: 'Google Gemini 2.0 Flash', provider: 'Google'),
+                                                         double(id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini',
+                                                                provider: 'OpenAI')
+                                                       ])
   end
 
-  xit 'creates and runs a conversation between two LLMs - PENDING: investigate streaming/content issues', vcr: true, js: true, slow: true do
+  xit 'creates and runs a conversation between two LLMs - PENDING: investigate streaming/content issues', :js, :slow,
+      :vcr do
     # Skip if no API key for recording
-    skip "No API key available for recording" unless ENV['OPENROUTER_API_KEY'].present?
+    skip 'No API key available for recording' if ENV['OPENROUTER_API_KEY'].blank?
 
-    user = User.find_or_create_by(email: "anonymous@roboconvo.local") { |u| u.password = SecureRandom.hex(16) }
+    user = User.find_or_create_by(email: 'anonymous@roboconvo.local') { |u| u.password = SecureRandom.hex(16) }
     conversation = Conversation.create!(
       user: user,
       conversation_topic: 'Discuss the future of AI',
@@ -36,18 +41,18 @@ RSpec.describe 'LLM Conversation', type: :feature do
     visit conversation_path(conversation)
 
     # Should see the topic clearly displayed using helper
-    wait_for_test_element("conversation-topic")
+    wait_for_test_element('conversation-topic')
 
     # Start the conversation using helper
-    wait_for_test_element("start-conversation-button", timeout: QUICK_TIMEOUT)
-    click_test_element("start-conversation-button")
+    wait_for_test_element('start-conversation-button', timeout: QUICK_TIMEOUT)
+    click_test_element('start-conversation-button')
 
     # Wait for the conversation to start using helper
     wait_for_round_indicator
 
     # Wait for continue button after first message and click it
-    wait_for_test_element("continue-conversation-button", timeout: LONG_TIMEOUT)
-    click_test_element("continue-conversation-button")
+    wait_for_test_element('continue-conversation-button', timeout: LONG_TIMEOUT)
+    click_test_element('continue-conversation-button')
 
     # Verify conversation progressed
     wait_for_round_indicator

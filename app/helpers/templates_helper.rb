@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module TemplatesHelper
   def dialogue_types_for_select
     ConversationTemplates.dialogue_types_by_category.map do |category, types|
       [
         category,
-        types.map { |key, type| [ type[:name], key ] }
+        types.map { |key, type| [type[:name], key] }
       ]
     end
   end
@@ -12,14 +14,14 @@ module TemplatesHelper
     ConversationTemplates.characters_by_category.map do |category, characters|
       [
         category,
-        characters.map { |key, character| [ character[:name], key ] }
+        characters.map { |key, character| [character[:name], key] }
       ]
     end
   end
 
   def suggested_combinations_for_select
     ConversationTemplates::SUGGESTED_COMBINATIONS.map do |combo|
-      [ combo[:name], combo[:name] ]
+      [combo[:name], combo[:name]]
     end
   end
 
