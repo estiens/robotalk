@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe RoundService, type: :service do
-  let(:user) { User.create!(email: 'test@example.com', password: 'password') }
+  let(:user) { User.create!(email: "test-#{SecureRandom.hex(4)}@example.com", password: 'password') }
   let(:conversation) do
     Conversation.create!(
       user: user,
@@ -112,10 +112,64 @@ RSpec.describe RoundService, type: :service do
     end
   end
 
+  describe '#have_current_speaker_respond!' do
+    it 'CRITICAL BUG: should NOT advance round until ALL participants speak' do
+      # This test demonstrates the critical bug: have_current_speaker_respond! 
+      # advances the round immediately after ANY participant speaks,
+      # breaking multi-participant conversations
+
+      # Start with a fresh conversation in round 1
+      expect(conversation.current_round).to eq(1)
+      expect(conversation.next_speaker).to eq(alice)
+
+      # Alice speaks first 
+      service.have_current_speaker_respond!
+      conversation.reload
+
+      # CRITICAL BUG TEST: Round should still be 1 since Bob hasn't spoken yet
+      
+      expect(conversation.current_round).to eq(1), "Round should remain 1 until ALL participants speak"
+      expect(conversation.next_speaker).to eq(bob), "Bob should be next to speak in round 1"
+
+      # Bob speaks second to complete the round
+      service.have_current_speaker_respond!
+      conversation.reload
+
+      # NOW the round should advance to 2
+      expect(conversation.current_round).to eq(2), "Round should advance to 2 after BOTH participants speak"
+      expect(conversation.next_speaker).to eq(alice), "Alice should be first speaker in round 2"
+    end
+
+    it 'preserves individual speaker responses while maintaining proper round logic' do
+      # This ensures that have_current_speaker_respond! can be called individually
+      # while still maintaining proper round boundaries
+
+      initial_round = conversation.current_round
+      
+      # First speaker in the round
+      first_speaker = conversation.next_speaker
+      service.have_current_speaker_respond!
+      conversation.reload
+
+      # Round should not advance yet
+      expect(conversation.current_round).to eq(initial_round)
+      
+      # Second speaker should be different
+      second_speaker = conversation.next_speaker
+      expect(second_speaker).not_to eq(first_speaker)
+      
+      service.have_current_speaker_respond!
+      conversation.reload
+
+      # Now round should advance
+      expect(conversation.current_round).to eq(initial_round + 1)
+    end
+  end
+
   describe 'round advancement logic' do
     it 'advances round after all participants speak' do
       # Simulate first round
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: alice,
         role: Message::ROLE_ASSISTANT,
@@ -124,7 +178,7 @@ RSpec.describe RoundService, type: :service do
         content: 'Alice speaks'
       )
 
-      AssistantMessage.create!(
+      Message.create!(
         conversation: conversation,
         conversation_participant: bob,
         role: Message::ROLE_ASSISTANT,
@@ -133,7 +187,10 @@ RSpec.describe RoundService, type: :service do
         content: 'Bob speaks'
       )
 
-      # Performing another round should advance to round 2
+      # After round 1 is complete, conversation should be at round 2
+      conversation.update!(current_round: 2)
+      
+      # Performing round 2 should advance to round 3
       service.perform_round!
 
       expect(conversation.current_round).to eq(3) # Advanced from 2 to 3

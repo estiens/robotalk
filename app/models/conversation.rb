@@ -46,6 +46,13 @@ class Conversation < ApplicationRecord
     update!(status: :failed)
   end
 
+  def reset!
+    return false unless failed? || complete?
+    
+    update!(status: :pending)
+    true
+  end
+
   # Delegate complex operations to services
   def current_speaker
     round_manager.next_speaker

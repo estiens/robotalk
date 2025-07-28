@@ -194,5 +194,5 @@ Pre-configured pairings like "Classic Debate" (Analytical + Philosophical) or "C
 - `app/javascript/controllers/` - Stimulus controllers for interactive behavior
 
 ## Documentation References
-- `TODO.md` - Comprehensive improvement plan for conversation flow, round management, and UX enhancements
+- **`TODO.md`** - **CRITICAL**: Comprehensive development TODO list with immediate fixes needed. Contains all identified bugs, performance issues, and security vulnerabilities that must be addressed before production deployment.
 - `docs/ruby_llm.txt` - Detailed documentation for the RubyLLM gem integration patterns and usage

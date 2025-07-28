@@ -91,4 +91,47 @@ module ConversationsHelper
   def content_missing_count(conversation)
     conversation.messages.where(role: 'assistant').count { |m| m.content.blank? }
   end
+
+  def smart_truncate_message(content, max_length: 800)
+    return content if content.length <= max_length
+
+    # Find a good breaking point near the max length
+    # Look for sentence endings first (. ! ?)
+    sentence_endings = ['. ', '! ', '? ']
+    
+    # Try to find the last sentence ending before max_length
+    best_break = 0
+    sentence_endings.each do |ending|
+      content[0...max_length].split(ending).tap do |parts|
+        if parts.length > 1
+          # Reconstruct up to the last complete sentence
+          candidate_break = parts[0...-1].join(ending).length + ending.length
+          best_break = [best_break, candidate_break].max
+        end
+      end
+    end
+    
+    # If no sentence break found, try paragraph breaks
+    if best_break == 0
+      paragraph_break = content[0...max_length].rindex("\n\n")
+      best_break = paragraph_break + 2 if paragraph_break
+    end
+    
+    # If still no good break, try single line breaks
+    if best_break == 0
+      line_break = content[0...max_length].rindex("\n")
+      best_break = line_break + 1 if line_break
+    end
+    
+    # If still no break found, try word boundaries
+    if best_break == 0
+      word_break = content[0...max_length].rindex(' ')
+      best_break = word_break + 1 if word_break
+    end
+    
+    # Fallback to character truncation if all else fails
+    break_point = best_break > 0 ? best_break : max_length
+    
+    content[0...break_point].rstrip
+  end
 end

@@ -33,7 +33,7 @@
               </div>
               <% if i < conversation.participants.count - 1 %>
                 <div class="hidden sm:flex items-center">
-                  <div class="flex justify-center items-center bg-accent shadow-lg rounded-full w-8 h-8 text-accent-content">
+                  <div class="flex justify-center items-center bg-accent shadow-lg rounded-full w-10 h-10 sm:w-8 sm:h-8 text-accent-content">
                     <i class="text-lg ph ph-lightning"></i>
                   </div>
                 </div>
@@ -103,39 +103,49 @@
             <!-- Round Progress Circle -->
             <div class="flex items-center space-x-4">
               <div class="relative">
-                <div class="flex justify-center items-center bg-primary shadow-2xl rounded-2xl w-16 h-16">
-                  <span class="font-bold text-primary-content text-2xl">
-                    <%= [conversation.current_round, 1].max %>
-                  </span>
-                </div>
-                <!-- Animated Ring -->
-                <div class="absolute inset-0 bg-primary/30 rounded-2xl animate-ping"></div>
+                <% assistant_messages_count = conversation.messages.where(role: 'assistant').count %>
+                <% if assistant_messages_count > 0 %>
+                  <div class="flex justify-center items-center bg-primary shadow-2xl rounded-2xl w-16 h-16">
+                    <span class="font-bold text-primary-content text-2xl">
+                      <%= conversation.current_round %>
+                    </span>
+                  </div>
+                  <!-- Animated Ring -->
+                  <div class="absolute inset-0 bg-primary/30 rounded-2xl animate-ping"></div>
+                <% else %>
+                  <div class="flex justify-center items-center bg-base-300 shadow-2xl rounded-2xl w-16 h-16">
+                    <i class="text-primary text-3xl ph ph-chat-circle"></i>
+                  </div>
+                <% end %>
               </div>
               <div>
                 <div class="font-bold text-neutral-content text-xl" data-test="round-indicator">
-                  Round <%= [conversation.current_round, 1].max %> / <%= conversation.max_rounds %>
+                  <% if assistant_messages_count > 0 %>
+                    Round <%= conversation.current_round %> / <%= conversation.max_rounds %>
+                  <% else %>
+                    Ready to Begin
+                  <% end %>
                 </div>
                 <div class="font-medium text-neutral-content/70 text-sm">
-                  <% assistant_messages_count = conversation.messages.where(role: 'assistant').count %>
                   <% if assistant_messages_count > 0 %>
                     <%= pluralize(assistant_messages_count, 'exchange', 'exchanges') %> complete
                   <% else %>
-                    Ready to begin dialogue
+                    <%= pluralize(conversation.max_rounds, 'round', 'rounds') %> planned
                   <% end %>
                 </div>
               </div>
             </div>
 
             <!-- Enhanced Progress Bar -->
-            <% if conversation.messages.any? %>
+            <% if assistant_messages_count > 0 %>
               <div class="hidden lg:block w-48">
                 <div class="flex justify-between mb-2 font-semibold text-neutral-content/70 text-sm">
-                  <span>Round <%= [conversation.current_round, 1].max %></span>
+                  <span>Round <%= conversation.current_round %></span>
                   <span>of <%= conversation.max_rounds %></span>
                 </div>
                 <div class="relative bg-neutral-focus shadow-inner rounded-full h-3 overflow-hidden">
                   <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500 ease-out" 
-                       style="width: <%= ([conversation.current_round, 1].max.to_f / conversation.max_rounds * 100).round(1) %>%">
+                       style="width: <%= (conversation.current_round.to_f / conversation.max_rounds * 100).round(1) %>%">
                   </div>
                   <div class="absolute inset-0 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full animate-pulse"></div>
                 </div>
@@ -158,7 +168,7 @@
               </div>
             <% elsif conversation.in_progress? %>
               <div class="flex items-center space-x-3 bg-warning/20 shadow-lg px-4 py-3 border-2 border-warning/30 rounded-2xl">
-                <div class="flex justify-center items-center bg-warning rounded-xl w-8 h-8 text-warning-content">
+                <div class="flex justify-center items-center bg-warning rounded-xl w-10 h-10 sm:w-8 sm:h-8 text-warning-content">
                   <div class="border-2 border-warning-content border-t-transparent rounded-full w-4 h-4 animate-spin"></div>
                 </div>
                 <span class="font-bold text-warning text-lg animate-pulse">AI is thinking...</span>

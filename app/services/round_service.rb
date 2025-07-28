@@ -8,7 +8,8 @@ class RoundService
   end
 
   def have_current_speaker_respond!
-    conversation.start! if conversation.pending?
+    was_pending = conversation.pending?
+    conversation.start! if was_pending
 
     speaker = conversation.current_speaker
     raise 'No current speaker available' unless speaker
@@ -27,12 +28,29 @@ class RoundService
 
       # Check if round is complete after this successful response
       if round_complete?
-        advance_round!
-        Rails.logger.info "[RoundService] Round #{conversation.current_round - 1} completed after #{speaker.name}'s response"
+        if advance_round!
+          Rails.logger.info "[RoundService] Round #{conversation.current_round - 1} completed after #{speaker.name}'s response"
+        else
+          Rails.logger.info "[RoundService] Round already advanced by another process after #{speaker.name}'s response"
+        end
       end
     end
 
     message
+  rescue StandardError => e
+    Rails.logger.error "[RoundService] Failed to have #{speaker&.name || 'unknown'} respond: #{e.message}"
+    
+    # Reset conversation state if we just started it and it failed
+    if was_pending && conversation.in_progress?
+      Rails.logger.info "[RoundService] Resetting conversation to pending state due to startup failure"
+      conversation.update!(status: :pending)
+    elsif conversation.in_progress?
+      # For ongoing conversations, mark as failed so user can reset or restart
+      Rails.logger.info "[RoundService] Marking conversation as failed due to LLM error"
+      conversation.fail!
+    end
+    
+    raise e
   end
 
   def perform_round!
@@ -56,9 +74,11 @@ class RoundService
     end
 
     # Advance to next round
-    advance_round!
-
-    Rails.logger.info "[RoundService] Round #{current_round_number} completed"
+    if advance_round!
+      Rails.logger.info "[RoundService] Round #{current_round_number} completed"
+    else
+      Rails.logger.info "[RoundService] Round #{current_round_number} already completed by another process"
+    end
   end
 
   def generate_full_conversation!
@@ -97,12 +117,26 @@ class RoundService
     new_round = current_round_number + 1
     Rails.logger.info "[RoundService] Advancing from round #{current_round_number} to #{new_round}"
 
-    conversation.update!(current_round: new_round)
+    # Use optimistic concurrency control to prevent race conditions
+    # Only advance if we're still in the expected round
+    rows_updated = Conversation.where(id: conversation.id, current_round: current_round_number)
+                              .update_all(current_round: new_round)
+
+    if rows_updated == 0
+      # Someone else already advanced the round
+      Rails.logger.warn "[RoundService] Race condition detected: round #{current_round_number} already advanced by another process"
+      conversation.reload # Refresh our local state
+      return false
+    end
+
+    # Refresh conversation state after successful update
+    conversation.reload
 
     # Check if conversation is complete
-    return unless conversation.current_round > conversation.max_rounds
+    return true unless conversation.current_round > conversation.max_rounds
 
     conversation.complete!
     Rails.logger.info "[RoundService] Conversation complete after #{conversation.max_rounds} rounds"
+    true
   end
 end

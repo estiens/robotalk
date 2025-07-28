@@ -48,17 +48,21 @@
               <% if should_truncate %>
                 <div data-controller="expandable-message">
                   <div data-expandable-message-target="preview">
-                    <%= simple_format(truncate(message.content, length: 800, separator: '. '), class: "leading-loose text-lg font-medium") %>
+                    <%= simple_format(smart_truncate_message(message.content), class: "leading-loose text-lg font-medium") %>
+                    <div class="mt-2 text-sm text-base-content/60 italic">
+                      Message truncated • <%= message.content.length - smart_truncate_message(message.content).length %> more characters
+                    </div>
                   </div>
                   <div data-expandable-message-target="full" class="hidden">
                     <%= simple_format(message.content, class: "leading-loose text-lg font-medium") %>
                   </div>
                   <div class="mt-4 text-center">
-                    <button class="btn btn-sm <%= is_first_participant ? 'btn-primary' : 'btn-secondary' %> btn-outline gap-2" 
+                    <button class="btn <%= is_first_participant ? 'btn-primary' : 'btn-secondary' %> btn-outline gap-2 min-h-[44px] min-w-[44px] sm:btn-sm" 
                             data-action="click->expandable-message#toggle"
                             data-expandable-message-target="toggleButton">
                       <i class="ph ph-caret-down"></i>
-                      Show Full Message
+                      <span class="hidden sm:inline">Show Full Message</span>
+                      <span class="sm:hidden">More</span>
                     </button>
                   </div>
                 </div>

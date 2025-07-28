@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_28_001300) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_202053) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -50,22 +50,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_001300) do
     t.integer "output_tokens"
     t.integer "conversation_participant_id"
     t.integer "round_number"
-    t.string "type"
+    t.index ["conversation_id", "round_number"], name: "index_messages_on_conversation_and_round"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["conversation_participant_id"], name: "index_messages_on_conversation_participant_id"
-  end
-
-  create_table "tool_calls", force: :cascade do |t|
-    t.integer "conversation_id", null: false
-    t.integer "message_id", null: false
-    t.string "tool_call_id"
-    t.string "name"
-    t.text "arguments"
-    t.text "result"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["conversation_id"], name: "index_tool_calls_on_conversation_id"
-    t.index ["message_id"], name: "index_tool_calls_on_message_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -82,6 +69,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_28_001300) do
   add_foreign_key "conversations", "users"
   add_foreign_key "messages", "conversation_participants"
   add_foreign_key "messages", "conversations"
-  add_foreign_key "tool_calls", "conversations"
-  add_foreign_key "tool_calls", "messages"
 end

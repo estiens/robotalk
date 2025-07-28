@@ -21,7 +21,33 @@ export default class extends Controller {
     this.updateToggleUI()
     this.updateButtonText()
     
+    // Listen for loading completion events
+    this.boundHandleLoadingComplete = this.handleLoadingComplete.bind(this)
+    document.addEventListener('conversation:loading:complete', this.boundHandleLoadingComplete)
+    
     // Don't auto-start on connect - let user explicitly toggle
+  }
+
+  disconnect() {
+    document.removeEventListener('conversation:loading:complete', this.boundHandleLoadingComplete)
+  }
+
+  handleLoadingComplete(event) {
+    if (event.detail.conversationId === this.conversationIdValue) {
+      console.log('Auto-continue: Received loading complete event')
+      
+      // Clear safety timeout
+      if (this.safetyTimeout) {
+        clearTimeout(this.safetyTimeout)
+        this.safetyTimeout = null
+      }
+      
+      // Reset processing flag and check if we should continue
+      this.isProcessing = false
+      setTimeout(() => {
+        this.checkAndContinue()
+      }, 1000)
+    }
   }
 
   toggle() {
@@ -76,7 +102,7 @@ export default class extends Controller {
     }
   }
 
-  async continueConversation() {
+  continueConversation() {
     if (!this.isActive) return
     
     // Prevent multiple simultaneous clicks
@@ -88,7 +114,6 @@ export default class extends Controller {
     console.log('Auto-continue: Starting conversation continuation')
     
     // Find and click the continue button
-    // button_to creates a form with a button inside, so we need to find the form first
     const continueForm = document.querySelector('form[action*="/continue"]')
     const continueButton = continueForm?.querySelector('button[type="submit"]')
     
@@ -98,93 +123,83 @@ export default class extends Controller {
       // Mark as processing
       this.isProcessing = true
       
-      // Set up a promise to wait for the streaming to complete
-      const streamingComplete = new Promise((resolve) => {
-        let messageFrameAdded = false
-        let streamingStarted = false
-        let timeoutId = null
+      try {
+        // Click the button - the new event system will handle completion
+        continueButton.click()
         
-        // Listen for the message frame being added (indicates streaming started)
-        const handleMessageFrame = (event) => {
-          const target = event.detail?.newStream?.target
-          if (target && target.includes('message_')) {
-            console.log('Auto-continue: Message frame added, streaming started')
-            messageFrameAdded = true
-            streamingStarted = true
-            
-            // Reset timeout now that streaming has started
-            if (timeoutId) clearTimeout(timeoutId)
-            timeoutId = setTimeout(() => {
-              console.log('Auto-continue: Streaming timeout after message frame')
-              cleanup()
-              resolve()
-            }, 30000) // 30 second timeout after streaming starts
-          }
-        }
-        
-        // Listen for the conversation frame being replaced (indicates round complete)
-        const handleConversationUpdate = (event) => {
-          const target = event.detail?.newStream?.target
-          if (target === 'conversation' && streamingStarted) {
-            console.log('Auto-continue: Conversation frame updated, round complete')
-            cleanup()
-            resolve()
-          }
-        }
-        
-        // Listen for streaming indicator being shown/hidden
-        const handleStreamingIndicator = (event) => {
-          const target = event.detail?.newStream?.target
-          if (target === 'message-loading') {
-            console.log('Auto-continue: Streaming indicator updated')
-            if (!streamingStarted) {
-              streamingStarted = true
-              // Reset timeout when streaming starts
-              if (timeoutId) clearTimeout(timeoutId)
-              timeoutId = setTimeout(() => {
-                console.log('Auto-continue: Streaming timeout')
-                cleanup()
-                resolve()
-              }, 30000)
-            }
-          }
-        }
-        
-        const cleanup = () => {
-          document.removeEventListener('turbo:before-stream-render', handleMessageFrame)
-          document.removeEventListener('turbo:before-stream-render', handleConversationUpdate)
-          document.removeEventListener('turbo:before-stream-render', handleStreamingIndicator)
-          if (timeoutId) clearTimeout(timeoutId)
-          this.isProcessing = false
-        }
-        
-        // Set up listeners
-        document.addEventListener('turbo:before-stream-render', handleMessageFrame)
-        document.addEventListener('turbo:before-stream-render', handleConversationUpdate)
-        document.addEventListener('turbo:before-stream-render', handleStreamingIndicator)
-        
-        // Set initial timeout
-        timeoutId = setTimeout(() => {
-          console.log('Auto-continue: Initial timeout reached')
-          cleanup()
-          resolve()
-        }, 10000) // 10 second initial timeout
-      })
-      
-      // Click the button
-      continueButton.click()
-      
-      // Wait for streaming to complete
-      await streamingComplete
-      
-      // Add a small delay before checking if we should continue
-      setTimeout(() => {
-        this.checkAndContinue()
-      }, 1000)
+        // Set up a safety timeout in case event system fails
+        this.setupSafetyTimeout()
+      } catch (error) {
+        console.error('Auto-continue: Error clicking continue button:', error)
+        this.handleContinueError('Failed to continue conversation')
+      }
     } else {
       console.log('Auto-continue: No continue button found, stopping')
       this.stop()
     }
+  }
+
+  setupSafetyTimeout() {
+    // Clear any existing timeout
+    if (this.safetyTimeout) {
+      clearTimeout(this.safetyTimeout)
+    }
+    
+    // Set timeout to reset processing state if event system fails (45 seconds)
+    this.safetyTimeout = setTimeout(() => {
+      console.warn('Auto-continue: Safety timeout reached - resetting state')
+      this.handleContinueError('Auto-continue timed out')
+    }, 45000)
+  }
+
+  handleContinueError(message) {
+    // Reset processing state
+    this.isProcessing = false
+    
+    // Clear timeout
+    if (this.safetyTimeout) {
+      clearTimeout(this.safetyTimeout)
+      this.safetyTimeout = null
+    }
+    
+    // Show error notification
+    this.showErrorNotification(message)
+    
+    // Stop auto-continue to prevent infinite error loops
+    console.log('Auto-continue: Stopping due to error:', message)
+    this.stop()
+  }
+
+  showErrorNotification(message) {
+    // Create or update error notification
+    let errorElement = document.getElementById('auto-continue-error')
+    if (!errorElement) {
+      errorElement = document.createElement('div')
+      errorElement.id = 'auto-continue-error'
+      errorElement.className = 'fixed top-4 left-4 z-50 max-w-sm'
+      document.body.appendChild(errorElement)
+    }
+    
+    errorElement.innerHTML = `
+      <div class="alert alert-error shadow-lg">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">⚠️</span>
+          <div>
+            <div class="font-bold">Auto-continue Error</div>
+            <div class="text-sm">${message}</div>
+          </div>
+        </div>
+      </div>
+    `
+    
+    errorElement.classList.remove('hidden')
+    
+    // Auto-hide after 8 seconds
+    setTimeout(() => {
+      if (errorElement) {
+        errorElement.classList.add('hidden')
+      }
+    }, 8000)
   }
 
   checkAndContinue() {

@@ -12,11 +12,9 @@ class ConversationParticipant < ApplicationRecord
 
   before_validation :set_defaults
 
-  # Checks if this participant has a successful (non-error) message in the given round_number
+  # Checks if this participant has spoken in the given round_number
   def has_spoken_in_round?(round_number_to_check)
-    messages.where(round_number: round_number_to_check)
-            .where("metadata IS NULL OR metadata->>'is_error' != 'true'")
-            .exists?
+    messages.where(round_number: round_number_to_check).exists?
   end
 
   def system_prompt_with_topic
