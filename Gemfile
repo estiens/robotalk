@@ -56,7 +56,7 @@ group :development, :test do
 
   gem 'factory_bot_rails', require: false
   gem 'pry-rails'
-  gem 'rspec-rails', '~> 7.1.0'
+  gem 'rspec-rails', '~> 8.0.1'
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem 'brakeman', require: false
   # Detect N+1 queries and unused eager loading
