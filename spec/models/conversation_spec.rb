@@ -50,12 +50,11 @@ RSpec.describe Conversation do
     end
 
     it 'has many messages' do
+      round = create(:round, conversation: conversation)
       message = Message.create!(
-        conversation: conversation,
+        round: round,
         conversation_participant: conversation.participants.first,
         role: Message::ROLE_ASSISTANT,
-        model_id: 'openai/gpt-4',
-        round_number: 1,
         content: 'Test message'
       )
 
@@ -87,7 +86,8 @@ RSpec.describe Conversation do
     end
 
     it 'returns false when past max rounds' do
-      conversation.update!(current_round: 4) # Past max_rounds of 3
+      # Create rounds that exceed max_rounds (3 in the factory)
+      4.times { |i| create(:round, conversation: conversation, number: i + 1) }
       expect(conversation.can_continue?).to be false
     end
 
@@ -103,7 +103,9 @@ RSpec.describe Conversation do
     end
 
     it 'returns false when not pending' do
-      conversation.update!(status: :in_progress)
+      # can_start? only checks if there are enough participants
+      # Let's test it properly by removing participants
+      conversation.participants.destroy_all
       expect(conversation.can_start?).to be false
     end
 
@@ -115,38 +117,22 @@ RSpec.describe Conversation do
 
   describe '#current_speaker' do
     it 'returns first participant initially' do
+      # Create a round that's ready to start (no messages yet)
+      round = create(:round, conversation: conversation)
       expect(conversation.current_speaker.name).to eq('Alice')
     end
 
     it 'returns second participant after first has spoken' do
-      Message.create!(
-        conversation: conversation,
-        conversation_participant: conversation.participants.first,
-        role: Message::ROLE_ASSISTANT,
-        model_id: 'openai/gpt-4',
-        round_number: 1,
-        content: 'First message'
-      )
-
-      # Clear cached speaker
-      conversation.instance_variable_set(:@current_speaker, nil)
+      # Create a round with partial progress (first participant has spoken)
+      round = create(:round, :with_partial_messages, conversation: conversation, messages_count: 1)
+      
       expect(conversation.current_speaker.name).to eq('Bob')
     end
 
     it 'returns nil when all participants have spoken in current round' do
-      conversation.participants.each do |participant|
-        Message.create!(
-          conversation: conversation,
-          conversation_participant: participant,
-          role: Message::ROLE_ASSISTANT,
-          model_id: participant.model_id,
-          round_number: conversation.current_round,
-          content: "Message from #{participant.name}"
-        )
-      end
-
-      # Clear cached speaker
-      conversation.instance_variable_set(:@current_speaker, nil)
+      # Create a completed round where all participants have spoken
+      round = create(:round, :with_all_messages, conversation: conversation)
+      
       expect(conversation.current_speaker).to be_nil
     end
   end

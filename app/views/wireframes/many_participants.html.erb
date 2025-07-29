@@ -1,0 +1,416 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Many Participants Layout (6+)</h1>
+    </div>
+    <div class="navbar-end">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+          View: Grid
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
+          <li><a>Grid</a></li>
+          <li><a>Radial</a></li>
+          <li><a>Compact</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-base-content">Global Peace Summit Simulation</h2>
+          <p class="text-base-content/70">Round 3 of 15 • 8 participants • 15 minutes elapsed</p>
+        </div>
+        <div class="stats shadow">
+          <div class="stat place-items-center">
+            <div class="stat-title">Messages</div>
+            <div class="stat-value text-primary">24</div>
+          </div>
+          <div class="stat place-items-center">
+            <div class="stat-title">Round</div>
+            <div class="stat-value text-secondary">3/15</div>
+          </div>
+          <div class="stat place-items-center">
+            <div class="stat-title">Active</div>
+            <div class="stat-value text-accent">8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex h-[calc(100vh-120px)]">
+    <!-- Participants Panel -->
+    <div class="w-80 bg-base-200 border-r border-base-300 overflow-y-auto">
+      <div class="p-4">
+        <h3 class="font-bold text-lg mb-4">Participants</h3>
+        
+        <!-- Current Speaker -->
+        <div class="mb-6">
+          <h4 class="text-sm font-medium text-base-content/70 mb-2">CURRENTLY SPEAKING</h4>
+          <div class="card bg-primary text-primary-content">
+            <div class="card-body compact">
+              <div class="flex items-center gap-3">
+                <div class="avatar">
+                  <div class="w-10 h-10 rounded-full bg-primary-content text-primary ring-2 ring-primary-content">
+                    <span class="flex items-center justify-center h-full font-bold text-sm">US</span>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <p class="font-semibold">United States</p>
+                  <p class="text-xs opacity-70">GPT-4 • Round 3</p>
+                </div>
+                <div class="loading loading-spinner loading-sm"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Queue -->
+        <div class="mb-6">
+          <h4 class="text-sm font-medium text-base-content/70 mb-2">SPEAKING QUEUE</h4>
+          <div class="space-y-2">
+            <div class="card bg-secondary/20 border border-secondary">
+              <div class="card-body compact">
+                <div class="flex items-center gap-3">
+                  <div class="avatar">
+                    <div class="w-8 h-8 rounded-full bg-secondary text-secondary-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">CN</span>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-medium">China</p>
+                    <p class="text-xs opacity-70">Claude-3.5</p>
+                  </div>
+                  <div class="badge badge-secondary badge-sm">Next</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card bg-base-100">
+              <div class="card-body compact">
+                <div class="flex items-center gap-3">
+                  <div class="avatar">
+                    <div class="w-8 h-8 rounded-full bg-accent text-accent-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">RU</span>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-medium">Russia</p>
+                    <p class="text-xs opacity-70">Gemini-Pro</p>
+                  </div>
+                  <div class="badge badge-ghost badge-sm">3rd</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Participants -->
+        <div>
+          <h4 class="text-sm font-medium text-base-content/70 mb-2">ALL PARTICIPANTS</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <!-- US -->
+            <div class="card bg-primary/20 border border-primary">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-primary text-primary-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">US</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">United States</p>
+                  <p class="text-xs opacity-70">3 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- China -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-secondary text-secondary-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">CN</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">China</p>
+                  <p class="text-xs opacity-70">3 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Russia -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-accent text-accent-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">RU</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">Russia</p>
+                  <p class="text-xs opacity-70">3 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- EU -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-info text-info-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">EU</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">European Union</p>
+                  <p class="text-xs opacity-70">2 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- India -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-warning text-warning-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">IN</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">India</p>
+                  <p class="text-xs opacity-70">2 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Brazil -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-success text-success-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">BR</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">Brazil</p>
+                  <p class="text-xs opacity-70">2 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Japan -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-error text-error-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">JP</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">Japan</p>
+                  <p class="text-xs opacity-70">2 msgs</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- UN -->
+            <div class="card bg-base-100 hover:bg-base-200">
+              <div class="card-body compact">
+                <div class="text-center">
+                  <div class="avatar mx-auto mb-1">
+                    <div class="w-8 h-8 rounded-full bg-neutral text-neutral-content">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">UN</span>
+                    </div>
+                  </div>
+                  <p class="text-xs font-medium truncate">UN Mediator</p>
+                  <p class="text-xs opacity-70">2 msgs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation Area -->
+    <div class="flex-1 overflow-hidden flex flex-col">
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-4xl mx-auto space-y-4">
+          
+          <!-- Compact Message Format for Many Participants -->
+          
+          <!-- Round 1 Messages -->
+          <div class="space-y-3">
+            <div class="text-center">
+              <div class="badge badge-neutral">Round 1</div>
+            </div>
+            
+            <!-- US Message -->
+            <div class="flex items-start gap-3 bg-primary/10 rounded-lg p-3">
+              <div class="avatar flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-primary text-primary-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">US</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-sm">United States</span>
+                  <span class="badge badge-primary badge-xs">GPT-4</span>
+                  <time class="text-xs opacity-50">15m ago</time>
+                </div>
+                <p class="text-sm">We propose a multilateral framework for nuclear disarmament with staged verification protocols. Peace through strength and transparency.</p>
+              </div>
+            </div>
+            
+            <!-- China Message -->
+            <div class="flex items-start gap-3 bg-secondary/10 rounded-lg p-3">
+              <div class="avatar flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-secondary text-secondary-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">CN</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-sm">China</span>
+                  <span class="badge badge-secondary badge-xs">Claude-3.5</span>
+                  <time class="text-xs opacity-50">14m ago</time>
+                </div>
+                <p class="text-sm">Mutual respect and non-interference are fundamental. We support peaceful dialogue but emphasize sovereignty in internal affairs.</p>
+              </div>
+            </div>
+            
+            <!-- Russia Message -->
+            <div class="flex items-start gap-3 bg-accent/10 rounded-lg p-3">
+              <div class="avatar flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-accent text-accent-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">RU</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-sm">Russia</span>
+                  <span class="badge badge-accent badge-xs">Gemini-Pro</span>
+                  <time class="text-xs opacity-50">13m ago</time>
+                </div>
+                <p class="text-sm">Security concerns must be addressed collectively. NATO expansion has created instability. We need a new European security architecture.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 2 Messages -->
+          <div class="space-y-3">
+            <div class="text-center">
+              <div class="badge badge-neutral">Round 2</div>
+            </div>
+            
+            <!-- More compact messages... -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="flex items-start gap-2 bg-info/10 rounded-lg p-3">
+                <div class="avatar flex-shrink-0">
+                  <div class="w-6 h-6 rounded-full bg-info text-info-content">
+                    <span class="flex items-center justify-center h-full font-bold text-xs">EU</span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1 mb-1">
+                    <span class="font-medium text-xs">European Union</span>
+                    <time class="text-xs opacity-50">10m</time>
+                  </div>
+                  <p class="text-xs">Diplomatic solutions through international law and multilateral institutions...</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-2 bg-warning/10 rounded-lg p-3">
+                <div class="avatar flex-shrink-0">
+                  <div class="w-6 h-6 rounded-full bg-warning text-warning-content">
+                    <span class="flex items-center justify-center h-full font-bold text-xs">IN</span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1 mb-1">
+                    <span class="font-medium text-xs">India</span>
+                    <time class="text-xs opacity-50">9m</time>
+                  </div>
+                  <p class="text-xs">Non-alignment principles and South-South cooperation for sustainable peace...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Round -->
+          <div class="space-y-3">
+            <div class="text-center">
+              <div class="badge badge-primary">Round 3 - Current</div>
+            </div>
+            
+            <!-- Current Speaker -->
+            <div class="flex items-start gap-3 bg-primary/20 rounded-lg p-4 border-2 border-primary border-dashed">
+              <div class="avatar flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-primary text-primary-content ring-2 ring-primary ring-offset-2 animate-pulse">
+                  <span class="flex items-center justify-center h-full font-bold text-sm">US</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-semibold">United States</span>
+                  <span class="badge badge-primary badge-sm">GPT-4</span>
+                  <span class="badge badge-outline badge-sm">Round 3</span>
+                  <span class="loading loading-dots loading-sm"></span>
+                </div>
+                <div class="bg-primary/10 rounded p-3">
+                  <div class="flex items-center gap-2">
+                    <span class="loading loading-spinner loading-sm"></span>
+                    <span class="text-sm opacity-70">Generating diplomatic response...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <!-- Bottom Status -->
+      <div class="bg-base-200 border-t border-base-300 p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+              <span class="text-sm">Live simulation</span>
+            </div>
+            <div class="text-sm text-base-content/70">
+              Next: China → Russia → EU → India → Brazil → Japan → UN
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-ghost btn-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Pause
+            </button>
+            <button class="btn btn-ghost btn-sm">Summary</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -29,8 +29,9 @@ RSpec.describe 'Conversation deletion' do
     it 'deletes conversation and all associated data when delete button is clicked' do
       conversation1 = create_test_conversation(user: user, topic: 'Test Topic 1')
       conversation2 = create_test_conversation(user: user, topic: 'Test Topic 2')
-      create('message', conversation: conversation1, content: 'Test message 1')
-      create('message', conversation: conversation1, content: 'Test message 2')
+      round1 = create(:round, conversation: conversation1)
+      create(:message, round: round1, content: 'Test message 1')
+      create(:message, round: round1, content: 'Test message 2')
 
       visit conversations_path
 
@@ -38,7 +39,7 @@ RSpec.describe 'Conversation deletion' do
       expect(page).to have_content('Test Topic 1')
       expect(page).to have_content('Test Topic 2')
       expect_record_to_exist(Conversation, conversation1.id)
-      expect(Message.where(conversation: conversation1).count).to eq(2)
+      expect(Message.joins(:round).where(rounds: { conversation: conversation1 }).count).to eq(2)
 
       # Record initial counts
       initial_conversation_count = Conversation.count
@@ -55,7 +56,7 @@ RSpec.describe 'Conversation deletion' do
       expect_record_not_to_exist(Conversation, conversation1.id)
       expect_record_to_exist(Conversation, conversation2.id)
       expect(Conversation.count).to eq(initial_conversation_count - 1)
-      expect(Message.where(conversation_id: conversation1.id).count).to eq(0) # Messages should be deleted via cascade
+      expect(Message.joins(:round).where(rounds: { conversation: conversation1 }).count).to eq(0) # Messages should be deleted via cascade
       expect(Message.count).to eq(initial_message_count - 2) # 2 messages belonged to conversation1
 
       # Verify we're still on the conversations index page

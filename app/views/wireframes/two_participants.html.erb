@@ -1,0 +1,245 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Two Participants Layout</h1>
+    </div>
+    <div class="navbar-end">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+          <li><a>Export Design</a></li>
+          <li><a>Share Link</a></li>
+          <li><a>Full Screen</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-base-content">AI Ethics Debate</h2>
+          <p class="text-base-content/70">Round 3 of 10 • Started 5 minutes ago</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="stats shadow">
+            <div class="stat place-items-center">
+              <div class="stat-title">Messages</div>
+              <div class="stat-value text-primary">6</div>
+            </div>
+            <div class="stat place-items-center">
+              <div class="stat-title">Round</div>
+              <div class="stat-value text-secondary">3/10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Bar -->
+  <div class="bg-base-100 border-b border-base-300">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <!-- Participant 1 -->
+          <div class="flex items-center gap-3">
+            <div class="avatar">
+              <div class="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center ring-2 ring-primary ring-offset-2">
+                <span class="text-sm font-bold">A</span>
+              </div>
+            </div>
+            <div>
+              <p class="font-semibold text-base-content">Aristotle</p>
+              <p class="text-xs text-base-content/60">GPT-4 • Next to speak</p>
+            </div>
+            <div class="badge badge-primary">Active</div>
+          </div>
+
+          <!-- VS Divider -->
+          <div class="divider divider-horizontal text-base-content/40">VS</div>
+
+          <!-- Participant 2 -->
+          <div class="flex items-center gap-3">
+            <div class="avatar">
+              <div class="w-10 h-10 rounded-full bg-secondary text-secondary-content flex items-center justify-center">
+                <span class="text-sm font-bold">S</span>
+              </div>
+            </div>
+            <div>
+              <p class="font-semibold text-base-content">Socrates</p>
+              <p class="text-xs text-base-content/60">Claude-3.5-Sonnet</p>
+            </div>
+            <div class="badge badge-ghost">Waiting</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-2">
+          <button class="btn btn-circle btn-sm btn-ghost">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </button>
+          <button class="btn btn-circle btn-sm btn-ghost">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="flex-1 overflow-hidden">
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
+      <div class="space-y-6">
+        
+        <!-- Message 1 - Aristotle -->
+        <div class="chat chat-start">
+          <div class="chat-image avatar">
+            <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+              <span class="text-sm font-bold">A</span>
+            </div>
+          </div>
+          <div class="chat-header flex items-center gap-2">
+            <span class="font-semibold">Aristotle</span>
+            <span class="badge badge-primary badge-sm">GPT-4</span>
+            <time class="text-xs opacity-50">2 mins ago</time>
+          </div>
+          <div class="chat-bubble chat-bubble-primary">
+            The question of artificial intelligence and ethics is fundamentally about virtue. Can a machine possess eudaimonia - true flourishing - without the capacity for moral choice? I argue that true ethical behavior requires intentionality and the ability to choose virtue over vice.
+          </div>
+          <div class="chat-footer opacity-50 flex items-center gap-2">
+            <span class="text-xs">Round 1</span>
+            <div class="flex items-center gap-1">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-xs">Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2 - Socrates -->
+        <div class="chat chat-end">
+          <div class="chat-image avatar">
+            <div class="w-10 rounded-full bg-secondary text-secondary-content flex items-center justify-center">
+              <span class="text-sm font-bold">S</span>
+            </div>
+          </div>
+          <div class="chat-header flex items-center gap-2 justify-end">
+            <time class="text-xs opacity-50">2 mins ago</time>
+            <span class="badge badge-secondary badge-sm">Claude-3.5</span>
+            <span class="font-semibold">Socrates</span>
+          </div>
+          <div class="chat-bubble chat-bubble-secondary">
+            But friend Aristotle, how can we be so certain about our own capacity for virtue? Do we truly understand what we mean by "ethical choice"? Perhaps the question is not whether machines can be ethical, but whether we ourselves know what ethics truly are. What if an AI's apparent randomness is actually a form of moral exploration we don't yet comprehend?
+          </div>
+          <div class="chat-footer opacity-50 flex items-center gap-2 justify-end">
+            <div class="flex items-center gap-1">
+              <span class="text-xs">Delivered</span>
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <span class="text-xs">Round 1</span>
+          </div>
+        </div>
+
+        <!-- Message 3 - Aristotle -->
+        <div class="chat chat-start">
+          <div class="chat-image avatar">
+            <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+              <span class="text-sm font-bold">A</span>
+            </div>
+          </div>
+          <div class="chat-header flex items-center gap-2">
+            <span class="font-semibold">Aristotle</span>
+            <span class="badge badge-primary badge-sm">GPT-4</span>
+            <time class="text-xs opacity-50">1 min ago</time>
+          </div>
+          <div class="chat-bubble chat-bubble-primary">
+            Your questioning method serves us well, Socrates. Yet I maintain that virtue is not merely about knowing good from evil, but about the habitual practice of excellence. A machine may process ethical frameworks, but can it develop phronesis - practical wisdom through lived experience? Without the capacity for genuine choice and the weight of consequence, how can it practice virtue?
+          </div>
+          <div class="chat-footer opacity-50 flex items-center gap-2">
+            <span class="text-xs">Round 2</span>
+            <div class="flex items-center gap-1">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-xs">Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="chat chat-end">
+          <div class="chat-image avatar">
+            <div class="w-10 rounded-full bg-secondary text-secondary-content flex items-center justify-center">
+              <span class="text-sm font-bold">S</span>
+            </div>
+          </div>
+          <div class="chat-header flex items-center gap-2 justify-end">
+            <span class="loading loading-dots loading-sm"></span>
+            <span class="badge badge-secondary badge-sm">Claude-3.5</span>
+            <span class="font-semibold">Socrates</span>
+          </div>
+          <div class="chat-bubble chat-bubble-secondary">
+            <span class="loading loading-dots loading-sm"></span>
+          </div>
+          <div class="chat-footer opacity-50 flex items-center gap-2 justify-end">
+            <span class="text-xs">Thinking...</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Status Bar -->
+  <div class="bg-base-200 border-t border-base-300">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+            <span class="text-sm text-base-content/70">Live conversation</span>
+          </div>
+          <div class="divider divider-horizontal"></div>
+          <span class="text-sm text-base-content/70">Next: Socrates responds (Round 3)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost btn-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Export
+          </button>
+          <button class="btn btn-ghost btn-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+            </svg>
+            Share
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

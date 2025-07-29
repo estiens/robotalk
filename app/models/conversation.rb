@@ -4,14 +4,12 @@ class Conversation < ApplicationRecord
   include TurboStreamable
 
   belongs_to :user
-  has_many :messages, dependent: :destroy
+  has_many :rounds, dependent: :destroy
+  has_many :messages, through: :rounds
   has_many :participants, class_name: 'ConversationParticipant', dependent: :destroy
 
   enum :status, {
     pending: 'pending',
-    in_progress: 'in_progress',
-    generating: 'generating',
-    round_ready: 'round_ready',
     complete: 'complete',
     failed: 'failed'
   }
@@ -28,76 +26,54 @@ class Conversation < ApplicationRecord
 
   # Simple state machine methods
   def can_start?
-    pending? && participants.size >= 2
+    participants.size >= 2
   end
 
   def can_continue?
-    # Can continue if pending, in_progress, round_ready, or failed (for retry)
-    status_ok = pending? || in_progress? || round_ready? || failed?
-
+    # Check status first - completed/failed conversations can't continue
+    return false if complete? || failed?
+    
     # Check if we haven't exceeded max rounds
-    rounds_ok = current_round <= max_rounds
+    rounds_ok = current_round_number < max_rounds
 
     # Check if we have enough participants
     participants_ok = participants.size >= 2
 
-    result = status_ok && rounds_ok && participants_ok
-    Rails.logger.debug do
-      "[DEBUG] Conversation ##{id} status: #{status}, pending?: #{pending?}, in_progress?: #{in_progress?}, round_ready?: #{round_ready?}, failed?: #{failed?}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}, can_continue?: #{result}"
-    end
-    result
+    rounds_ok && participants_ok
+  end
+  
+  # Current round number based on Round records
+  def current_round_number
+    rounds.count
   end
 
-  def start!
-    return false unless can_start?
+  # Backward compatibility alias
+  alias_method :current_round, :current_round_number
 
-    update!(status: :in_progress)
-    true
-  end
 
-  def complete!
-    update!(status: :complete)
-  end
-
-  def fail!
-    Rails.logger.error "[CONVERSATION FAIL] Conversation ##{id} being marked as failed. Current status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}"
-    Rails.logger.error "[CONVERSATION FAIL] Backtrace: #{caller.join("\n")}"
-    update!(status: :failed)
-  end
-
-  def reset!
-    return false unless failed? || complete?
-
-    update!(status: :pending)
-    true
-  end
-
-  # Delegate complex operations to services
+  # Get current speaker from active round
   def current_speaker
-    round_manager.next_speaker
+    current_round = rounds.order(:number).last
+    return participants.ordered.first unless current_round
+    
+    current_round.current_participant
+  end
+  
+  def next_speaker
+    current_speaker
   end
 
-  delegate :next_speaker, to: :round_manager
-
-  def ready_for_next_round?
-    result = can_continue? && current_round <= max_rounds
-    Rails.logger.debug { "[DEBUG] Conversation ##{id} ready_for_next_round?: #{result}, can_continue?: #{can_continue?}, current_round: #{current_round}, max_rounds: #{max_rounds}" }
-    result
+  # Convenience methods for UI
+  def has_rounds?
+    rounds.exists?
   end
-
-  # Delegate to RoundService for individual speaker response
-  def have_current_speaker_respond!
-    RoundService.new(self).have_current_speaker_respond!
+  
+  def latest_round
+    rounds.order(:number).last
   end
-
-  # Delegate to RoundService for full round
-  def perform_round!(interactive: true)
-    RoundService.new(self).perform_round!(interactive: interactive)
-  end
-
-  # Generate full conversation (for background jobs)
-  def generate_full_conversation!
-    RoundService.new(self).generate_full_conversation!
+  
+  def is_conversation_complete?
+    current_round_number >= max_rounds
   end
 
   # Build conversation history as formatted text
@@ -111,18 +87,19 @@ class Conversation < ApplicationRecord
     end.join("\n\n")
   end
 
-  # Expected by Message callbacks
-  def process_new_message
-    # This method is called when a Message is created
-    # Currently handled by RoundService, but keeping for compatibility
-    Rails.logger.info '[Conversation] Processing new message'
+  # Check if conversation is ready for the next round
+  def ready_for_next_round?
+    # Should have an active round that is completed and within max rounds
+    current_round = rounds.order(:number).last
+    return false unless current_round
+    return false unless current_round.completed?
+    
+    can_continue?
   end
+
 
   private
 
-  def round_manager
-    @round_manager ||= RoundManager.new(self)
-  end
 
   def must_have_at_least_two_participants
     errors.add(:participants, 'must have at least 2 participants') if participants.size < 2
@@ -134,8 +111,7 @@ class Conversation < ApplicationRecord
     self.status = :pending if status.blank?
     self.dialogue_instructions = 'Have a thoughtful conversation about the given topic, exploring different perspectives and ideas.' if dialogue_instructions.blank?
     self.max_rounds = 10 if max_rounds.blank?
-    self.current_round = 1 if current_round.blank?
-    Rails.logger.debug { "[CONVERSATION CREATE] Setting defaults for conversation - status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}" }
+    Rails.logger.debug { "[CONVERSATION CREATE] Setting defaults for conversation - status: #{status}, max_rounds: #{max_rounds}" }
   end
 
   def ensure_user_exists
@@ -143,6 +119,6 @@ class Conversation < ApplicationRecord
   end
 
   def log_creation
-    Rails.logger.info "[CONVERSATION CREATED] Conversation ##{id} created with status: #{status}, current_round: #{current_round}, max_rounds: #{max_rounds}, participants: #{participants.size}, can_continue?: #{can_continue?}"
+    Rails.logger.info "[CONVERSATION CREATED] Conversation ##{id} created with status: #{status}, max_rounds: #{max_rounds}, participants: #{participants.size}, can_continue?: #{can_continue?}"
   end
 end

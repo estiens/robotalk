@@ -4,12 +4,13 @@
 class Message < ApplicationRecord
   ROLE_ASSISTANT = 'assistant'
 
-  belongs_to :conversation
+  belongs_to :round
   belongs_to :conversation_participant, optional: true
-  # Removed: has_many :tool_calls (no more tool calling)
+  
+  # Delegate conversation access through round
+  delegate :conversation, to: :round
 
   validates :content, presence: true, unless: :streaming_message?
-  validates :round_number, presence: true
 
   before_validation :set_defaults
   after_create_commit :trigger_conversation_processing
@@ -35,10 +36,6 @@ class Message < ApplicationRecord
 
   def set_defaults
     self.role = ROLE_ASSISTANT if role.nil?
-
-    return unless conversation.present? && round_number.nil?
-
-    self.round_number = conversation.current_round
   end
 
   def trigger_conversation_processing

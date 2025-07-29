@@ -3,7 +3,7 @@
     <div class="chat-image avatar">
       <div class="avatar placeholder relative">
         <div class="w-12 rounded-full bg-warning text-warning-content">
-          <span class="text-lg"><%= model_avatar_emoji(model_name) %></span>
+          <span class="text-lg"><%= model_avatar_emoji(local_assigns.fetch(:model_name, 'gpt-4')) %></span>
         </div>
         <!-- Multiple pulse rings for thinking effect -->
         <div class="absolute inset-0 rounded-full bg-warning animate-ping opacity-20"></div>
@@ -12,7 +12,9 @@
       </div>
     </div>
     <div class="chat-header mb-1">
-      <span class="font-semibold text-warning"><%= friendly_model_name(model_name) %></span>
+      <span class="font-semibold text-warning">
+        <%= local_assigns.fetch(:participant_name, friendly_model_name(local_assigns.fetch(:model_name, 'AI'))) %>
+      </span>
       <span class="text-xs text-base-content/60 ml-2">is thinking...</span>
     </div>
     <div class="chat-bubble chat-bubble-warning shadow-lg border-0 relative overflow-hidden">

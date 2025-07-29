@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class LlmService
+  # Custom error classes
+  class LlmApiError < StandardError; end
+  class RateLimitError < LlmApiError; end
+  
   attr_reader :conversation, :participant
 
   def initialize(conversation, participant)
@@ -11,7 +15,7 @@ class LlmService
   end
 
   def generate_response
-    Rails.logger.info "[LlmService] Generating response for #{participant.name} in round #{conversation.current_round}"
+    Rails.logger.info "[LlmService] Generating response for #{participant.name}"
 
     # Build message array for OpenRouter API
     messages = build_messages
@@ -33,33 +37,28 @@ class LlmService
     # Extract content from response
     content = extract_content_from_response(response)
 
-    # Create message with response
-    Message.create!(
-      conversation: conversation,
+    # Return message data instead of creating the record
+    # TurnService will handle the actual creation and round association
+    {
       conversation_participant: participant,
       model_id: participant.model_id,
-      round_number: conversation.current_round,
       content: content,
       metadata: {
         model_name: participant.model_id,
         response_metadata: response.to_h.slice('usage', 'model', 'created')
       }
-    )
+    }
   rescue StandardError => e
     Rails.logger.error "[LlmService] Error: #{e.message}"
 
-    # Create error message with error flag in metadata
-    Message.create!(
-      conversation: conversation,
+    # Return error data instead of creating the record
+    # TurnService will handle creation and error propagation
+    {
       conversation_participant: participant,
       model_id: participant.model_id,
-      round_number: conversation.current_round,
       content: 'Sorry, I encountered an error generating my response.',
       metadata: { error: e.message, is_error: true }
-    )
-
-    # Re-raise the error for proper handling
-    raise e
+    }
   end
 
   private
@@ -73,11 +72,13 @@ class LlmService
       content: participant.system_prompt_with_topic
     }
 
-    # Add conversation history as individual messages
-    conversation.messages.includes(:conversation_participant)
-                .order(:created_at)
-                .last(10) # Limit for context window
-                .each do |msg|
+    # Add conversation history from all rounds as individual messages
+    Message.joins(round: :conversation)
+           .where(rounds: { conversation_id: conversation.id })
+           .includes(:conversation_participant)
+           .order(:created_at)
+           .last(10) # Limit for context window
+           .each do |msg|
       messages << {
         role: 'assistant',
         content: msg.content,
@@ -95,10 +96,15 @@ class LlmService
   end
 
   def build_user_message
-    if conversation.messages.empty?
-      "Please introduce yourself and start discussing: #{conversation.conversation_topic}"
-    else
+    # Check if there are any messages in the conversation across all rounds
+    has_messages = Message.joins(round: :conversation)
+                          .where(rounds: { conversation_id: conversation.id })
+                          .exists?
+    
+    if has_messages
       "Please continue the discussion about: #{conversation.conversation_topic}. Stay true to your character and respond naturally."
+    else
+      "Please introduce yourself and start discussing: #{conversation.conversation_topic}"
     end
   end
 

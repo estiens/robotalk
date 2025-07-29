@@ -31,4 +31,17 @@ Rails.application.routes.draw do
   end
 
   resources :models, only: [:index]
+
+  # Wireframes for UX design exploration
+  resources :wireframes, only: [:index] do
+    collection do
+      get :two_participants
+      get :multi_participants  
+      get :many_participants
+      get :timeline_view
+      get :speaker_lanes
+      get :threaded_view
+      get :compact_cards
+    end
+  end
 end

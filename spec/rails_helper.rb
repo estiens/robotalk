@@ -17,6 +17,7 @@ require 'support/vcr'
 require 'capybara/rspec'
 require 'factory_bot_rails'
 require 'shoulda/matchers'
+require 'timecop'
 
 # Optimize Capybara for speed
 Capybara.default_driver = :rack_test
@@ -98,6 +99,18 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :test
     ActiveJob::Base.queue_adapter.perform_enqueued_jobs = true
   end
+
+  # Clean up Timecop after each test
+  config.after(:each) do
+    Timecop.return
+  end
+
+  # Add freeze_time helper method
+  config.include(Module.new do
+    def freeze_time(&block)
+      Timecop.freeze(Time.current, &block)
+    end
+  end)
 
   # VCR helper methods
   # Helper method to record new cassettes when needed

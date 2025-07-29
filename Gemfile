@@ -32,6 +32,9 @@ gem 'solid_cable'
 gem 'solid_cache'
 gem 'solid_queue'
 
+# State machine for Round model
+gem 'aasm'
+
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 
@@ -81,6 +84,7 @@ group :test do
   gem 'shoulda-matchers', '~> 5.3'
   gem 'vcr', '~> 6.3', require: false
   gem 'webmock', '~> 3.25', require: false
+  gem 'timecop'
 end
 
 gem 'faker', '~> 3.5', groups: %i[development test]

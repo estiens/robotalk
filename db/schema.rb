@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_28_210553) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_29_005548) do
   create_table "conversation_participants", force: :cascade do |t|
     t.integer "conversation_id", null: false
     t.string "model_id", null: false
@@ -43,7 +43,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_210553) do
   end
 
   create_table "messages", force: :cascade do |t|
-    t.integer "conversation_id", null: false
     t.string "role"
     t.text "content"
     t.string "model_id"
@@ -54,12 +53,32 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_210553) do
     t.integer "output_tokens"
     t.integer "conversation_participant_id"
     t.integer "round_number"
-    t.index ["conversation_id", "role"], name: "index_messages_on_conversation_id_and_role"
-    t.index ["conversation_id", "round_number"], name: "index_messages_on_conversation_and_round"
-    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.integer "round_id", null: false
     t.index ["conversation_participant_id"], name: "index_messages_on_conversation_participant_id"
     t.index ["created_at"], name: "index_messages_on_created_at"
+    t.index ["role"], name: "index_messages_on_conversation_id_and_role"
     t.index ["role"], name: "index_messages_on_role"
+    t.index ["round_id"], name: "index_messages_on_round_id"
+    t.index ["round_number"], name: "index_messages_on_conversation_and_round"
+  end
+
+  create_table "rounds", force: :cascade do |t|
+    t.integer "conversation_id", null: false
+    t.integer "number", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "next_participant_index", default: 0, null: false
+    t.text "pause_reason"
+    t.text "failure_reason"
+    t.datetime "last_activity_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "failed_at"
+    t.index ["conversation_id", "number"], name: "index_rounds_on_conversation_id_and_number", unique: true
+    t.index ["conversation_id"], name: "index_rounds_on_conversation_id"
+    t.index ["last_activity_at"], name: "index_rounds_on_last_activity_at"
+    t.index ["status"], name: "index_rounds_on_status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -75,5 +94,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_210553) do
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversations", "users"
   add_foreign_key "messages", "conversation_participants"
-  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "rounds"
+  add_foreign_key "rounds", "conversations"
 end

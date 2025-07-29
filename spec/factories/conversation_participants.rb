@@ -5,6 +5,6 @@ FactoryBot.define do
     conversation
     name { 'Test Participant' }
     model_id { 'openai/gpt-4o-mini' }
-    sequence(:turn_order)
+    sequence(:turn_order) { |n| n }
   end
 end

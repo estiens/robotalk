@@ -29,7 +29,7 @@
           <i class="text-4xl ph ph-chat-circle"></i>
         </div>
         <div class="text-neutral-content/70 stat-title">Total Messages</div>
-        <div class="text-accent stat-value"><%= Message.where(conversation: @conversations, role: 'assistant').count %></div>
+        <div class="text-accent stat-value"><%= Message.joins(:round).where(rounds: { conversation: @conversations }, role: 'assistant').count %></div>
         <div class="text-neutral-content/70 stat-desc">All conversations</div>
       </div>
       

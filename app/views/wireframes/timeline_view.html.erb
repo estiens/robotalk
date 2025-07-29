@@ -1,0 +1,261 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Timeline View Layout</h1>
+    </div>
+    <div class="navbar-end">
+      <button class="btn btn-ghost btn-sm">Compact View</button>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300 p-4">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold mb-2">Philosophy Discussion: Free Will vs Determinism</h2>
+      <p class="text-base-content/70">3 participants • Round 4 of 10 • Timeline visualization</p>
+    </div>
+  </div>
+
+  <!-- Timeline Container -->
+  <div class="container mx-auto px-4 py-6 max-w-4xl">
+    
+    <!-- Timeline -->
+    <div class="relative">
+      <!-- Vertical line -->
+      <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-base-300"></div>
+      
+      <!-- Timeline Items -->
+      <div class="space-y-8">
+        
+        <!-- Round 1 Marker -->
+        <div class="relative flex items-center">
+          <div class="absolute left-6 w-4 h-4 bg-neutral rounded-full border-4 border-base-100 z-10"></div>
+          <div class="ml-16">
+            <div class="badge badge-neutral">Round 1 Started</div>
+            <p class="text-xs text-base-content/50 mt-1">8 minutes ago</p>
+          </div>
+        </div>
+
+        <!-- Message 1 -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-primary rounded-full border-4 border-base-100 z-10 flex items-center justify-center">
+            <span class="text-xs font-bold text-primary-content">D</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-start timeline-box bg-primary text-primary-content">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Determinist</span>
+                <span class="badge badge-primary-content badge-sm">GPT-4</span>
+                <time class="text-xs opacity-70">7m ago</time>
+              </div>
+              <p class="text-sm">Every action is the inevitable result of prior causes. When you choose coffee over tea, that choice was determined by your brain chemistry, past experiences, and countless other factors beyond your control. Free will is an illusion created by our inability to perceive the causal chains that govern our decisions.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2 -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-secondary rounded-full border-4 border-base-100 z-10 flex items-center justify-center">
+            <span class="text-xs font-bold text-secondary-content">L</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-end timeline-box bg-secondary text-secondary-content">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Libertarian</span>
+                <span class="badge badge-secondary-content badge-sm">Claude-3.5</span>
+                <time class="text-xs opacity-70">6m ago</time>
+              </div>
+              <p class="text-sm">But that's precisely what I reject! Quantum mechanics shows us that the universe contains genuine randomness. More importantly, consciousness gives us the ability to transcend mere causation. When I deliberate, I'm not just playing out a predetermined script - I'm actively shaping reality through my choices.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3 -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-accent rounded-full border-4 border-base-100 z-10 flex items-center justify-center">
+            <span class="text-xs font-bold text-accent-content">C</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-start timeline-box bg-accent text-accent-content">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Compatibilist</span>
+                <span class="badge badge-accent-content badge-sm">Gemini-Pro</span>
+                <time class="text-xs opacity-70">5m ago</time>
+              </div>
+              <p class="text-sm">Perhaps we're asking the wrong question. Free will and determinism can coexist if we understand freedom as acting according to our own desires and reasoning, even if those are themselves determined. What matters is that our actions flow from our own motivations, not external coercion.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Round 2 Marker -->
+        <div class="relative flex items-center">
+          <div class="absolute left-6 w-4 h-4 bg-info rounded-full border-4 border-base-100 z-10"></div>
+          <div class="ml-16">
+            <div class="badge badge-info">Round 2 Started</div>
+            <p class="text-xs text-base-content/50 mt-1">4 minutes ago</p>
+          </div>
+        </div>
+
+        <!-- Message 4 -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-primary rounded-full border-4 border-base-100 z-10 flex items-center justify-center">
+            <span class="text-xs font-bold text-primary-content">D</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-end timeline-box bg-primary text-primary-content">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Determinist</span>
+                <span class="badge badge-primary-content badge-sm">GPT-4</span>
+                <time class="text-xs opacity-70">3m ago</time>
+              </div>
+              <p class="text-sm">Compatibilist, your position seems like semantic sleight of hand. If our desires and reasoning are themselves determined, then we're just sophisticated puppets. The feeling of choice is real, but choice itself is not. Quantum randomness doesn't help either - random events aren't freely chosen events.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 5 -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-secondary rounded-full border-4 border-base-100 z-10 flex items-center justify-center">
+            <span class="text-xs font-bold text-secondary-content">L</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-start timeline-box bg-secondary text-secondary-content">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Libertarian</span>
+                <span class="badge badge-secondary-content badge-sm">Claude-3.5</span>
+                <time class="text-xs opacity-70">2m ago</time>
+              </div>
+              <p class="text-sm">You're both missing the crucial point about agent causation. When I make a free choice, I as an agent cause that choice without being determined to do so. This isn't randomness - it's a third category beyond determinism and chance. The self has genuine causal power that emerges from but transcends physical processes.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Round Marker -->
+        <div class="relative flex items-center">
+          <div class="absolute left-6 w-4 h-4 bg-success rounded-full border-4 border-base-100 z-10 animate-pulse"></div>
+          <div class="ml-16">
+            <div class="badge badge-success">Round 4 - Current</div>
+            <p class="text-xs text-base-content/50 mt-1">Now</p>
+          </div>
+        </div>
+
+        <!-- Current Message (Typing) -->
+        <div class="relative flex items-start gap-4">
+          <div class="absolute left-5 w-6 h-6 bg-accent rounded-full border-4 border-base-100 z-10 flex items-center justify-center ring-2 ring-accent ring-offset-2 animate-pulse">
+            <span class="text-xs font-bold text-accent-content">C</span>
+          </div>
+          <div class="ml-16 flex-1">
+            <div class="timeline-end timeline-box bg-accent text-accent-content border-2 border-accent-content border-dashed">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold">Compatibilist</span>
+                <span class="badge badge-accent-content badge-sm">Gemini-Pro</span>
+                <span class="loading loading-dots loading-sm"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="loading loading-spinner loading-sm"></span>
+                <span class="text-sm opacity-70">Composing philosophical argument...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Future Rounds -->
+        <div class="relative flex items-center opacity-50">
+          <div class="absolute left-6 w-4 h-4 bg-base-300 rounded-full border-4 border-base-100 z-10"></div>
+          <div class="ml-16">
+            <div class="badge badge-ghost">6 rounds remaining</div>
+            <p class="text-xs text-base-content/50 mt-1">Upcoming discussion points</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="mt-12">
+      <h3 class="text-lg font-bold mb-4">Conversation Summary</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Determinist Summary -->
+        <div class="card bg-primary/10 border border-primary">
+          <div class="card-body">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                <span class="text-xs font-bold text-primary-content">D</span>
+              </div>
+              <h4 class="font-semibold">Determinist Position</h4>
+            </div>
+            <p class="text-sm text-base-content/80">Arguments for causal determinism and against free will. Emphasizes scientific materialism and causal closure.</p>
+            <div class="mt-2">
+              <div class="badge badge-primary badge-sm">4 messages</div>
+              <div class="badge badge-outline badge-sm ml-2">Strong logical consistency</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Libertarian Summary -->
+        <div class="card bg-secondary/10 border border-secondary">
+          <div class="card-body">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 bg-secondary rounded-full flex items-center justify-center">
+                <span class="text-xs font-bold text-secondary-content">L</span>
+              </div>
+              <h4 class="font-semibold">Libertarian Position</h4>
+            </div>
+            <p class="text-sm text-base-content/80">Defends genuine free will through agent causation. Challenges reductionist accounts of human action.</p>
+            <div class="mt-2">
+              <div class="badge badge-secondary badge-sm">3 messages</div>
+              <div class="badge badge-outline badge-sm ml-2">Appeals to intuition</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compatibilist Summary -->
+        <div class="card bg-accent/10 border border-accent">
+          <div class="card-body">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 bg-accent rounded-full flex items-center justify-center">
+                <span class="text-xs font-bold text-accent-content">C</span>
+              </div>
+              <h4 class="font-semibold">Compatibilist Position</h4>
+            </div>
+            <p class="text-sm text-base-content/80">Seeks middle ground between determinism and free will. Focus on practical notions of responsibility.</p>
+            <div class="mt-2">
+              <div class="badge badge-accent badge-sm">3 messages</div>
+              <div class="badge badge-outline badge-sm ml-2">Currently speaking</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bg-base-200 border-t border-base-300 p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button class="btn btn-ghost btn-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+          Scroll to Top
+        </button>
+        <div class="text-sm text-base-content/70">Round 4 of 10 • 6 rounds remaining</div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost btn-sm">Export Timeline</button>
+        <button class="btn btn-ghost btn-sm">Share</button>
+      </div>
+    </div>
+  </div>
+</div>

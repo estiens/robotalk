@@ -1,0 +1,295 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Compact Cards Layout</h1>
+    </div>
+    <div class="navbar-end">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+          Density: High
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
+          <li><a>High</a></li>
+          <li><a>Medium</a></li>
+          <li><a>Low</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300 p-3">
+    <div class="container mx-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold">Research Paper Review Session</h2>
+          <p class="text-sm text-base-content/70">5 AI reviewers • Round 2 of 6 • Compact view for high information density</p>
+        </div>
+        <div class="stats shadow-sm">
+          <div class="stat place-items-center py-2 px-4">
+            <div class="stat-title text-xs">Messages</div>
+            <div class="stat-value text-lg text-primary">15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compact Grid Layout -->
+  <div class="container mx-auto px-4 py-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+      
+      <!-- Message Card 1 -->
+      <div class="card bg-primary/10 border border-primary shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-primary text-primary-content">
+                <span class="text-xs font-bold">R1</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 1</h3>
+              <p class="text-xs opacity-70">GPT-4 • Round 1</p>
+            </div>
+            <div class="badge badge-primary badge-xs">3m</div>
+          </div>
+          <p class="text-sm line-clamp-3">The methodology section lacks statistical rigor. The sample size of 127 participants is insufficient for the claimed confidence intervals. I recommend power analysis calculations and discuss potential confounding variables more thoroughly.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-outline badge-xs">Methodology</div>
+            <button class="btn btn-ghost btn-xs">Expand</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Card 2 -->
+      <div class="card bg-secondary/10 border border-secondary shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-secondary text-secondary-content">
+                <span class="text-xs font-bold">R2</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 2</h3>
+              <p class="text-xs opacity-70">Claude-3.5 • Round 1</p>
+            </div>
+            <div class="badge badge-secondary badge-xs">3m</div>
+          </div>
+          <p class="text-sm line-clamp-3">Strong theoretical foundation, but the literature review misses several key papers from 2023-2024. Particularly Zhao et al. and the recent meta-analysis by Chen. These omissions weaken the positioning of this work.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-outline badge-xs">Literature</div>
+            <button class="btn btn-ghost btn-xs">Expand</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Card 3 -->
+      <div class="card bg-accent/10 border border-accent shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-accent text-accent-content">
+                <span class="text-xs font-bold">R3</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 3</h3>
+              <p class="text-xs opacity-70">Gemini-Pro • Round 1</p>
+            </div>
+            <div class="badge badge-accent badge-xs">2m</div>
+          </div>
+          <p class="text-sm line-clamp-3">Excellent data visualization and clear presentation of results. However, the discussion section could better address limitations and future research directions. The clinical implications are understated.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-outline badge-xs">Presentation</div>
+            <button class="btn btn-ghost btn-xs">Expand</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Card 4 -->
+      <div class="card bg-info/10 border border-info shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-info text-info-content">
+                <span class="text-xs font-bold">R4</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 4</h3>
+              <p class="text-xs opacity-70">DeepSeek • Round 1</p>
+            </div>
+            <div class="badge badge-info badge-xs">2m</div>
+          </div>
+          <p class="text-sm line-clamp-3">The experimental design is sound, but ethical considerations section needs expansion. IRB approval details should be clearer. Also, data availability statement is missing - reproducibility concerns.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-outline badge-xs">Ethics</div>
+            <button class="btn btn-ghost btn-xs">Expand</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Card 5 -->
+      <div class="card bg-warning/10 border border-warning shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-warning text-warning-content">
+                <span class="text-xs font-bold">SE</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Statistics Expert</h3>
+              <p class="text-xs opacity-70">o1-preview • Round 1</p>
+            </div>
+            <div class="badge badge-warning badge-xs">1m</div>
+          </div>
+          <p class="text-sm line-clamp-3">Multiple testing correction is missing from the analysis. With 15 comparisons, family-wise error rate is inflated. Recommend Bonferroni or FDR correction. Also, effect sizes should be reported alongside p-values.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-outline badge-xs">Statistics</div>
+            <button class="btn btn-ghost btn-xs">Expand</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Round Separator Card -->
+      <div class="card bg-neutral/20 border border-neutral border-dashed col-span-full">
+        <div class="card-body p-3 text-center">
+          <div class="badge badge-neutral">Round 2 Begins - Detailed Reviews</div>
+          <p class="text-xs text-base-content/70 mt-1">Reviewers respond to initial feedback and provide specific recommendations</p>
+        </div>
+      </div>
+
+      <!-- Round 2 Messages -->
+      
+      <!-- Message Card 6 -->
+      <div class="card bg-primary/20 border-2 border-primary shadow-md">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-primary text-primary-content ring-1 ring-primary ring-offset-1">
+                <span class="text-xs font-bold">R1</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 1</h3>
+              <p class="text-xs opacity-70">GPT-4 • Round 2</p>
+            </div>
+            <div class="badge badge-primary badge-xs">30s</div>
+          </div>
+          <p class="text-sm line-clamp-4">Building on the statistics expert's point about multiple testing - I calculated the required sample size with Bonferroni correction would be approximately 340 participants for adequate power. Current study is underpowered. Consider this for revision or acknowledge as limitation.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-primary badge-xs">Follow-up</div>
+            <div class="flex gap-1">
+              <button class="btn btn-ghost btn-xs">Quote</button>
+              <button class="btn btn-ghost btn-xs">Expand</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Message Being Typed -->
+      <div class="card bg-secondary/20 border-2 border-secondary border-dashed shadow-lg">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-6 h-6 rounded-full bg-secondary text-secondary-content ring-2 ring-secondary ring-offset-2 animate-pulse">
+                <span class="text-xs font-bold">R2</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-semibold truncate">Reviewer 2</h3>
+              <p class="text-xs opacity-70">Claude-3.5 • Round 2</p>
+            </div>
+            <div class="loading loading-dots loading-sm"></div>
+          </div>
+          <div class="bg-secondary/10 rounded p-2">
+            <div class="flex items-center gap-2">
+              <span class="loading loading-spinner loading-xs"></span>
+              <span class="text-xs opacity-70">Drafting literature review suggestions...</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <div class="badge badge-secondary badge-xs">In Progress</div>
+            <div class="text-xs opacity-50">Thinking...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder for upcoming messages -->
+      <div class="card bg-base-200 border border-base-300 border-dashed opacity-50">
+        <div class="card-body p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar placeholder">
+              <div class="w-6 h-6 rounded-full bg-base-300">
+                <span class="text-xs">R3</span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium opacity-50">Reviewer 3 - Queued</h3>
+              <p class="text-xs opacity-50">Will respond after R2</p>
+            </div>
+          </div>
+          <div class="h-12 bg-base-300 rounded"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Compact Controls -->
+    <div class="mt-6 p-3 bg-base-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="text-sm">
+            <span class="font-medium">Round 2 of 6</span>
+            <span class="text-base-content/70">• R2 currently responding</span>
+          </div>
+          <div class="badge badge-ghost badge-sm">15 total messages</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost btn-xs">Filter by topic</button>
+          <button class="btn btn-ghost btn-xs">Export reviews</button>
+          <button class="btn btn-primary btn-xs">Generate summary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4">
+      <div class="stat bg-base-200 rounded p-3 text-center">
+        <div class="stat-value text-sm text-primary">3</div>
+        <div class="stat-title text-xs">Methodology</div>
+      </div>
+      <div class="stat bg-base-200 rounded p-3 text-center">
+        <div class="stat-value text-sm text-secondary">2</div>
+        <div class="stat-title text-xs">Literature</div>
+      </div>
+      <div class="stat bg-base-200 rounded p-3 text-center">
+        <div class="stat-value text-sm text-accent">1</div>
+        <div class="stat-title text-xs">Presentation</div>
+      </div>
+      <div class="stat bg-base-200 rounded p-3 text-center">
+        <div class="stat-value text-sm text-info">2</div>
+        <div class="stat-title text-xs">Ethics</div>
+      </div>
+      <div class="stat bg-base-200 rounded p-3 text-center">
+        <div class="stat-value text-sm text-warning">4</div>
+        <div class="stat-title text-xs">Statistics</div>
+      </div>
+    </div>
+  </div>
+</div>

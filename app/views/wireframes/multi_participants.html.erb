@@ -1,0 +1,323 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Multi-Participant Layout (3-5)</h1>
+    </div>
+    <div class="navbar-end">
+      <button class="btn btn-ghost btn-sm">View: Cards</button>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-base-content">Climate Change Solutions Brainstorm</h2>
+          <p class="text-base-content/70">Round 4 of 12 • 4 participants • 8 minutes elapsed</p>
+        </div>
+        <div class="stats shadow">
+          <div class="stat place-items-center">
+            <div class="stat-title">Messages</div>
+            <div class="stat-value text-primary">12</div>
+          </div>
+          <div class="stat place-items-center">
+            <div class="stat-title">Round</div>
+            <div class="stat-value text-secondary">4/12</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Grid -->
+  <div class="bg-base-100 border-b border-base-300">
+    <div class="container mx-auto px-4 py-4">
+      <div class="grid grid-cols-4 gap-4">
+        <!-- Participant 1 -->
+        <div class="card bg-primary text-primary-content shadow-md">
+          <div class="card-body compact">
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-primary-content text-primary flex items-center justify-center">
+                  <span class="text-xs font-bold">E</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold truncate">Dr. Environmentalist</p>
+                <p class="text-xs opacity-70 truncate">GPT-4 • Speaking now</p>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="badge badge-accent badge-sm">Round 4</div>
+              <div class="loading loading-dots loading-xs"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participant 2 -->
+        <div class="card bg-base-200 hover:bg-base-300 transition-colors">
+          <div class="card-body compact">
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-secondary text-secondary-content flex items-center justify-center">
+                  <span class="text-xs font-bold">T</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold truncate">Tech Innovator</p>
+                <p class="text-xs opacity-70 truncate">Claude-3.5 • Next up</p>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="badge badge-ghost badge-sm">Waiting</div>
+              <span class="text-xs opacity-50">3 msg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participant 3 -->
+        <div class="card bg-base-200 hover:bg-base-300 transition-colors">
+          <div class="card-body compact">
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-accent text-accent-content flex items-center justify-center">
+                  <span class="text-xs font-bold">P</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold truncate">Policy Maker</p>
+                <p class="text-xs opacity-70 truncate">Gemini-Pro • Queue</p>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="badge badge-ghost badge-sm">Queue</div>
+              <span class="text-xs opacity-50">2 msg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participant 4 -->
+        <div class="card bg-base-200 hover:bg-base-300 transition-colors">
+          <div class="card-body compact">
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-info text-info-content flex items-center justify-center">
+                  <span class="text-xs font-bold">E</span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold truncate">Economist</p>
+                <p class="text-xs opacity-70 truncate">DeepSeek • Queue</p>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="badge badge-ghost badge-sm">Queue</div>
+              <span class="text-xs opacity-50">3 msg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversation Area -->
+  <div class="flex-1 overflow-hidden">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+      <div class="space-y-6">
+        
+        <!-- Message 1 - Dr. Environmentalist -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-primary text-primary-content flex items-center justify-center ring-2 ring-primary ring-offset-2">
+                <span class="font-bold">E</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibold">Dr. Environmentalist</h3>
+              <span class="badge badge-primary badge-sm">GPT-4</span>
+              <span class="badge badge-outline badge-sm">Round 1</span>
+              <time class="text-xs opacity-50">8 min ago</time>
+            </div>
+            <div class="card bg-primary text-primary-content shadow-md">
+              <div class="card-body">
+                <p>We're facing an unprecedented climate crisis that requires immediate, systematic change. The latest IPCC reports show we have less than a decade to cut emissions by 50%. I propose we focus on three key areas: renewable energy transition, carbon sequestration technologies, and policy frameworks that incentivize sustainable practices.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2 - Tech Innovator -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-secondary text-secondary-content flex items-center justify-center">
+                <span class="font-bold">T</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibold">Tech Innovator</h3>
+              <span class="badge badge-secondary badge-sm">Claude-3.5</span>
+              <span class="badge badge-outline badge-sm">Round 1</span>
+              <time class="text-xs opacity-50">7 min ago</time>
+            </div>
+            <div class="card bg-secondary text-secondary-content shadow-md">
+              <div class="card-body">
+                <p>Building on your points, I see massive potential in emerging technologies. AI-optimized smart grids could reduce energy waste by 30%. Direct air capture is becoming cost-effective at scale. And fusion energy is finally showing commercial promise. We need to accelerate R&D funding and create innovation sandboxes for climate tech startups.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3 - Policy Maker -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-accent text-accent-content flex items-center justify-center">
+                <span class="font-bold">P</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibold">Policy Maker</h3>
+              <span class="badge badge-accent badge-sm">Gemini-Pro</span>
+              <span class="badge badge-outline badge-sm">Round 1</span>
+              <time class="text-xs opacity-50">6 min ago</time>
+            </div>
+            <div class="card bg-accent text-accent-content shadow-md">
+              <div class="card-body">
+                <p>While technology is crucial, we can't ignore the policy infrastructure needed. I propose a global carbon pricing mechanism, phased fossil fuel subsidy elimination, and mandatory climate risk disclosure for corporations. We also need just transition programs for workers in carbon-intensive industries.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4 - Economist -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-info text-info-content flex items-center justify-center">
+                <span class="font-bold">E</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibrand">Economist</h3>
+              <span class="badge badge-info badge-sm">DeepSeek</span>
+              <span class="badge badge-outline badge-sm">Round 1</span>
+              <time class="text-xs opacity-50">5 min ago</time>
+            </div>
+            <div class="card bg-info text-info-content shadow-md">
+              <div class="card-body">
+                <p>The economic framework is critical. We need to properly price externalities and create market incentives for green innovation. I suggest implementing a border carbon adjustment mechanism, establishing green bonds markets, and redirecting fossil fuel subsidies (currently $5.9 trillion annually) toward renewable infrastructure and climate adaptation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Round Divider -->
+        <div class="divider">
+          <div class="badge badge-neutral">Round 2 Begins</div>
+        </div>
+
+        <!-- Message 5 - Dr. Environmentalist (Round 2) -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-primary text-primary-content flex items-center justify-center ring-2 ring-primary ring-offset-2">
+                <span class="font-bold">E</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibold">Dr. Environmentalist</h3>
+              <span class="badge badge-primary badge-sm">GPT-4</span>
+              <span class="badge badge-outline badge-sm">Round 2</span>
+              <time class="text-xs opacity-50">3 min ago</time>
+            </div>
+            <div class="card bg-primary text-primary-content shadow-md">
+              <div class="card-body">
+                <p>Excellent points from everyone. I want to emphasize the urgency of natural climate solutions. Protecting and restoring forests, wetlands, and grasslands could provide 37% of needed emission reductions. We should integrate ecosystem-based adaptation into all our tech and policy solutions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Speaker Indicator -->
+        <div class="flex gap-4">
+          <div class="flex-shrink-0">
+            <div class="avatar">
+              <div class="w-12 h-12 rounded-full bg-primary text-primary-content flex items-center justify-center ring-4 ring-primary ring-offset-4 animate-pulse">
+                <span class="font-bold">E</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="font-semibold">Dr. Environmentalist</h3>
+              <span class="badge badge-primary badge-sm">GPT-4</span>
+              <span class="badge badge-outline badge-sm">Round 4</span>
+              <span class="loading loading-dots loading-sm"></span>
+            </div>
+            <div class="card bg-primary text-primary-content shadow-md border-2 border-primary-content">
+              <div class="card-body">
+                <div class="flex items-center gap-2">
+                  <span class="loading loading-dots loading-md"></span>
+                  <span class="text-sm opacity-70">Generating response...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Speaking Queue -->
+  <div class="bg-base-200 border-t border-base-300">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-sm font-medium">Speaking Queue:</span>
+          <div class="flex items-center gap-2">
+            <div class="badge badge-primary">Current: Dr. Environmentalist</div>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <div class="badge badge-secondary">Next: Tech Innovator</div>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <div class="badge badge-ghost">Policy Maker</div>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <div class="badge badge-ghost">Economist</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost btn-sm">Pause</button>
+          <button class="btn btn-ghost btn-sm">Export</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

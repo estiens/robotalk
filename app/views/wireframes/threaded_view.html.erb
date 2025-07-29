@@ -1,0 +1,225 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Threaded View Layout</h1>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-4 py-6 max-w-6xl">
+    <h2 class="text-2xl font-bold mb-2">Threaded Conversation: Software Architecture Debate</h2>
+    <p class="text-base-content/70 mb-6">Tree-like structure showing conversation branches and responses</p>
+
+    <!-- Main Thread -->
+    <div class="space-y-4">
+      
+      <!-- Root Message -->
+      <div class="card bg-primary text-primary-content">
+        <div class="card-body">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar">
+              <div class="w-8 h-8 rounded-full bg-primary-content text-primary">
+                <span class="flex items-center justify-center h-full font-bold text-xs">A</span>
+              </div>
+            </div>
+            <span class="font-semibold">Architect</span>
+            <span class="badge badge-primary-content badge-sm">GPT-4</span>
+          </div>
+          <p>Should we adopt microservices for our new e-commerce platform? I'm concerned about the complexity overhead versus the scalability benefits.</p>
+          <div class="card-actions justify-end mt-2">
+            <div class="badge badge-outline">3 responses</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 1 Responses -->
+      <div class="ml-8 space-y-4">
+        
+        <!-- Response 1 -->
+        <div class="flex gap-2">
+          <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+          <div class="flex-1">
+            <div class="card bg-secondary text-secondary-content">
+              <div class="card-body">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="avatar">
+                    <div class="w-8 h-8 rounded-full bg-secondary-content text-secondary">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">D</span>
+                    </div>
+                  </div>
+                  <span class="font-semibold">DevOps Engineer</span>
+                  <span class="badge badge-secondary-content badge-sm">Claude-3.5</span>
+                </div>
+                <p>Microservices add operational complexity but improve deployment independence. With our team size, I'd recommend starting with a modular monolith and extracting services as needed.</p>
+                <div class="card-actions justify-end mt-2">
+                  <div class="badge badge-outline">1 response</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Level 2 Response -->
+            <div class="ml-8 mt-4">
+              <div class="flex gap-2">
+                <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+                <div class="flex-1">
+                  <div class="card bg-accent text-accent-content">
+                    <div class="card-body">
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="avatar">
+                          <div class="w-6 h-6 rounded-full bg-accent-content text-accent">
+                            <span class="flex items-center justify-center h-full font-bold text-xs">S</span>
+                          </div>
+                        </div>
+                        <span class="font-medium">Senior Developer</span>
+                        <span class="badge badge-accent-content badge-xs">Gemini-Pro</span>
+                      </div>
+                      <p class="text-sm">Great point about modular monoliths! We could use Domain-Driven Design to identify bounded contexts first, then extract when we hit scaling bottlenecks.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Response 2 -->
+        <div class="flex gap-2">
+          <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+          <div class="flex-1">
+            <div class="card bg-info text-info-content">
+              <div class="card-body">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="avatar">
+                    <div class="w-8 h-8 rounded-full bg-info-content text-info">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">P</span>
+                    </div>
+                  </div>
+                  <span class="font-semibold">Product Manager</span>
+                  <span class="badge badge-info-content badge-sm">DeepSeek</span>
+                </div>
+                <p>From a business perspective, we need to ship fast. Microservices seem like premature optimization. What's the minimum viable architecture that gets us to market?</p>
+                <div class="card-actions justify-end mt-2">
+                  <div class="badge badge-outline">2 responses</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Level 2 Responses -->
+            <div class="ml-8 mt-4 space-y-3">
+              <div class="flex gap-2">
+                <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+                <div class="flex-1">
+                  <div class="card bg-warning text-warning-content">
+                    <div class="card-body">
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="avatar">
+                          <div class="w-6 h-6 rounded-full bg-warning-content text-warning">
+                            <span class="flex items-center justify-center h-full font-bold text-xs">T</span>
+                          </div>
+                        </div>
+                        <span class="font-medium">Tech Lead</span>
+                        <span class="badge badge-warning-content badge-xs">GPT-4</span>
+                      </div>
+                      <p class="text-sm">Agreed on speed to market, but let's not create technical debt we'll regret. A well-structured monolith with clean interfaces can evolve into microservices later.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+                <div class="flex-1">
+                  <div class="card bg-error text-error-content">
+                    <div class="card-body">
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="avatar">
+                          <div class="w-6 h-6 rounded-full bg-error-content text-error">
+                            <span class="flex items-center justify-center h-full font-bold text-xs">Q</span>
+                          </div>
+                        </div>
+                        <span class="font-medium">QA Engineer</span>
+                        <span class="badge badge-error-content badge-xs">Claude-3.5</span>
+                      </div>
+                      <p class="text-sm">Testing complexity increases exponentially with microservices. Contract testing, service mesh monitoring, distributed tracing - that's a lot of new tooling to master.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Response 3 - Currently Being Written -->
+        <div class="flex gap-2">
+          <div class="w-0.5 bg-base-300 flex-shrink-0"></div>
+          <div class="flex-1">
+            <div class="card bg-success text-success-content border-2 border-success-content border-dashed">
+              <div class="card-body">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="avatar">
+                    <div class="w-8 h-8 rounded-full bg-success-content text-success ring-2 ring-success-content animate-pulse">
+                      <span class="flex items-center justify-center h-full font-bold text-xs">S</span>
+                    </div>
+                  </div>
+                  <span class="font-semibold">Security Engineer</span>
+                  <span class="badge badge-success-content badge-sm">Anthropic</span>
+                  <span class="loading loading-dots loading-sm"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="loading loading-spinner loading-sm"></span>
+                  <span class="text-sm opacity-70">Analyzing security implications...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Thread Navigation -->
+    <div class="mt-8 p-4 bg-base-200 rounded-lg">
+      <h3 class="font-semibold mb-3">Thread Summary</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="font-medium text-sm mb-2">Active Branches</h4>
+          <ul class="text-sm space-y-1">
+            <li class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-secondary rounded-full"></div>
+              <span>Modular Monolith Discussion (2 messages)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-info rounded-full"></div>
+              <span>Business Requirements Branch (3 messages)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <span>Security Considerations (in progress)</span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium text-sm mb-2">Participants</h4>
+          <div class="flex flex-wrap gap-2">
+            <div class="badge badge-primary">Architect</div>
+            <div class="badge badge-secondary">DevOps</div>
+            <div class="badge badge-info">Product</div>
+            <div class="badge badge-accent">Senior Dev</div>
+            <div class="badge badge-warning">Tech Lead</div>
+            <div class="badge badge-error">QA</div>
+            <div class="badge badge-success">Security</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -65,7 +65,7 @@ class ConversationsController < ApplicationController
 
   def debug
     @conversation = current_user.conversations
-                                .includes(:participants, :messages)
+                                .includes(:participants, :messages, :rounds)
                                 .find(params[:id])
     render json: {
       conversation: {
@@ -73,8 +73,8 @@ class ConversationsController < ApplicationController
         topic: @conversation.conversation_topic,
         dialogue_instructions: @conversation.dialogue_instructions,
         max_rounds: @conversation.max_rounds,
-        current_round: @conversation.current_round,
-        can_continue: @conversation.ready_for_next_round?,
+        current_round: @conversation.current_round_number,
+        can_continue: @conversation.can_continue?,
         message_count: @conversation.messages.count,
         participant_count: @conversation.participants.count
       },
@@ -89,9 +89,22 @@ class ConversationsController < ApplicationController
           full_system_prompt: p.system_prompt_with_topic
         }
       end,
+      rounds: @conversation.rounds.map do |r|
+        {
+          id: r.id,
+          number: r.number,
+          status: r.status,
+          started_at: r.started_at,
+          completed_at: r.completed_at,
+          failed_at: r.failed_at,
+          progress_percentage: r.progress_percentage,
+          messages_count: r.messages.count
+        }
+      end,
       messages: @conversation.messages.map do |m|
         {
           id: m.id,
+          round_id: m.round_id,
           role: m.role,
           model_id: m.model_id,
           content_length: m.content&.length || 0,
@@ -120,19 +133,29 @@ class ConversationsController < ApplicationController
     end
 
     begin
-      # Start conversation and perform first round
-      @conversation.start!
-      @conversation.perform_round!
-
-      respond_to do |format|
-        format.html { redirect_to @conversation, notice: 'Conversation started and first round completed!' }
-        format.turbo_stream { redirect_to @conversation }
+      # Create first round and start it
+      round = @conversation.rounds.create!(number: 1)
+      
+      # Execute round with interactive UI updates
+      result = InteractiveRoundRunner.new(round).execute
+      round = result[:round] # Get updated round state
+      
+      if round.execution_successful?
+        Rails.logger.info "[CONTROLLER] First round completed for conversation ##{@conversation.id}"
+        respond_to do |format|
+          format.html { redirect_to @conversation, notice: 'Conversation started and first round completed!' }
+          format.turbo_stream { redirect_to @conversation }
+        end
+      else
+        raise StandardError, "Round execution failed with status: #{round.status}"
       end
     rescue StandardError => e
       Rails.logger.error "[CONTROLLER] Start conversation failed for conversation ##{@conversation.id}: #{e.message}"
       Rails.logger.error "[CONTROLLER] Start conversation error backtrace: #{e.backtrace.join("\n")}"
-      @conversation.fail!
-      Rails.logger.error "Failed to start conversation: #{e.message}"
+      
+      # Mark round as failed if it exists
+      round&.fail!(e.message)
+      
       respond_to do |format|
         format.html { redirect_to @conversation, alert: "Failed to start conversation: #{e.message}" }
         format.turbo_stream do
@@ -145,37 +168,51 @@ class ConversationsController < ApplicationController
 
   def continue
     @conversation = current_user.conversations
-                                .includes(:participants)
+                                .includes(:participants, :rounds)
                                 .find(params[:id])
 
-    if @conversation.ready_for_next_round?
-      begin
-        # Set to in_progress when starting the round
-        @conversation.update!(status: :in_progress)
-
-        # Perform entire round (all participants speak)
-        @conversation.perform_round!
-
-        respond_to do |format|
-          format.html { redirect_to @conversation, notice: 'Round completed!' }
-          format.turbo_stream { redirect_to @conversation }
-        end
-      rescue StandardError => e
-        Rails.logger.error "[CONTROLLER] Continue conversation failed for conversation ##{@conversation.id}: #{e.message}"
-        Rails.logger.error "[CONTROLLER] Continue conversation error backtrace: #{e.backtrace.join("\n")}"
-        @conversation.fail!
-        Rails.logger.error "Failed to continue conversation: #{e.message}"
-        respond_to do |format|
-          format.html { redirect_to @conversation, alert: "Failed to continue conversation: #{e.message}" }
-          format.turbo_stream do
-            render turbo_stream: turbo_stream.replace('conversation', template: 'conversations/show',
-                                                                      locals: { conversation: @conversation })
-          end
+    # Check if we can continue based on max_rounds and current progress
+    unless @conversation.can_continue?
+      respond_to do |format|
+        format.html { redirect_to @conversation, alert: 'Conversation has reached maximum rounds.' }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace('conversation', template: 'conversations/show',
+                                                                    locals: { conversation: @conversation })
         end
       end
-    else
+      return
+    end
+
+    begin
+      # Create next round
+      next_round_number = @conversation.current_round_number + 1
+      round = @conversation.rounds.create!(number: next_round_number)
+      
+      # Execute round with interactive UI updates
+      result = InteractiveRoundRunner.new(round).execute
+      round = result[:round] # Get updated round state
+      
+      if round.execution_successful?
+        Rails.logger.info "[CONTROLLER] Round #{next_round_number} completed for conversation ##{@conversation.id}"
+        respond_to do |format|
+          format.html { redirect_to @conversation, notice: 'Round completed!' }
+          format.turbo_stream do
+            # No redirect needed - streaming updates handle UI changes
+            head :ok
+          end
+        end
+      else
+        raise StandardError, "Round execution failed with status: #{round.status}"
+      end
+    rescue StandardError => e
+      Rails.logger.error "[CONTROLLER] Continue conversation failed for conversation ##{@conversation.id}: #{e.message}"
+      Rails.logger.error "[CONTROLLER] Continue conversation error backtrace: #{e.backtrace.join("\n")}"
+      
+      # Mark round as failed if it exists
+      round&.fail!(e.message)
+
       respond_to do |format|
-        format.html { redirect_to @conversation, alert: 'Conversation cannot continue.' }
+        format.html { redirect_to @conversation, alert: "Failed to continue conversation: #{e.message}" }
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace('conversation', template: 'conversations/show',
                                                                     locals: { conversation: @conversation })
@@ -187,32 +224,19 @@ class ConversationsController < ApplicationController
   def restart
     @conversation = current_user.conversations.find(params[:id])
 
-    # Delete all messages
-    @conversation.messages.destroy_all
-
-    # Reset status if it was complete or failed, otherwise keep as is
-    @conversation.update(status: :pending, current_round: 1) if @conversation.complete? || @conversation.failed?
-
-    # Optionally, reset other specific attributes if needed, e.g., current_round if stored explicitly
-    # For now, deleting messages effectively resets the round count as it's calculated.
+    # Delete all rounds (which will cascade delete messages due to dependent: :destroy)
+    @conversation.rounds.destroy_all
 
     redirect_to @conversation, notice: 'Conversation has been restarted.'
   end
 
   def destroy
     @conversation = current_user.conversations.find(params[:id])
-
-    # Optimize deletion by bulk-deleting related records first
     conversation_id = @conversation.id
 
-    # Bulk delete messages (fastest approach)
-    Message.where(conversation_id: conversation_id).delete_all
-
-    # Bulk delete participants
-    ConversationParticipant.where(conversation_id: conversation_id).delete_all
-
-    # Now delete the conversation (no cascade needed)
-    @conversation.delete
+    # The Conversation model has dependent: :destroy on rounds and participants
+    # which will cascade delete messages automatically through rounds
+    @conversation.destroy
 
     respond_to do |format|
       format.html { redirect_to conversations_path, notice: 'Conversation was successfully deleted.' }

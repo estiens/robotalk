@@ -1,0 +1,274 @@
+<div class="min-h-screen bg-base-100">
+  <!-- Header -->
+  <div class="navbar bg-base-200 shadow-lg">
+    <div class="navbar-start">
+      <%= link_to wireframes_path, class: "btn btn-ghost" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Wireframes
+      <% end %>
+    </div>
+    <div class="navbar-center">
+      <h1 class="text-xl font-bold">Speaker Lanes Layout</h1>
+    </div>
+    <div class="navbar-end">
+      <button class="btn btn-ghost btn-sm">Timeline View</button>
+    </div>
+  </div>
+
+  <!-- Conversation Header -->
+  <div class="bg-base-200 border-b border-base-300 p-4">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold mb-2">Product Strategy Debate</h2>
+      <p class="text-base-content/70">3 participants • Round 2 of 8 • Horizontal lanes view</p>
+    </div>
+  </div>
+
+  <!-- Speaker Lanes Container -->
+  <div class="overflow-x-auto overflow-y-hidden h-[calc(100vh-180px)]">
+    <div class="min-w-[800px] h-full flex flex-col">
+      
+      <!-- Lane Headers -->
+      <div class="bg-base-300 border-b border-base-300 flex">
+        <!-- Timeline column -->
+        <div class="w-24 p-3 border-r border-base-300">
+          <div class="text-xs font-medium text-center">TIME</div>
+        </div>
+        
+        <!-- Participant Lanes -->
+        <div class="flex-1 flex">
+          <!-- PM Lane -->
+          <div class="flex-1 p-3 border-r border-base-300 bg-primary/10">
+            <div class="flex items-center gap-2">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-primary text-primary-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">PM</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-semibold text-sm">Product Manager</div>
+                <div class="text-xs opacity-70">GPT-4 • 3 messages</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Eng Lane -->
+          <div class="flex-1 p-3 border-r border-base-300 bg-secondary/10">
+            <div class="flex items-center gap-2">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-secondary text-secondary-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">EN</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-semibold text-sm">Engineer</div>
+                <div class="text-xs opacity-70">Claude-3.5 • 2 messages</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Designer Lane -->
+          <div class="flex-1 p-3 bg-accent/10">
+            <div class="flex items-center gap-2">
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full bg-accent text-accent-content">
+                  <span class="flex items-center justify-center h-full font-bold text-xs">UX</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-semibold text-sm">UX Designer</div>
+                <div class="text-xs opacity-70">Gemini-Pro • 2 messages</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Content -->
+      <div class="flex-1 overflow-y-auto">
+        <div class="flex">
+          <!-- Timeline Column -->
+          <div class="w-24 border-r border-base-300 bg-base-100">
+            
+            <!-- Time markers -->
+            <div class="h-20 border-b border-base-300 flex items-center justify-center">
+              <div class="text-xs text-center">
+                <div class="font-medium">Round 1</div>
+                <div class="opacity-50">5m ago</div>
+              </div>
+            </div>
+            
+            <div class="h-20 border-b border-base-300 flex items-center justify-center">
+              <div class="text-xs text-center">
+                <div class="font-medium">Round 1</div>
+                <div class="opacity-50">4m ago</div>
+              </div>
+            </div>
+            
+            <div class="h-20 border-b border-base-300 flex items-center justify-center">
+              <div class="text-xs text-center">
+                <div class="font-medium">Round 1</div>
+                <div class="opacity-50">3m ago</div>
+              </div>
+            </div>
+            
+            <div class="h-24 border-b border-base-300 flex items-center justify-center bg-neutral/20">
+              <div class="text-xs text-center">
+                <div class="font-medium">Round 2</div>
+                <div class="opacity-50">Now</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lanes Content -->
+          <div class="flex-1 flex">
+            
+            <!-- PM Lane Content -->
+            <div class="flex-1 border-r border-base-300 bg-primary/5">
+              <!-- PM Round 1 Message -->
+              <div class="h-20 border-b border-base-300 p-3">
+                <div class="card bg-primary text-primary-content h-full">
+                  <div class="card-body p-2">
+                    <p class="text-xs">We need to prioritize user research before building features. Data shows 40% drop-off in onboarding.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- PM Round 2 Message (Current) -->
+              <div class="h-24 border-b border-base-300 p-3">
+                <div class="card bg-primary text-primary-content h-full ring-2 ring-primary ring-offset-2">
+                  <div class="card-body p-2">
+                    <div class="flex items-center gap-1 mb-1">
+                      <span class="loading loading-dots loading-xs"></span>
+                      <span class="text-xs font-medium">Typing...</span>
+                    </div>
+                    <p class="text-xs opacity-70">Generating response to technical concerns...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Engineer Lane Content -->
+            <div class="flex-1 border-r border-base-300 bg-secondary/5">
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- Engineer Round 1 Message -->
+              <div class="h-20 border-b border-base-300 p-3">
+                <div class="card bg-secondary text-secondary-content h-full">
+                  <div class="card-body p-2">
+                    <p class="text-xs">Technical debt is blocking us. The current architecture can't scale. Need 2 sprints to refactor.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- Next up indicator -->
+              <div class="h-24 border-b border-base-300 p-3">
+                <div class="card bg-secondary/20 border border-secondary border-dashed h-full">
+                  <div class="card-body p-2 flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="badge badge-secondary badge-sm mb-1">Next</div>
+                      <p class="text-xs opacity-70">Waiting to respond</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Designer Lane Content -->
+            <div class="flex-1 bg-accent/5">
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- Empty slot -->
+              <div class="h-20 border-b border-base-300 p-3 opacity-30">
+                <div class="h-full border-2 border-dashed border-base-300 rounded flex items-center justify-center">
+                  <span class="text-xs text-base-content/50">—</span>
+                </div>
+              </div>
+              
+              <!-- Designer Round 1 Message -->
+              <div class="h-20 border-b border-base-300 p-3">
+                <div class="card bg-accent text-accent-content h-full">
+                  <div class="card-body p-2">
+                    <p class="text-xs">User feedback shows confusion with the new nav. Can we A/B test a simpler design?</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Queue indicator -->
+              <div class="h-24 border-b border-base-300 p-3">
+                <div class="card bg-base-100 border border-base-300 h-full">
+                  <div class="card-body p-2 flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="badge badge-ghost badge-sm mb-1">Queue</div>
+                      <p class="text-xs opacity-70">Will respond after Engineer</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls Footer -->
+  <div class="bg-base-200 border-t border-base-300 p-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="text-sm">
+          <span class="font-medium">Current:</span> Product Manager speaking
+        </div>
+        <div class="text-sm opacity-70">
+          <span class="font-medium">Next:</span> Engineer → UX Designer
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost btn-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          Zoom
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

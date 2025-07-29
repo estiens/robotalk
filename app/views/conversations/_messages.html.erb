@@ -6,62 +6,26 @@
     <div class="pt-0 card-body" data-test="conversation-timeline">
       <%# No system messages displayed - conversation shows only actual assistant responses %>
 
-      <!-- Conversation Messages Timeline -->
-      <% if conversation_messages.any? %>
-        <div class="space-y-4">
-          <% conversation_messages.each_with_index do |message, index| %>
-            <%= render "conversations/message", message: message, conversation: conversation, index: index %>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="py-8 text-center">
-          <div class="mb-4 text-4xl">🤖</div>
-          <h3 class="mb-2 font-semibold text-lg">Ready to start the conversation</h3>
-          <p class="opacity-70 text-sm">Click "Start Conversation" to begin the dialogue</p>
-        </div>
-      <% end %>
-      
-      <!-- Ultra Modern Loading Indicator -->
-      <div id="message-loading" class="hidden mt-8 animate-fade-in-up loading-indicator-chat" data-controller="loading-indicator">
-        <div class="group/loading mb-8 chat chat-start">
-          <div class="chat-image avatar">
-            <div class="relative">
-              <!-- Enhanced Avatar with Multi-Ring Animation -->
-              <div class="flex justify-center items-center bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 shadow-2xl border-2 border-white/20 rounded-2xl w-16 h-16 text-2xl">
-                🤔
-              </div>
-              <!-- Multiple Animated Rings -->
-              <div class="absolute inset-0 bg-orange-400 opacity-20 rounded-2xl animate-ping"></div>
-              <div class="absolute inset-1 bg-orange-500 opacity-30 rounded-2xl animate-ping" style="animation-delay: 0.2s;"></div>
-              <div class="absolute inset-2 bg-amber-500 opacity-40 rounded-2xl animate-ping" style="animation-delay: 0.4s;"></div>
-            </div>
+      <!-- Dynamic Loading Indicator (only shows when actively streaming) -->
+      <div id="message-loading" class="hidden mt-8 animate-fade-in-up loading-indicator-chat">
+        <!-- Content will be dynamically updated via Turbo Streams when needed -->
+      </div>
+
+      <!-- Conversation Messages Timeline (newest first for better UX) -->
+      <div id="conversation-messages">
+        <% if conversation_messages.any? %>
+          <div class="space-y-4">
+            <% conversation_messages.reverse.each_with_index do |message, index| %>
+              <%= render "conversations/message", message: message, conversation: conversation, index: index %>
+            <% end %>
           </div>
-          <div class="mb-3 chat-header">
-            <div class="flex items-center gap-3">
-              <span class="font-bold text-orange-600 text-lg" data-loading-indicator-target="modelName">AI Assistant</span>
-              <div class="bg-gradient-to-r from-orange-100 to-amber-200 shadow-sm px-2.5 py-1 rounded-full font-bold text-orange-800">
-                Thinking
-              </div>
-            </div>
-            <div class="mt-1 font-medium text-gray-500 text-xs">Generating intelligent response...</div>
+        <% else %>
+          <div class="py-8 text-center">
+            <div class="mb-4 text-4xl">🤖</div>
+            <h3 class="mb-2 font-semibold text-lg">Ready to start the conversation</h3>
+            <p class="opacity-70 text-sm">Click "Start Conversation" to begin the dialogue</p>
           </div>
-          
-          <!-- Enhanced Loading Bubble -->
-          <div class="relative bg-white bg-gradient-to-br from-orange-50/50 to-amber-100/30 shadow-xl group-hover/loading:shadow-2xl px-6 py-4 border-2 border-orange-200 rounded-2xl max-w-md transition-all duration-300">
-            <!-- Gradient Accent -->
-            <div class="top-0 left-0 absolute bg-gradient-to-r from-orange-400 to-amber-500 rounded-t-2xl w-full h-1"></div>
-            
-            <div class="z-10 relative flex items-center gap-4 py-2">
-              <!-- Enhanced Typing Dots -->
-              <div class="flex gap-2">
-                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0s;"></div>
-                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0.1s;"></div>
-                <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-full w-3 h-3 animate-bounce" style="animation-delay: 0.2s;"></div>
-              </div>
-              <span class="font-semibold text-gray-700 text-lg animate-pulse">Crafting thoughtful response...</span>
-            </div>
-          </div>
-        </div>
+        <% end %>
       </div>
       
     </div>
@@ -81,4 +45,4 @@
       </div>
     </div>
   </div>
-<% end %> 
+<% end %>
