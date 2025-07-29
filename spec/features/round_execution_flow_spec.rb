@@ -102,6 +102,14 @@ RSpec.describe 'Round Execution Flow', type: :system do
 
       # Verify round progression and conversation completion
       conversation.reload
+      puts "DEBUG: Conversation has #{conversation.rounds.count} rounds"
+      puts "DEBUG: Conversation has #{conversation.messages.count} messages"
+      puts "DEBUG: Conversation max_rounds: #{conversation.max_rounds}"
+      conversation.rounds.each_with_index do |round, i|
+        puts "DEBUG: Round #{i+1}: #{round.status}, messages: #{round.messages.count}"
+      end
+      
+      # We expect at least 2 rounds for a 2-round conversation
       expect(conversation.rounds.count).to be >= 2
       expect(conversation.messages.count).to be >= 2
     end
