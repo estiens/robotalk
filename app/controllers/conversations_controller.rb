@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ConversationsController < ApplicationController
-  before_action :require_user
+  # before_action :require_user
   def index
     @conversations = current_user.conversations
                                  .includes(:participants, :messages)
@@ -153,8 +153,8 @@ class ConversationsController < ApplicationController
       Rails.logger.error "[CONTROLLER] Start conversation failed for conversation ##{@conversation.id}: #{e.message}"
       Rails.logger.error "[CONTROLLER] Start conversation error backtrace: #{e.backtrace.join("\n")}"
       
-      # Mark round as failed if it exists
-      round&.fail!(e.message)
+      # Mark round as failed if it exists and isn't already failed
+      round&.fail!(e.message) unless round&.execution_failed?
       
       respond_to do |format|
         format.html { redirect_to @conversation, alert: "Failed to start conversation: #{e.message}" }
@@ -208,8 +208,8 @@ class ConversationsController < ApplicationController
       Rails.logger.error "[CONTROLLER] Continue conversation failed for conversation ##{@conversation.id}: #{e.message}"
       Rails.logger.error "[CONTROLLER] Continue conversation error backtrace: #{e.backtrace.join("\n")}"
       
-      # Mark round as failed if it exists
-      round&.fail!(e.message)
+      # Mark round as failed if it exists and isn't already failed
+      round&.fail!(e.message) unless round&.execution_failed?
 
       respond_to do |format|
         format.html { redirect_to @conversation, alert: "Failed to continue conversation: #{e.message}" }

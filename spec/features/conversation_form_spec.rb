@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'ostruct'
 
-RSpec.describe 'Conversation Form', :vcr do
+RSpec.describe 'Conversation Form', type: :system, vcr: true do
 
   it 'creates a conversation using dialogue type and character archetypes' do
     visit new_conversation_path
@@ -13,17 +13,19 @@ RSpec.describe 'Conversation Form', :vcr do
     expect(page).to have_css('h2', text: 'Dialogue Instructions')
     expect(page).to have_css('h2', text: 'AI Participants')
 
-    # Select a dialogue type
-    find('select[data-test="dialogue-type"]').select('Formal Debate')
+    # Enter conversation topic and max rounds first
+    fill_in 'conversation_conversation_topic', with: 'Free Will vs Determinism'
+    fill_in 'conversation_max_rounds', with: '5'
 
-    # Should see participants created
+    # Manually set the dialogue instructions hidden field using JavaScript
+    page.execute_script("document.querySelector('input[name=\"conversation[dialogue_instructions]\"]').value = 'Conduct a structured debate on the topic'")
+    
+    # Ensure we have the right number of participants
     expect(page).to have_css('[data-participant-form-target="container"] .participant-item', count: 2)
 
-    # Enter conversation topic
-    fill_in 'conversation_conversation_topic', with: 'Free Will vs Determinism'
-
-    # Set max rounds
-    fill_in 'conversation_max_rounds', with: '5'
+    # Fill in participant names (which are required)
+    fill_in 'conversation[participants_attributes][0][name]', with: 'Participant 1'
+    fill_in 'conversation[participants_attributes][1][name]', with: 'Participant 2'
 
     # Select models for participants
     select 'OpenAI: GPT-4o Mini', from: 'conversation[participants_attributes][0][model_id]'

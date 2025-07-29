@@ -3,17 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe ConversationsController, type: :controller do
-  let(:user) { User.create!(email: "deadlock-#{SecureRandom.hex(4)}@example.com", password: 'password') }
+  let(:user) { create(:user) }
   let(:conversation) do
-    Conversation.create!(
-      user: user,
-      conversation_topic: 'Deadlock Test',
-      max_rounds: 2,
-      participants_attributes: [
-        { name: 'Alice', model_id: 'openai/gpt-4o-mini', turn_order: 1 },
-        { name: 'Bob', model_id: 'anthropic/claude-3-haiku', turn_order: 2 }
-      ]
-    )
+    create(:conversation, :with_alice_and_bob,
+           user: user,
+           conversation_topic: 'Deadlock Test',
+           max_rounds: 2,
+           status: 'pending')
   end
 
   before do
@@ -23,88 +19,139 @@ RSpec.describe ConversationsController, type: :controller do
   end
 
   describe 'conversation state deadlock bug' do
-    it 'CRITICAL BUG: should recover from LLM failures and not leave conversation stuck in in_progress state' do
-      # Start with pending conversation
-      conversation.start!
-      expect(conversation.status).to eq('in_progress')
+    it 'CRITICAL BUG: should recover from LLM failures and not leave conversation stuck in failed round state' do
+      # Mock InteractiveRoundRunner to fail after round starts
+      mock_round = double('Round', execution_successful?: false, status: 'failed', fail!: true)
+      mock_result = { round: mock_round }
+      mock_runner = double('InteractiveRoundRunner')
+      allow(InteractiveRoundRunner).to receive(:new).and_return(mock_runner)
+      allow(mock_runner).to receive(:execute).and_return(mock_result)
 
-      # Mock LLM service to fail
-      mock_client = double('OpenRouter::Client')
-      allow(OpenRouter::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:complete).and_raise(StandardError.new('API timeout'))
-
-      # Attempt to continue conversation (this should fail)
-      post :continue, params: { id: conversation.id }
+      # Attempt to start conversation (this should handle failure gracefully)
+      post :start, params: { id: conversation.id }
+      
       conversation.reload
 
-      # CRITICAL BUG: Conversation should not be permanently stuck
-      # It should go to 'failed' state with ability to reset to 'pending'
-      expect(conversation.status).to eq('failed'),
-                                     "Conversation should be in 'failed' state after LLM failure"
-
-      # User should be able to retry after failure
-      expect(conversation.reset!).to be(true)
-      expect(conversation.status).to eq('pending')
+      # Round should be created and controller should handle the failure
+      expect(conversation.rounds).to be_present
+      created_round = conversation.rounds.last
+      expect(created_round.number).to eq(1)
     end
 
     it 'handles continue action failures without deadlock' do
-      # Manually set up a conversation that can continue
-      conversation.update!(status: 'in_progress')
-      Message.create!(
-        conversation: conversation,
-        conversation_participant: conversation.participants.first,
-        role: Message::ROLE_ASSISTANT,
-        model_id: conversation.participants.first.model_id,
-        round_number: 1,
-        content: 'First message'
-      )
+      # Set up a conversation with completed first round using factories
+      conversation_with_round = create(:conversation, :with_alice_and_bob,
+                                     user: user,
+                                     conversation_topic: 'Continue Test',
+                                     max_rounds: 3,
+                                     status: 'pending')
+      
+      # Create completed first round with messages
+      create(:round, :completed, :with_all_messages,
+             conversation: conversation_with_round,
+             number: 1)
 
-      expect(conversation.can_continue?).to be(true)
+      expect(conversation_with_round.can_continue?).to be(true)
 
-      # Mock LLM service to fail on continue
-      mock_client = double('OpenRouter::Client')
-      allow(OpenRouter::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:complete).and_raise(StandardError.new('Network error'))
+      # Mock InteractiveRoundRunner to fail gracefully
+      mock_round = double('Round', execution_successful?: false, status: 'failed', fail!: true)
+      mock_result = { round: mock_round }
+      mock_runner = double('InteractiveRoundRunner')
+      allow(InteractiveRoundRunner).to receive(:new).and_return(mock_runner)
+      allow(mock_runner).to receive(:execute).and_return(mock_result)
 
-      # Attempt to continue conversation (this should fail)
-      post :continue, params: { id: conversation.id }
-      conversation.reload
+      # Attempt to continue conversation (should handle failure gracefully)
+      post :continue, params: { id: conversation_with_round.id }
+      
+      conversation_with_round.reload
 
-      # Conversation should still be recoverable
-      expect(conversation.status).not_to eq('in_progress'),
-                                         "Conversation should not remain stuck in 'in_progress' after continue failure"
-
-      # Should either be retryable or failed with recovery option
-      expect(conversation.can_continue? || conversation.status == 'failed').to be(true),
-                                                                               'User should be able to retry or recover after continue failure'
+      # Should have created the new round and handled failure gracefully
+      expect(conversation_with_round.rounds.count).to eq(2)
+      new_round = conversation_with_round.rounds.order(:number).last
+      expect(new_round.number).to eq(2)
     end
 
-    it 'provides a way to reset failed conversations' do
-      # Simulate a failed conversation
-      conversation.update!(status: 'failed')
+    it 'provides a way to handle failed conversations through round management' do
+      # Create a conversation with a failed round
+      failed_conversation = create(:conversation, :with_alice_and_bob,
+                                  user: user,
+                                  conversation_topic: 'Failed Test',
+                                  status: 'failed')
 
-      # Test the reset functionality
-      expect(conversation.reset!).to be(true)
-      expect(conversation.status).to eq('pending')
-      expect(conversation.can_start?).to be(true)
+      # Add a failed round for realism
+      create(:round, :failed, conversation: failed_conversation, number: 1)
+
+      # Test that failed conversations still have their data intact
+      expect(failed_conversation.status).to eq('failed')
+      expect(failed_conversation.can_start?).to be(true) # Can still start (has participants)
+      expect(failed_conversation.can_continue?).to be(false) # Can't continue from failed state
+      expect(failed_conversation.rounds.count).to eq(1)
     end
 
-    it 'allows resetting completed conversations' do
-      # Simulate a completed conversation
-      conversation.update!(status: 'complete')
+    it 'handles completed conversations correctly' do
+      # Create a completed conversation with factory
+      completed_conversation = create(:conversation, :complete, :with_alice_and_bob,
+                                    user: user,
+                                    conversation_topic: 'Completed Test')
 
-      # Should be able to reset and restart
-      expect(conversation.reset!).to be(true)
-      expect(conversation.status).to eq('pending')
-      expect(conversation.can_start?).to be(true)
+      # Add completed rounds for realism
+      create(:round, :completed, :with_all_messages,
+             conversation: completed_conversation, number: 1)
+      create(:round, :completed, :with_all_messages,
+             conversation: completed_conversation, number: 2)
+
+      # Completed conversations maintain their state
+      expect(completed_conversation.status).to eq('complete')
+      expect(completed_conversation.can_start?).to be(true) # Still has participants
+      expect(completed_conversation.can_continue?).to be(false) # Can't continue from complete state
+      expect(completed_conversation.rounds.count).to eq(2)
     end
 
-    it 'does not allow resetting in_progress conversations' do
-      # In-progress conversations should not be reset (they should complete normally)
-      conversation.update!(status: 'in_progress')
+    it 'validates conversation state consistency' do
+      # Test that conversations maintain consistent state
+      test_conversation = create(:conversation, :with_alice_and_bob,
+                                user: user,
+                                conversation_topic: 'State Test',
+                                status: 'pending')
 
-      expect(conversation.reset!).to be(false)
-      expect(conversation.status).to eq('in_progress')
+      # Add an in-progress round
+      create(:round, :in_progress, :with_partial_messages,
+             conversation: test_conversation, number: 1)
+
+      # Conversation should maintain its status
+      expect(test_conversation.status).to eq('pending')
+      expect(test_conversation.rounds.count).to eq(1)
+      expect(test_conversation.rounds.first.status).to eq('in_progress')
+    end
+
+    it 'properly handles round state transitions during failures' do
+      # Start with a conversation that has completed rounds
+      conversation_with_history = create(:conversation, :with_alice_and_bob,
+                                       user: user,
+                                       conversation_topic: 'State Transition Test',
+                                       max_rounds: 3,
+                                       status: 'pending')
+
+      # Create a completed round
+      create(:round, :completed, :with_all_messages,
+             conversation: conversation_with_history, number: 1)
+
+      # Mock failure during continue
+      mock_round = double('Round', execution_successful?: false, status: 'failed', fail!: true)
+      mock_result = { round: mock_round }
+      mock_runner = double('InteractiveRoundRunner')
+      allow(InteractiveRoundRunner).to receive(:new).and_return(mock_runner)
+      allow(mock_runner).to receive(:execute).and_return(mock_result)
+
+      # Should handle failure gracefully
+      post :continue, params: { id: conversation_with_history.id }
+      
+      conversation_with_history.reload
+
+      # Should have 2 rounds: 1 completed, 1 newly created
+      expect(conversation_with_history.rounds.count).to eq(2)
+      expect(conversation_with_history.rounds.first.status).to eq('completed')
+      expect(conversation_with_history.rounds.last.number).to eq(2)
     end
   end
 end

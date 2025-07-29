@@ -122,6 +122,15 @@ RSpec.configure do |config|
   def rerecord_cassette(cassette_name, &block)
     VCR.use_cassette(cassette_name, record: :all, &block)
   end
+
+  # Disable Bullet gem for system tests to avoid alerts interrupting Selenium
+  config.before(:each, type: :system) do
+    Bullet.enable = false
+  end
+  
+  config.after(:each, type: :system) do
+    Bullet.enable = true
+  end
 end
 
 # Shoulda Matchers configuration

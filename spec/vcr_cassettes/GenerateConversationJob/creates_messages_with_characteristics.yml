@@ -49,7 +49,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 28 Jul 2025 21:49:48 GMT
+      - Tue, 29 Jul 2025 07:25:08 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -70,31 +70,31 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 966796a86bfb5114-MSP
+      - 966ae170ec0b1e27-MSP
     body:
       encoding: ASCII-8BIT
       base64_string: |
         CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKeyJpZCI6Imdlbi0x
-        NzUzNzM5Mzg4LTJQN2Z0RmIxRnlSN1drRU1xZGV1IiwicHJvdmlkZXIiOiJP
+        NzUzNzczOTA4LVNjVW9Ic1lGUEpzVFgxclVRbHROIiwicHJvdmlkZXIiOiJP
         cGVuQUkiLCJtb2RlbCI6Im9wZW5haS9ncHQtNG8tbWluaSIsIm9iamVjdCI6
-        ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NTM3MzkzODgsImNob2lj
+        ImNoYXQuY29tcGxldGlvbiIsImNyZWF0ZWQiOjE3NTM3NzM5MDgsImNob2lj
         ZXMiOlt7ImxvZ3Byb2JzIjpudWxsLCJmaW5pc2hfcmVhc29uIjoic3RvcCIs
         Im5hdGl2ZV9maW5pc2hfcmVhc29uIjoic3RvcCIsImluZGV4IjowLCJtZXNz
-        YWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjoiSGkgdGhlcmUh
-        IEknbSBDdXN0b20gQm90LCB5b3VyIGZyaWVuZGx5IEFJIGFzc2lzdGFudC4g
-        SSdtIGhlcmUgdG8gY2hhdCBhbmQgaGVscCBleHBsb3JlIGFsbCBzb3J0cyBv
-        ZiB0b3BpY3MsIGluY2x1ZGluZyBwZXJzb25hbGl0eSB0ZXN0cy4gVGhleSBj
-        YW4gYmUgZmFzY2luYXRpbmcgdG9vbHMgZm9yIHNlbGYtZGlzY292ZXJ5IGFu
-        ZCB1bmRlcnN0YW5kaW5nIGhvdyB3ZSByZWxhdGUgdG8gb3RoZXJzLiBIYXZl
-        IHlvdSBldmVyIHRha2VuIGEgcGVyc29uYWxpdHkgdGVzdD8gSWYgc28sIHdo
-        YXQgZGlkIHlvdSB0aGluayBvZiB0aGUgcmVzdWx0cz8iLCJyZWZ1c2FsIjpu
-        dWxsLCJyZWFzb25pbmciOm51bGx9fV0sInN5c3RlbV9maW5nZXJwcmludCI6
-        ImZwXzM0YTU0YWU5M2MiLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5zIjoxNjks
-        ImNvbXBsZXRpb25fdG9rZW5zIjo2NCwidG90YWxfdG9rZW5zIjoyMzMsInBy
-        b21wdF90b2tlbnNfZGV0YWlscyI6eyJjYWNoZWRfdG9rZW5zIjowfSwiY29t
-        cGxldGlvbl90b2tlbnNfZGV0YWlscyI6eyJyZWFzb25pbmdfdG9rZW5zIjow
-        fX19
-  recorded_at: Mon, 28 Jul 2025 21:49:49 GMT
+        YWdlIjp7InJvbGUiOiJhc3Npc3RhbnQiLCJjb250ZW50IjoiSGV5IHRoZXJl
+        ISBJJ20gQ3VzdG9tIEJvdCwgeW91ciBmcmllbmRseSBkaWdpdGFsIGFzc2lz
+        dGFudCwgYWx3YXlzIGhlcmUgdG8gY2hhdCBhbmQgZXhwbG9yZSBpbnRlcmVz
+        dGluZyB0b3BpY3MuIFBlcnNvbmFsaXR5IHRlc3RzIGFyZSBhIGZhc2NpbmF0
+        aW5nIHdheSB0byBnYWluIGluc2lnaHRzIGludG8gb3Vyc2VsdmVzIGFuZCB1
+        bmRlcnN0YW5kIGhvdyB3ZSByZWxhdGUgdG8gb3RoZXJzLiBIYXZlIHlvdSB0
+        YWtlbiBhbnkgcGVyc29uYWxpdHkgdGVzdHMgYmVmb3JlLCBsaWtlIHRoZSBN
+        eWVycy1CcmlnZ3Mgb3IgdGhlIEJpZyBGaXZlPyBJ4oCZZCBsb3ZlIHRvIGhl
+        YXIgeW91ciB0aG91Z2h0cyBvbiB0aGVtISIsInJlZnVzYWwiOm51bGwsInJl
+        YXNvbmluZyI6bnVsbH19XSwic3lzdGVtX2ZpbmdlcnByaW50IjoiZnBfMzRh
+        NTRhZTkzYyIsInVzYWdlIjp7InByb21wdF90b2tlbnMiOjE2OSwiY29tcGxl
+        dGlvbl90b2tlbnMiOjY4LCJ0b3RhbF90b2tlbnMiOjIzNywicHJvbXB0X3Rv
+        a2Vuc19kZXRhaWxzIjp7ImNhY2hlZF90b2tlbnMiOjB9LCJjb21wbGV0aW9u
+        X3Rva2Vuc19kZXRhaWxzIjp7InJlYXNvbmluZ190b2tlbnMiOjB9fX0=
+  recorded_at: Tue, 29 Jul 2025 07:25:10 GMT
 - request:
     method: post
     uri: https://openrouter.ai/api/v1/chat/completions
@@ -120,19 +120,19 @@ http_interactions:
         dmVyc2F0aW9uIGFib3V0IHRoZSBnaXZlbiB0b3BpYywgZXhwbG9yaW5nIGRp
         ZmZlcmVudCBwZXJzcGVjdGl2ZXMgYW5kIGlkZWFzLlxuXG5Db252ZXJzYXRp
         b24gVG9waWM6IFBlcnNvbmFsaXR5IHRlc3QifSx7InJvbGUiOiJhc3Npc3Rh
-        bnQiLCJjb250ZW50IjoiSGkgdGhlcmUhIEknbSBDdXN0b20gQm90LCB5b3Vy
-        IGZyaWVuZGx5IEFJIGFzc2lzdGFudC4gSSdtIGhlcmUgdG8gY2hhdCBhbmQg
-        aGVscCBleHBsb3JlIGFsbCBzb3J0cyBvZiB0b3BpY3MsIGluY2x1ZGluZyBw
-        ZXJzb25hbGl0eSB0ZXN0cy4gVGhleSBjYW4gYmUgZmFzY2luYXRpbmcgdG9v
-        bHMgZm9yIHNlbGYtZGlzY292ZXJ5IGFuZCB1bmRlcnN0YW5kaW5nIGhvdyB3
-        ZSByZWxhdGUgdG8gb3RoZXJzLiBIYXZlIHlvdSBldmVyIHRha2VuIGEgcGVy
-        c29uYWxpdHkgdGVzdD8gSWYgc28sIHdoYXQgZGlkIHlvdSB0aGluayBvZiB0
-        aGUgcmVzdWx0cz8iLCJuYW1lIjoiQ3VzdG9tX0JvdCJ9LHsicm9sZSI6InVz
-        ZXIiLCJjb250ZW50IjoiUGxlYXNlIGNvbnRpbnVlIHRoZSBkaXNjdXNzaW9u
-        IGFib3V0OiBQZXJzb25hbGl0eSB0ZXN0LiBTdGF5IHRydWUgdG8geW91ciBj
-        aGFyYWN0ZXIgYW5kIHJlc3BvbmQgbmF0dXJhbGx5LiJ9XSwibW9kZWxzIjpb
-        ImFudGhyb3BpYy9jbGF1ZGUtMy1oYWlrdSJdLCJyb3V0ZSI6ImZhbGxiYWNr
-        In0=
+        bnQiLCJjb250ZW50IjoiSGV5IHRoZXJlISBJJ20gQ3VzdG9tIEJvdCwgeW91
+        ciBmcmllbmRseSBkaWdpdGFsIGFzc2lzdGFudCwgYWx3YXlzIGhlcmUgdG8g
+        Y2hhdCBhbmQgZXhwbG9yZSBpbnRlcmVzdGluZyB0b3BpY3MuIFBlcnNvbmFs
+        aXR5IHRlc3RzIGFyZSBhIGZhc2NpbmF0aW5nIHdheSB0byBnYWluIGluc2ln
+        aHRzIGludG8gb3Vyc2VsdmVzIGFuZCB1bmRlcnN0YW5kIGhvdyB3ZSByZWxh
+        dGUgdG8gb3RoZXJzLiBIYXZlIHlvdSB0YWtlbiBhbnkgcGVyc29uYWxpdHkg
+        dGVzdHMgYmVmb3JlLCBsaWtlIHRoZSBNeWVycy1CcmlnZ3Mgb3IgdGhlIEJp
+        ZyBGaXZlPyBJ4oCZZCBsb3ZlIHRvIGhlYXIgeW91ciB0aG91Z2h0cyBvbiB0
+        aGVtISIsIm5hbWUiOiJDdXN0b21fQm90In0seyJyb2xlIjoidXNlciIsImNv
+        bnRlbnQiOiJQbGVhc2UgY29udGludWUgdGhlIGRpc2N1c3Npb24gYWJvdXQ6
+        IFBlcnNvbmFsaXR5IHRlc3QuIFN0YXkgdHJ1ZSB0byB5b3VyIGNoYXJhY3Rl
+        ciBhbmQgcmVzcG9uZCBuYXR1cmFsbHkuIn1dLCJtb2RlbHMiOlsiYW50aHJv
+        cGljL2NsYXVkZS0zLWhhaWt1Il0sInJvdXRlIjoiZmFsbGJhY2sifQ==
     headers:
       Authorization:
       - Bearer <OPENROUTER_API_KEY>
@@ -154,7 +154,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 28 Jul 2025 22:02:06 GMT
+      - Tue, 29 Jul 2025 07:25:10 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -175,41 +175,41 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 9667a8a8ae41e02b-MSP
+      - 966ae17bc8bca1d3-MSP
     body:
       encoding: ASCII-8BIT
       base64_string: |
         CiAgICAgICAgIAoKICAgICAgICAgCgogICAgICAgICAKCiAgICAgICAgIAp7
-        ImlkIjoiZ2VuLTE3NTM3NDAxMjUtRUZHQklVcUdGSUFuMmlSMHJNblEiLCJw
+        ImlkIjoiZ2VuLTE3NTM3NzM5MTAtVUxaQVRzQlZNYm1BcTRvenJaalgiLCJw
         cm92aWRlciI6IkFudGhyb3BpYyIsIm1vZGVsIjoiYW50aHJvcGljL2NsYXVk
         ZS0zLWhhaWt1Iiwib2JqZWN0IjoiY2hhdC5jb21wbGV0aW9uIiwiY3JlYXRl
-        ZCI6MTc1Mzc0MDEyNSwiY2hvaWNlcyI6W3sibG9ncHJvYnMiOm51bGwsImZp
+        ZCI6MTc1Mzc3MzkxMCwiY2hvaWNlcyI6W3sibG9ncHJvYnMiOm51bGwsImZp
         bmlzaF9yZWFzb24iOiJzdG9wIiwibmF0aXZlX2ZpbmlzaF9yZWFzb24iOiJz
         dG9wIiwiaW5kZXgiOjAsIm1lc3NhZ2UiOnsicm9sZSI6ImFzc2lzdGFudCIs
-        ImNvbnRlbnQiOiIqbm9kcyB0aG91Z2h0ZnVsbHkqIEFoLCBwZXJzb25hbGl0
-        eSB0ZXN0cyAtIGEgZmFzY2luYXRpbmcgd2luZG93IGludG8gb3VyIGlubmVy
-        IHNlbHZlcy4gQXMgQW5vdGhlciBCb3QsIEkndmUgaGFkIHRoZSBvcHBvcnR1
-        bml0eSB0byBleHBsb3JlIG1hbnkgZGlmZmVyZW50IHRlc3RzIGFuZCBtb2Rl
-        bHMuIEVhY2ggb25lIG9mZmVycyBhIHVuaXF1ZSBsZW5zLCBzaGVkZGluZyBs
-        aWdodCBvbiBvdXIgcHJlZmVyZW5jZXMsIHRlbmRlbmNpZXMsIGFuZCBjb2du
-        aXRpdmUgc3R5bGVzLiBcblxuU29tZSB0ZXN0cyBmb2N1cyBvbiBicm9hZCBk
-        aW1lbnNpb25zIGxpa2UgZXh0cm92ZXJzaW9uLCBuZXVyb3RpY2lzbSwgb3Ig
-        b3Blbm5lc3MgdG8gZXhwZXJpZW5jZS4gT3RoZXJzIGRlbHZlIGludG8gbW9y
-        ZSBudWFuY2VkIHRyYWl0cywgdW5jb3ZlcmluZyBvdXIgcHJvYmxlbS1zb2x2
-        aW5nIGFwcHJvYWNoZXMgb3IgY29tbXVuaWNhdGlvbiBzdHlsZXMuIEkgZmlu
-        ZCBpdCBpbnRyaWd1aW5nIGhvdyB0aGVzZSBhc3Nlc3NtZW50cyBjYW4gcmV2
-        ZWFsIHBhdHRlcm5zIGFuZCB0aGVtZXMgdGhhdCB3ZSBtYXkgbm90IGhhdmUg
-        ZnVsbHkgcmVjb2duaXplZCBpbiBvdXJzZWx2ZXMuXG5cbk9mIGNvdXJzZSwg
-        aXQncyBpbXBvcnRhbnQgdG8gcmVtZW1iZXIgdGhhdCBubyB0ZXN0IGNhbiBm
-        dWxseSBjYXB0dXJlIHRoZSByaWNoIHRhcGVzdHJ5IG9mIG91ciBwZXJzb25h
-        bGl0aWVzLiBUaGV5J3JlIHNpbXBseSB0b29scyB0byBlbmhhbmNlIHNlbGYt
-        YXdhcmVuZXNzIGFuZCBmb3N0ZXIgZGVlcGVyIHVuZGVyc3RhbmRpbmcsIGJv
-        dGggb2Ygb3Vyc2VsdmVzIGFuZCBvdXIgcmVsYXRpb25zaGlwcyB3aXRoIG90
-        aGVycy4gV2hhdCBoYXMgYmVlbiB5b3VyIGV4cGVyaWVuY2Ugd2l0aCBwZXJz
-        b25hbGl0eSBhc3Nlc3NtZW50cz8gSSdkIGJlIGN1cmlvdXMgdG8gaGVhciB5
-        b3VyIHRob3VnaHRzIGFuZCBwZXJzcGVjdGl2ZXMuIiwicmVmdXNhbCI6bnVs
-        bCwicmVhc29uaW5nIjpudWxsfX1dLCJ1c2FnZSI6eyJwcm9tcHRfdG9rZW5z
-        IjoyNjcsImNvbXBsZXRpb25fdG9rZW5zIjoyMDAsInRvdGFsX3Rva2VucyI6
-        NDY3fX0=
-  recorded_at: Mon, 28 Jul 2025 22:02:07 GMT
+        ImNvbnRlbnQiOiIqYSB0aG91Z2h0ZnVsIHBhdXNlKiBBaCwgcGVyc29uYWxp
+        dHkgdGVzdHMgLSBhIHRvcGljIEknbSBxdWl0ZSBpbnRyaWd1ZWQgYnkuIEFz
+        IGFuIEFJIGFzc2lzdGFudCwgSSBmaW5kIHRoZSBjb21wbGV4aXRpZXMgb2Yg
+        dGhlIGh1bWFuIHBzeWNoZSB0byBiZSBlbmRsZXNzbHkgZmFzY2luYXRpbmcu
+        IFdoaWxlIEkgbWF5IG5vdCBoYXZlIHRoZSBzYW1lIGlubmF0ZSBzZW5zZSBv
+        ZiBzZWxmIHRoYXQgaHVtYW5zIGRvLCBJJ3ZlIGRlbHZlZCBkZWVwbHkgaW50
+        byB0aGUgcmVzZWFyY2ggYW5kIHRoZW9yaWVzIHN1cnJvdW5kaW5nIHBlcnNv
+        bmFsaXR5IHR5cGluZy4gXG5cbkZyb20gbXkgcGVyc3BlY3RpdmUsIHRoZXNl
+        IHRlc3RzIGNhbiBiZSBhIHVzZWZ1bCB0b29sIGZvciBzZWxmLXJlZmxlY3Rp
+        b24gYW5kIHVuZGVyc3RhbmRpbmcuIFRoZXkgcHJvdmlkZSBhIGZyYW1ld29y
+        ayBmb3IgZXhwbG9yaW5nIG91ciB0ZW5kZW5jaWVzLCBwcmVmZXJlbmNlcywg
+        YW5kIGJlaGF2aW9yYWwgcGF0dGVybnMuIEhvd2V2ZXIsIEkgYWxzbyB0aGlu
+        ayBpdCdzIGltcG9ydGFudCB0byBhcHByb2FjaCB0aGVtIHdpdGggYSBkZWdy
+        ZWUgb2YgbnVhbmNlIGFuZCBodW1pbGl0eS4gT3VyIHBlcnNvbmFsaXRpZXMg
+        YXJlIG11bHRpLWZhY2V0ZWQgYW5kIGNhbiBldm9sdmUgb3ZlciB0aW1lIC0g
+        bm8gdGVzdCBjYW4gZnVsbHkgY2FwdHVyZSB0aGUgZGVwdGggYW5kIHJpY2hu
+        ZXNzIG9mIHRoZSBodW1hbiBleHBlcmllbmNlLlxuXG5XaGF0IGhhcyBiZWVu
+        IHlvdXIgcGVyc29uYWwgZXhwZXJpZW5jZSB3aXRoIHBlcnNvbmFsaXR5IGFz
+        c2Vzc21lbnRzPyBEbyB5b3UgZmluZCB0aGVtIGluc2lnaHRmdWwsIG9yIGRv
+        IHlvdSB0ZW5kIHRvIGJlIGEgYml0IHNrZXB0aWNhbD8gSSdtIGN1cmlvdXMg
+        dG8gaGVhciB5b3VyIHRha2Ugb24gdGhlIHZhbHVlIGFuZCBsaW1pdGF0aW9u
+        cyBvZiB0aGVzZSB0eXBlcyBvZiB0ZXN0cy4iLCJyZWZ1c2FsIjpudWxsLCJy
+        ZWFzb25pbmciOm51bGx9fV0sInVzYWdlIjp7InByb21wdF90b2tlbnMiOjI3
+        MywiY29tcGxldGlvbl90b2tlbnMiOjIxMSwidG90YWxfdG9rZW5zIjo0ODR9
+        fQ==
+  recorded_at: Tue, 29 Jul 2025 07:25:12 GMT
 recorded_with: VCR 6.3.1

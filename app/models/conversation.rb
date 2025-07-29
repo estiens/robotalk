@@ -10,6 +10,7 @@ class Conversation < ApplicationRecord
 
   enum :status, {
     pending: 'pending',
+    in_progress: 'in_progress',
     complete: 'complete',
     failed: 'failed'
   }

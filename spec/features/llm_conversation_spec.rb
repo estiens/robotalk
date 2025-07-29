@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'LLM Conversation' do
+RSpec.describe 'LLM Conversation', type: :system do
   include CapybaraHelpers
 
   it 'creates and runs a conversation between two LLMs', :js, :slow, :vcr do

@@ -46,6 +46,7 @@ class Round < ApplicationRecord
       transitions from: :in_progress, to: :completed
       after do
         self.completed_at = Time.current
+        save!
       end
     end
     
@@ -54,6 +55,7 @@ class Round < ApplicationRecord
       after do |reason = nil|
         self.failure_reason = reason if reason
         self.failed_at = Time.current
+        save!
       end
     end
     

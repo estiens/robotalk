@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Conversation deletion' do
+RSpec.describe 'Conversation deletion', type: :system do
   let!(:user) { User.find_or_create_by(email: 'anonymous@roboconvo.local') { |u| u.password = 'password' } }
 
   describe 'on the index page' do

@@ -13,7 +13,6 @@ class Message < ApplicationRecord
   validates :content, presence: true, unless: :streaming_message?
 
   before_validation :set_defaults
-  after_create_commit :trigger_conversation_processing
 
   # Safe metadata access
   def metadata
@@ -38,7 +37,4 @@ class Message < ApplicationRecord
     self.role = ROLE_ASSISTANT if role.nil?
   end
 
-  def trigger_conversation_processing
-    conversation.process_new_message
-  end
 end

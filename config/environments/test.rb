@@ -25,7 +25,7 @@ Rails.application.configure do
   config.cache_store = :null_store
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
-  config.action_dispatch.show_exceptions = :rescuable
+  config.action_dispatch.show_exceptions = :none
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
@@ -36,6 +36,9 @@ Rails.application.configure do
   
   # Completely disable host authorization middleware in test
   config.middleware.delete ActionDispatch::HostAuthorization
+
+  # Disable browser version checking for all request specs (Claude Opus solution)
+  config.allow_browser = nil
 
   # Store uploaded files on the local file system in a temporary directory.
   config.active_storage.service = :test

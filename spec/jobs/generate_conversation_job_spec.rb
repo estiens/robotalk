@@ -11,13 +11,13 @@ RSpec.describe GenerateConversationJob, :vcr do
       it 'generates a complete conversation from start to finish via background job', :vcr do
         VCR.use_cassette('GenerateConversationJob/generates_complete_conversation', record: :new_episodes) do
           # Create a user and conversation
-          user = create_user
+          user = create(:user)
           conversation = Conversation.create!(
             user: user,
             conversation_topic: 'The impact of renewable energy on global climate goals',
             dialogue_instructions: 'Discuss the role of renewable energy in achieving climate targets, exploring both benefits and challenges.',
             max_rounds: 5,
-            status: :generating,
+            status: :pending,
             participants_attributes: [
               { model_id: 'openai/gpt-4o-mini', turn_order: 1, name: 'Climate Scientist',
                 character_prompt: 'You are a climate scientist focused on data-driven analysis.' },
@@ -27,9 +27,9 @@ RSpec.describe GenerateConversationJob, :vcr do
           )
 
           # Verify initial state
-          expect(conversation.status).to eq('generating')
+          expect(conversation.status).to eq('pending')
           expect(conversation.messages.count).to eq(0)
-          expect(conversation.current_round).to eq(1)
+          expect(conversation.current_round).to eq(0)
 
           # Execute the job
           perform_enqueued_jobs do
@@ -41,7 +41,7 @@ RSpec.describe GenerateConversationJob, :vcr do
 
           # Verify final conversation state
           expect(conversation.status).to eq('complete')
-          expect(conversation.current_round).to eq(6) # Past max_rounds
+          expect(conversation.current_round).to eq(5) # Equal to max_rounds
 
           # Verify message structure - all messages are assistant messages now
           messages = conversation.messages.order(:created_at)
@@ -56,7 +56,7 @@ RSpec.describe GenerateConversationJob, :vcr do
             expect(message.content.length).to be > 10 # Ensure responses have content
             expect(message.model_id).to be_present
             expect(message.model_id).to be_in(conversation.participants.pluck(:model_id))
-            expect(message.round_number).to be_between(1, 5)
+            expect(message.round.number).to be_between(1, 5)
           end
 
           # Verify conversation flows logically
@@ -88,20 +88,10 @@ RSpec.describe GenerateConversationJob, :vcr do
       end
 
       it 'handles job failure gracefully' do
-        user = create_user
-        conversation = Conversation.create!(
-          user: user,
-          conversation_topic: 'Test topic',
-          max_rounds: 3,
-          status: :generating,
-          participants_attributes: [
-            { model_id: 'invalid/model', turn_order: 1, name: 'Test Bot 1' },
-            { model_id: 'invalid/model2', turn_order: 2, name: 'Test Bot 2' }
-          ]
-        )
+        conversation = create(:conversation, :with_alice_and_bob, max_rounds: 3)
 
-        # Mock the Conversation model to raise an error during conversation generation
-        allow_any_instance_of(Conversation).to receive(:generate_full_conversation!).and_raise(StandardError.new('API Error'))
+        # Mock BackgroundRoundRunner to raise an error during round execution
+        allow_any_instance_of(BackgroundRoundRunner).to receive(:execute).and_raise(StandardError.new('API Error'))
 
         # Execute the job - we expect it to fail, but don't care about the exact error
         # The important part is the side effect: conversation should be marked as failed
@@ -117,12 +107,12 @@ RSpec.describe GenerateConversationJob, :vcr do
       end
 
       it 'respects max_rounds limit' do
-        user = create_user
+        user = create(:user)
         conversation = Conversation.create!(
           user: user,
           conversation_topic: 'Short test conversation',
           max_rounds: 2,
-          status: :generating,
+          status: :pending,
           participants_attributes: [
             { model_id: 'openai/gpt-4o-mini', turn_order: 1, name: 'Bot 1' },
             { model_id: 'anthropic/claude-3-haiku', turn_order: 2, name: 'Bot 2' }
@@ -136,18 +126,18 @@ RSpec.describe GenerateConversationJob, :vcr do
 
           conversation.reload
           expect(conversation.status).to eq('complete')
-          expect(conversation.current_round).to eq(3) # Past max_rounds
+          expect(conversation.current_round).to eq(2) # Equal to max_rounds
           expect(conversation.messages.count).to eq(4) # 2 participants × 2 rounds
         end
       end
 
       it 'creates conversation responses with participant characteristics' do
-        user = create_user
+        user = create(:user)
         conversation = Conversation.create!(
           user: user,
           conversation_topic: 'Personality test',
           max_rounds: 1,
-          status: :generating,
+          status: :pending,
           participants_attributes: [
             {
               model_id: 'openai/gpt-4o-mini',

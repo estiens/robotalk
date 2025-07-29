@@ -2,9 +2,8 @@
 
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  # Skip browser check in test environment to avoid 403 errors
-  # Temporarily commented out to debug 403 errors in tests
-  # allow_browser versions: :modern unless Rails.env.test?
+  # Disabled per user request: "lets take that out anyway, i dont like that check at all"
+  # allow_browser versions: :modern
 
   helper_method :current_user, :logged_in?
 

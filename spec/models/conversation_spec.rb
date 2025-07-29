@@ -5,40 +5,38 @@ require 'rails_helper'
 RSpec.describe Conversation do
   let(:user) { create(:user) }
   let(:conversation) do
-    Conversation.create!(
-      user: user,
-      conversation_topic: 'AI Ethics',
-      max_rounds: 3,
-      participants_attributes: [
-        { name: 'Alice', model_id: 'openai/gpt-4', turn_order: 1 },
-        { name: 'Bob', model_id: 'anthropic/claude-3', turn_order: 2 }
-      ]
-    )
+    create(:conversation, :with_alice_and_bob,
+           user: user,
+           conversation_topic: 'AI Ethics',
+           max_rounds: 3)
+  end
+  
+  before do
+    # Mock the callback method that doesn't exist yet
+    allow_any_instance_of(Conversation).to receive(:process_new_message).and_return(nil)
   end
 
   describe 'validations' do
     it 'requires conversation_topic' do
-      conversation.conversation_topic = nil
+      conversation = build(:conversation, conversation_topic: nil)
       expect(conversation).not_to be_valid
       expect(conversation.errors[:conversation_topic]).to include("can't be blank")
     end
 
     it 'requires max_rounds to be positive and <= 50' do
-      conversation.max_rounds = 0
+      conversation = build(:conversation, max_rounds: 0)
       expect(conversation).not_to be_valid
 
-      conversation.max_rounds = 51
+      conversation = build(:conversation, max_rounds: 51)
       expect(conversation).not_to be_valid
 
-      conversation.max_rounds = 25
+      conversation = build(:conversation, max_rounds: 25)
       expect(conversation).to be_valid
     end
 
     it 'requires at least 2 participants when starting' do
-      conversation.participants.destroy_all
-      conversation.participants.build(name: 'Solo', model_id: 'openai/gpt-4', turn_order: 1)
-
-      expect(conversation.can_start?).to be false
+      solo_conversation = create(:conversation, :with_single_participant, user: user)
+      expect(solo_conversation.can_start?).to be false
     end
   end
 
@@ -51,12 +49,10 @@ RSpec.describe Conversation do
 
     it 'has many messages' do
       round = create(:round, conversation: conversation)
-      message = Message.create!(
-        round: round,
-        conversation_participant: conversation.participants.first,
-        role: Message::ROLE_ASSISTANT,
-        content: 'Test message'
-      )
+      message = create(:message, :with_participant,
+                      round: round,
+                      conversation_participant: conversation.participants.first,
+                      content: 'Test message')
 
       expect(conversation.messages).to include(message)
     end
@@ -64,19 +60,17 @@ RSpec.describe Conversation do
 
   describe 'defaults' do
     it 'sets default values on creation' do
-      new_conversation = Conversation.new(user: user, conversation_topic: 'Test')
-      new_conversation.save!
+      new_conversation = create(:conversation, user: user, conversation_topic: 'Test')
 
       expect(new_conversation.status).to eq('pending')
-      expect(new_conversation.current_round).to eq(1)
+      expect(new_conversation.current_round).to eq(0)
       expect(new_conversation.max_rounds).to eq(10)
       expect(new_conversation.dialogue_instructions).to be_present
     end
   end
 
   describe '#can_continue?' do
-    it 'returns true when in_progress and within max rounds' do
-      conversation.update!(status: :in_progress)
+    it 'returns true when pending and within max rounds' do
       expect(conversation.can_continue?).to be true
     end
 
