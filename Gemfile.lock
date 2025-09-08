@@ -254,7 +254,7 @@ GEM
       date
       stringio
     public_suffix (6.0.2)
-    puma (6.6.0)
+    puma (7.0.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
@@ -481,7 +481,7 @@ DEPENDENCIES
   open_router
   propshaft
   pry-rails
-  puma (~> 6.0)
+  puma (~> 7.0)
   rails (~> 8.0.2)
   rspec-rails (~> 7.1.0)
   rubocop
