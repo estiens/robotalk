@@ -81,7 +81,7 @@ group :test do
   gem 'capybara', '>= 3.39', require: false
   gem 'cuprite', require: false # Chrome DevTools Protocol driver for faster JS testing
   gem 'selenium-webdriver', require: false
-  gem 'shoulda-matchers', '~> 5.3'
+  gem 'shoulda-matchers', '~> 6.5'
   gem 'vcr', '~> 6.3', require: false
   gem 'webmock', '~> 3.25', require: false
   gem 'timecop'
